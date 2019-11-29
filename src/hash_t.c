@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:07:14 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/29 17:03:44 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/29 17:08:56 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,11 @@ t_node		**h_table(t_parse *lines, int nodes_c)
 	lines = lines->next;
 	while (lines && lines->type == 1)
 	{
-		// prop = 0;
 		if (lines->line[0] != '#' && !add_node(nodes, lines, nodes_c, prop))
 		{
 			ft_printf("duplicate name error\n");
 			exit(1);
 		}
-		ft_printf("line : %s | prop %d\n", lines->line, lines->prop);
 		if (lines->next)
 			prop = lines->prop > 1 ? lines->prop : 0;
 		lines = lines->next;

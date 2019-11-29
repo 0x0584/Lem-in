@@ -6,20 +6,20 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/29 15:56:23 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/29 18:24:15 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-int check_node(char *line)
+int check_node(char *line) // func that check if the node is a valid node
 {
 	char **sline;
 	int i;
 
-	if (line && line[0] == '#' && line[1] != '#')
+	if (line && line[0] == '#' && line[1] != '#') // jumping the comments
 		return (-1);
-	else if (line && line[0] == '#' && line[1] == '#')
+	else if (line && line[0] == '#' && line[1] == '#') // 
 	{
 		if (ft_strequ(line + 2, "start"))
 			return (NODE_START);
@@ -124,7 +124,10 @@ t_parse	*get_lines(int *nodes_c)
 		if (!current->next && prop != 0)
 			break ;
 		if (!current->next && prop == 0)
+		{
+			current = current->next;
 			continue;
+		}
 		// ft_printf("line |%s| --- type : %d --- prop : %d\n", current->next->line, type, prop);
 		current = current->next;
 	}

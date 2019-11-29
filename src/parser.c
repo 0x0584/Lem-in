@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/29 17:01:42 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/29 18:30:58 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 	char	**s_lines;
 	t_node	*node[2];
 
-	while (lines->type < 2)
+	while (lines && lines->type < 2)
 		lines = lines->next;
 	while (lines)
 	{
