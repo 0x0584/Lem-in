@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/27 17:39:23 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/29 15:56:23 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,12 @@ int check_node(char *line)
 	if (line && line[0] == '#' && line[1] != '#')
 		return (-1);
 	else if (line && line[0] == '#' && line[1] == '#')
-		return (2);
+	{
+		if (ft_strequ(line + 2, "start"))
+			return (NODE_START);
+		if (ft_strequ(line + 2, "end"))
+			return (NODE_END);
+	}
 	sline = ft_strsplit(line, ' ');
 	i = -1;
 	while (sline[++i])
@@ -58,13 +63,14 @@ int check_edge(char *line)
 	return (1);
 }
 
-static t_parse	*add_pline(char *line, int type)
+static t_parse	*add_pline(char *line, int type, int prop)
 {
 	t_parse	*p_lines;
 
 	if (!(p_lines = (t_parse*)malloc(sizeof(t_parse))))
 		return (NULL);
 	p_lines->line = ft_strdup(line);
+	p_lines->prop = prop;
 	p_lines->type = type;
 	p_lines->next = NULL;
 	return (p_lines);
@@ -79,17 +85,17 @@ int		parse_line(t_parse **p_lines, int *type, int *prop)
 		*prop = -1;
 	else if (!(*type) && ft_isnumber(line))
 	{
-		*p_lines = add_pline(line, *type);
+		*p_lines = add_pline(line, *type, *prop);
 		(*type)++;
 	}
 	else if ((*type) == 1 && ((*prop) = check_node(line)))
 	{
-		*p_lines = add_pline(line, *type);
+		*p_lines = add_pline(line, *type, *prop);
 	}
 	else if (check_edge(line))
 	{
 		(*type) = ((*type) == 1) ? (*type) + 1 : (*type);
-		*p_lines = add_pline(line, *type);
+		*p_lines = add_pline(line, *type, *prop);
 	}
 	else // need to free the list
 	{
