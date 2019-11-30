@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/05 22:56:53 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/18 03:51:14 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/30 09:15:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <string.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdbool.h>
 # include "ft_printf.h"
 # include <stdio.h>
 

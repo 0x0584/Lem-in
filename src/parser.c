@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/29 18:30:58 by melalj           ###   ########.fr       */
+/*   Updated: 2019/11/30 20:36:57 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ t_node	*new_node(t_parse *line, int prop)
 	new_n->edges = NULL;
 	new_n->next = NULL;
 	new_n->type = NODE_DEFAULT;
+	new_n->seen = false;
 	ft_printf("prop : %d\n", prop);
 	if (prop > 1)
 		new_n->type = (prop == 2 ? NODE_START : NODE_END);
@@ -150,4 +151,3 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 // 		return (0);
 // 	return (1);
 // }
- 
