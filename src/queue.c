@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/11/30 08:57:26 by archid-          ###   ########.fr       */
+/*   Updated: 2019/11/30 23:10:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ void		queue_enq(t_queue *queue, t_qnode *node)
 {
 	if (!queue || !node)
 		return ;
+
+
 	queue->tail->prev->next = node;
 	node->prev = queue->tail->prev;
 	node->next = queue->tail;
@@ -101,7 +103,7 @@ t_qnode 	*queue_deq(t_queue *queue)
 	if (!queue || queue->head->next == queue->tail)
 		return (NULL);
 	node = queue->head->next;
-	queue->head->next->prev = queue->head;
+	node->next->prev = queue->head;
 	queue->head->next = node->next;
 	return (node);
 }
@@ -120,7 +122,7 @@ void		queue_iter(t_queue *q, void (*f)(t_qnode *))
 	}
 }
 
-/*
+
 void		print_int_node(t_qnode *node)
 {
 	if (!node)
@@ -134,7 +136,7 @@ void		queue_del_helper(void *blob, size_t size)
 	if (size)
 		free(blob);
 }
-
+/*
 int			main(int ac, char **av)
 {
 	int		i;
@@ -160,6 +162,18 @@ int			main(int ac, char **av)
 		node = queue_deq(q);
 		queue_node_del(&node, queue_del_helper);
 		ft_putchar('\n');
+	}
+	ft_printf("head: %p head next: %p | tail:%p tail prev: %p\n",
+			  q->head, q->head->next, q->tail, q->tail->prev);
+	ft_printf(" /// ");
+	system("sleep 100");
+	i = 1;
+	while (i < ac)
+	{
+		val = ft_atoi(av[i++]);
+		queue_enq(q, queue_node(&val, sizeof(int)));
+		queue_iter(q, print_int_node);
+		ft_printf("\nsize >> %zu\n", queue_size(q));
 	}
 	queue_del(&q, queue_del_helper);
 	return 0;

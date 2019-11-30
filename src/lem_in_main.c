@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/30 22:02:55 by archid-          ###   ########.fr       */
+/*   Updated: 2019/11/30 22:45:42 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,10 @@ t_graph *graph_init(t_node **nodes, int nodes_c)
 
 			/*  */
 			if (g->adjlst == NULL)
+			{
 				g->adjlst = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
+				walk = g->adjlst;
+			}
 			else
 			{
 				ft_putstr(" // ");
@@ -121,7 +124,6 @@ int		main(void)
 	int			i;
 
 	/* (void)getchar(); */
-	system("pause");
 
 	ft_printf(" // ");
 
@@ -136,7 +138,11 @@ int		main(void)
 	edges_fill(nodes, pp, nodes_c);
 
 	g = graph_init(nodes, nodes_c);
-	graph_dump(g);
+
+	ft_printf(" ==== heree ====\n ");
+	bfs(g, g->start, g->end);
+
+	/* graph_dump(g); */
 	/* graph_free(g); */
 
 	return (0);

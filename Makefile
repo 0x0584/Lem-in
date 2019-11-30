@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/11/24 13:55:12 by melalj           ###   ########.fr        #
+#    Updated: 2019/11/30 22:37:19 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,9 +15,12 @@ SRC_NAME = lem_in_main.c\
 			parser.c\
 			read_line.c\
 			hash_t.c\
-			get_lines.c
+			get_lines.c\
+			queue.c\
+			bfs.c
 
 OBJ_PATH = obj
+
 OBJ_NAME = $(SRC_NAME:.c=.o)
 OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
 LDFLIBS = -L libft -lft

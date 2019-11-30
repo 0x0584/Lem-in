@@ -6,14 +6,14 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/11/30 10:17:54 by archid-          ###   ########.fr       */
+/*   Updated: 2019/11/30 22:36:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef QUEUE_H
 # define QUEUE_H
 
-# include "libft.h"
+# include "../libft/libft.h"
 
 typedef struct s_queue_node	t_qnode;
 struct							s_queue_node

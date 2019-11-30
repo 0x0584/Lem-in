@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/30 21:34:02 by archid-          ###   ########.fr       */
+/*   Updated: 2019/11/30 22:33:41 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LEMIN_H
 
 # include "libft/libft.h"
+#include <stdbool.h>
 
 /*
 ** types
@@ -66,6 +67,7 @@ struct s_graph
 };
 
 t_graph						*graph_init(t_node **nodes, int nodes_c);
+bool						bfs(t_graph *graph, t_node *start, t_node *sink);
 
 void						read_line(int fd, char **line);
 t_parse						*get_lines(int *nodes_c);
