@@ -6,14 +6,14 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 19:03:24 by archid-           #+#    #+#             */
-/*   Updated: 2019/11/30 20:22:18 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/03 23:53:00 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-t_graph						*graph_init(void)
-{
-	t_graph *g;
+/* t_graph						*graph_init(void) */
+/* { */
+/* 	t_graph *g; */
 
-}
+/* } */

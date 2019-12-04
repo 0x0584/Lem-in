@@ -6,13 +6,13 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/30 20:36:57 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/04 04:03:50 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-t_node	*new_node(t_parse *line, int prop)
+t_node	*new_node(int index, t_parse *line, int prop)
 {
 	t_node	*new_n;
 	char	**s_line;
@@ -25,24 +25,28 @@ t_node	*new_node(t_parse *line, int prop)
 	new_n->next = NULL;
 	new_n->type = NODE_DEFAULT;
 	new_n->seen = false;
+	new_n->index = index;
 	ft_printf("prop : %d\n", prop);
 	if (prop > 1)
 		new_n->type = (prop == 2 ? NODE_START : NODE_END);
 	return (new_n);
 }
 
-int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop)
+int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop, t_node **refs)
 {
-	char	**s_lines;
-	t_node	*curr;
-	int		hash_h;
+	static size_t	index = 0;
+	char			**s_lines;
+	t_node			*curr;
+	int				hash_h;
 
 	s_lines = ft_strsplit(lines->line, ' ');
-	// ft_printf("added node %s in the hash %d\n", s_lines[0], hash((unsigned char*)s_lines[0]) % nodes_c);
 	hash_h = hash((unsigned char*)s_lines[0]) % nodes_c;
+	refs[index] = new_node(index, lines, prop);
+	// ft_printf("added node %s in the hash %d\n", s_lines[0],
+	//						hash((unsigned char*)s_lines[0]) % nodes_c);
 	if (!lst_node[hash_h])
 	{
-		lst_node[hash_h] = new_node(lines, prop);
+		lst_node[hash_h] = refs[index++];
 		free_tab(s_lines);
 		return (1);
 	}
@@ -56,11 +60,12 @@ int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop)
 			return (0);
 		(curr) = (curr)->next;
 	}
-	(curr)->next = new_node(lines, prop);
+	(curr)->next = refs[index++];
 	free_tab(s_lines);
 	return (1);
 }
 
+// get node based on a hash
 t_node	*get_node(t_node **lst_node, char *name, int nodes_c)
 {
 	int		hash_h;
@@ -119,9 +124,11 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 		node[0] = get_node(lst_node, s_lines[0], nodes_c);
 		node[1] = get_node(lst_node, s_lines[1], nodes_c);
 		add_edge(node[0], node[1]);
-		ft_printf("node %s, %d --- edge %s\n", node[0]->name, node[0]->type	,node[0]->edges->node_dst->name);
+		ft_printf("node %s, %d --- edge %s\n", node[0]->name,
+				  node[0]->type	,node[0]->edges->node_dst->name);
 		add_edge(node[1], node[0]);
-		// ft_printf("node %s --- from %s to %s\n", node[1]->name, node[1]->edges->node_src->name, node[1]->edges->node_dst->name);
+		// ft_printf("node %s --- from %s to %s\n", node[1]->name,
+		// node[1]->edges->node_src->name, node[1]->edges->node_dst->name);
 		// ft_printf("node %s --- edge %s\n", node[1]->name, node[1]->edges->node_dst->name);
 		lines = lines->next;
 		free_tab(s_lines);
@@ -130,6 +137,7 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 }
 
 
+// !?
 // int	nodes_exract(void)
 // {
 // 	char	*line;

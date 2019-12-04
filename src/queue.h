@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/11/30 22:36:37 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/04 03:22:31 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ struct							s_queue
 	void				(*del)(void *, size_t);
 };
 
+void							queue_del_helper(void *blob, size_t size);
 t_qnode							*queue_node(void *blob, size_t size);
 void							queue_node_del(t_qnode **a_node,
 												void (*del)(void *, size_t));

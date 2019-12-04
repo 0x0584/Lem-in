@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/11/30 22:37:19 by archid-          ###   ########.fr        #
+#    Updated: 2019/12/04 04:00:21 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ LDFLIBS = -L libft -lft
 
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Wextra -g
 NAME = lem-in
 .PHONY: all, clean, fclean, re
 all: $(NAME)
