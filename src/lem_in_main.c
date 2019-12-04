@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/04 05:47:17 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/04 06:41:29 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,16 @@
 void node_info(t_node *node)
 {
 	char *type;
+	char *seen;
 
-	/* ft_putendl("========================================"); */
+	ft_putendl("========================================");
 	ft_printf("index: %d -- name: '%s'\n", node->index, node->name);
 	if (node->type == NODE_DEFAULT)
 		type = "NODE";
 	else
 		type = (node->type == NODE_START ? "source" : "sink");
-	ft_printf("type: %s -- seen: '%s'\n", type, node->seen ? "visited" : "not visited");
-	/* ft_putendl("========================================"); */
+	ft_printf("type: %s -- seen: '%s'\n", type, node->seen == NODE_TAKEN ? "taken" : "fresh-or-seen");
+	ft_putendl("========================================");
 }
 
 void node_dump(t_qnode *e)
@@ -32,6 +33,7 @@ void node_dump(t_qnode *e)
 	t_edges *e_walk;
 
 	node_info(node = e->blob);
+	/*
 	ft_putendl("\n=========== edges ==========");
 	e_walk = node->edges;
 	while (e_walk)
@@ -42,7 +44,8 @@ void node_dump(t_qnode *e)
 		e_walk = e_walk->next;
 	}
 	ft_putendl("===========       ==========\n");
-	sleep(2);
+	*/
+	/* sleep(1); */
 }
 
 void lstdel_node(void *c, size_t size)
@@ -171,15 +174,36 @@ int		main(void)
 	nodes = h_table(refs, pp, nodes_c);
 	edges_fill(nodes, pp, nodes_c);
 
-	ft_printf(" ==== heree ====\n ");
 
 	g = graph_init(refs, nodes, nodes_c);
-	t_queue *sp;
 
-	sp = bfs(g);
-	queue_iter(sp, node_dump);
-	queue_del(&sp, queue_del_helper);
-	graph_dump(g);
+	t_queue *paths;
+	t_queue *tmp_path;
+	t_qnode *tmp;
+
+	paths = list_shortest_paths(g);
+	while (queue_size(paths))
+	{
+		ft_putendl("-----------");
+		tmp = queue_deq(paths);
+		tmp_path = tmp->blob;
+		queue_iter(tmp_path, node_dump);
+		queue_del(&tmp_path, queue_del_helper);
+		ft_putendl("-----------");
+		sleep(3);
+	}
+	queue_del(&paths, queue_del_helper);
+
+	/* sp1 = bfs(g); */
+	/* sp2 = bfs(g); */
+	/* ft_printf(" ==== heree ====\n "); */
+	/* queue_iter(sp1, node_dump); */
+	/* queue_del(&sp1, queue_del_helper); */
+	/* queue_iter(sp2, node_dump); */
+
+	/* queue_del(&sp2, queue_del_helper); */
+
+	/* graph_dump(g); */
 	graph_free(g);
 
 	return (0);

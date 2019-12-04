@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/04 05:58:03 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/04 06:41:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,16 @@ static t_queue	*gen_bfs_path(t_graph *graph, int *refs)
 	prev = graph->sink->index;	/* starting at the sink */
 	depth = 0;
 	i = 0;
-	ft_printf("sink:");
 	if (refs[prev] == -1)
 		return (NULL);
+	ft_printf("sink:");
 	q = queue_init();
 	while (true)
 	{
 		/* sleep(1); */
 		/* case of a dest_node in one edge of the sink's edges */
+		if (graph->refs[prev]->type == NODE_DEFAULT)
+			graph->refs[prev]->seen = NODE_TAKEN;
 		queue_enq(q, queue_node(graph->refs[prev], sizeof(t_node)));
 		ft_printf(" -> '%s'", graph->refs[prev]->name);
 		if (refs[prev] == -1)
@@ -43,7 +45,7 @@ static t_queue	*gen_bfs_path(t_graph *graph, int *refs)
 		depth++;
 		prev = refs[prev];
 		/* queue_iter(q, node_dump); */
-		sleep(2);
+		/* sleep(2); */
 	}
 	ft_printf(" -> :start\n");
 	return (q);
@@ -59,6 +61,18 @@ void		print_node(t_qnode *node)
 	ft_printf("%s %d\n", e->name, e->type);
 }
 
+void	reset_graph_discovery(t_graph *g)
+{
+	size_t i;
+
+	i = 0;
+	while (i < g->n_nodes)
+	{
+		if (g->refs[i]->seen != NODE_TAKEN)
+			g->refs[i]->seen = NODE_FRESH;
+		i++;
+	}
+}
 /*
 void		queue_del_helper(void *blob, size_t size)
 {
@@ -85,7 +99,7 @@ t_queue		*bfs(t_graph *graph)
 	q = queue_init();
 	ft_printf(" // BFS START // \n");
 	/* parents = queue_init(); */
-	graph->start->seen= true;
+	graph->start->seen = NODE_SEEN;
 	queue_enq(q, queue_node(graph->start, sizeof(t_node)));
 	/* system("sleep 1"); */
 	while (queue_size(q))
@@ -99,9 +113,9 @@ t_queue		*bfs(t_graph *graph)
 		{
 			ft_printf("%s -> [%s]\n", edge_walk->node_src->name,
 						edge_walk->node_dst->name);
-			if (!edge_walk->node_dst->seen)
+			if (edge_walk->node_dst->seen == NODE_FRESH)
 			{
-				edge_walk->node_dst->seen = true;
+				edge_walk->node_dst->seen = NODE_SEEN;
 				queue_enq(q, queue_node(edge_walk->node_dst, sizeof(t_node)));
 
 				ft_printf("[%zu]", queue_size(q));
@@ -116,7 +130,9 @@ t_queue		*bfs(t_graph *graph)
 // it might need a queue_del if we actually duplicate memory.
 		ft_printf("\n");
 	}
+	size_t i = 0;
 	path = gen_bfs_path(graph, refs);
+	reset_graph_discovery(graph);
 	/* queue_del(&q, queue_del_helper); */
 	free(refs);
 	return (path);
@@ -126,8 +142,20 @@ t_queue		*bfs(t_graph *graph)
 t_queue		*list_shortest_paths(t_graph *graph)
 {
 	t_queue *paths;
+	t_queue *tmp;
 
 	paths = queue_init();
 
+	while ((tmp = bfs(graph)))
+	{
+		/* queue_iter(tmp, node_dump); */
+		/* sleep(1); */
+		queue_enq(paths, queue_node(tmp, sizeof(t_queue)));
+		/* queue_del(&tmp, queue_del_helper); */ /* queue_node() allocates a copy, but we're
+											* not duplicating the actual queue, we're
+											* just duplicating tmp. so nothing to free, again!
+											* since it's all would be free'd at the very end
+											* with graph_free() */
+	}
 	return (paths);
 }
