@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/30 22:33:41 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/04 05:41:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define LEMIN_H
 
 # include "libft/libft.h"
+# include "src/queue.h"
+
 #include <stdbool.h>
 
 /*
@@ -32,21 +34,21 @@ enum e_node_type
 	NODE_START, NODE_END
 };
 
-
 struct s_node
 {
+	struct s_edges	*edges;
+	struct s_node	*next;
+
+	size_t			index;
 	char			*name;
 	t_node_type 	type;
 	bool			seen;
-	struct s_edges	*edges;
-	struct s_node	*next;
 };
 
 struct s_edges
 {
 	struct s_node	*node_dst;
 	struct s_node	*node_src;
-	int i;
 	struct s_edges	*next;
 };
 
@@ -61,19 +63,28 @@ struct s_parse
 struct s_graph
 {
 	struct s_node	*start;
-	struct s_node	*end;
+	struct s_node	*sink;
 	t_node			*adjlst;
+	t_node			**refs;		/* array where each node is indexed based on interance.
+								 * however if the # of nodes of big, this would consume
+								 * large space. used to find parent of each node while
+								 * traversing the graph using BFS() */
 	size_t			n_nodes;
 };
 
-t_graph						*graph_init(t_node **nodes, int nodes_c);
-bool						bfs(t_graph *graph, t_node *start, t_node *sink);
+t_graph						*graph_init(t_node **refs, t_node **nodes, int nodes_c);
+t_queue						*bfs(t_graph *graph);
+void						node_info(t_node *node);
+void						node_dump(t_qnode *e);
 
 void						read_line(int fd, char **line);
 t_parse						*get_lines(int *nodes_c);
 unsigned long				hash(unsigned char *str);
-int							add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop);
-t_node						**h_table(t_parse *lines, int nodes_c);
+
+/* FIXME: review add_node */
+int							add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop,
+										t_node **refs);
+t_node						**h_table(t_node **refs, t_parse *lines, int nodes_c);
 int							edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
 
 #endif
