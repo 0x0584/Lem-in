@@ -18,3 +18,13 @@ So two paths are expected:
 
   * `1-2-4-0`
   * `1-3-5-6-0`
+
+## Notes on finding the maximum flow in a flow graph
+
+> There are so many algorithms to find the *best possible way in order to achieve maximum flow through a flow graph*
+>
+> * [Ford-Fulkerson](https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm) Keep looking for augmenting paths until no more augmenting paths could be found. Where how to actually find them is unspecified detail.
+> *  [Edmonds-Karp](https://en.wikipedia.org/wiki/Edmonds–Karp_algorithm)
+> *  [Dinic's Algorithm](https://en.wikipedia.org/wiki/Dinic's_algorithm)
+
+In order to solve this, we shall add a residual edges to `struct s_edges`, so that
