@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/04 06:41:29 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/06 02:02:56 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void node_info(t_node *node)
 void node_dump(t_qnode *e)
 {
 	t_node *node;
-	t_edges *e_walk;
+	t_edge *e_walk;
 
 	node_info(node = e->blob);
 	/*
@@ -50,12 +50,11 @@ void node_dump(t_qnode *e)
 
 void lstdel_node(void *c, size_t size)
 {
-	t_edges *edges;
-	t_edges *tmp;
+	t_edge *edges;
+	t_edge *tmp;
 
 	if (!size || !c)
 		return ;
-
 	edges = ((t_node *)c)->edges;
 	while (edges)
 	{
@@ -64,6 +63,19 @@ void lstdel_node(void *c, size_t size)
 		free(tmp);
 	}
 	free(((t_node *)c)->name);
+}
+
+void	helper_lst_alloc(t_node **head, t_node *walk, t_node *node)
+{
+	if (!head || !node)
+		return ;
+
+	if (!*head)
+		*head = CLONE(node, sizeof(t_node));
+	else
+	{
+		walk->next = CLONE(node, sizeof(node));
+	}
 }
 
 t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
@@ -76,21 +88,11 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 
 	i = 0;
 	g = (t_graph *)ft_memalloc(sizeof(t_graph));
-	g->refs = refs;
+	g->nodes_ref = refs;
 	g->n_nodes = nodes_c;
-	ft_printf(" // ");
-	i = 0;
 	while ((int)i < nodes_c)
 	{
-
-		/* have adj list */
-		ft_printf("i : %d \n", i);
 		curr = nodes[i];
-
-		node_info(curr);
-
-		/* i = 3 */
-		/* pass over list of hash[i] */
 		while (curr)
 		{
 
@@ -98,23 +100,16 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 				g->start = curr;
 			else if (curr->type == NODE_END)
 				g->sink = curr;
-
-			/*  */
-			if (g->adjlst == NULL)
+			if (g->nodes_lst == NULL)
 			{
-				g->adjlst = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
-				walk = g->adjlst;
+				g->nodes_lst = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
+				walk = g->nodes_lst;
 			}
 			else
 			{
-				ft_putstr(" // ");
-				ft_printf("b: %p %p | ", walk, walk->next);
 				walk->next = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
 				walk = walk->next;
-				ft_printf("a: %p %p \n", walk, walk->next);
 			}
-			/*  */
-			ft_printf("%s\n", curr->name);
 			curr = curr->next;
 		}
 		i++;
@@ -125,9 +120,9 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 void	graph_dump(t_graph *g)
 {
 	t_node *walk;
-	t_edges *e;
+	t_edge *e;
 
-	walk = g->adjlst;
+	walk = g->nodes_lst;
 	while (walk)
 	{
 		ft_printf("<> name: %s type: %d <>\n", walk->name, walk->type);
@@ -144,18 +139,17 @@ void	graph_dump(t_graph *g)
 	}
 
 }
+
 void	graph_free(t_graph *g)
 {
-	/* ft_lstdel(&g->adjlst, lstdel_node); */
+	/* ft_lstdel(&g->nodes_lst, lstdel_node); */
 	free(g);
 }
 
 int		main(void)
 {
 	t_parse		*pp;
-
 	t_node		**nodes;
-
 	int			nodes_c;
 	int			i;
 	t_graph		*g;
@@ -164,16 +158,13 @@ int		main(void)
 	/* (void)getchar(); */
 
 	ft_printf(" // ");
-
 	i = 0;
-
 	pp = get_lines(&nodes_c);
 
 	/* `node' array of nodes */
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
 	edges_fill(nodes, pp, nodes_c);
-
 
 	g = graph_init(refs, nodes, nodes_c);
 
@@ -190,7 +181,7 @@ int		main(void)
 		queue_iter(tmp_path, node_dump);
 		queue_del(&tmp_path, queue_del_helper);
 		ft_putendl("-----------");
-		sleep(3);
+		/* sleep(3); */
 	}
 	queue_del(&paths, queue_del_helper);
 

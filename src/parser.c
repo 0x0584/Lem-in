@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/04 04:03:50 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/08 21:45:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,13 +82,15 @@ t_node	*get_node(t_node **lst_node, char *name, int nodes_c)
 	return (NULL);
 }
 
-int	add_edge(t_node *src, t_node *dst)
+int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 {
-	t_edges *curr;
+	t_edge *curr;
 
+	is_residual ^= true;
 	if (src->edges == NULL)
 	{
-		src->edges = (t_edges *)malloc(sizeof(t_edges));
+		src->edges = (t_edge *)malloc(sizeof(t_edge));
+		curr = src->edges;
 		src->edges->node_src = src;
 		src->edges->node_dst = dst;
 		src->edges->next = NULL;
@@ -98,11 +100,19 @@ int	add_edge(t_node *src, t_node *dst)
 		curr = src->edges;
 		while (curr->next)
 			curr = curr->next;
-		curr->next = (t_edges *)malloc(sizeof(t_edges));
-		curr->next->node_src = src;
-		curr->next->node_dst = dst;
-		curr->next->next = NULL;
+		curr->next = (t_edge *)malloc(sizeof(t_edge));
+		curr = curr->next;
+		curr->node_src = src;
+		curr->node_dst = dst;
+		curr->next = NULL;
 	}
+	if (is_residual == false)
+	{
+		curr->residual = e;
+		e->residual = curr;
+		return 0;
+	}
+	add_edge(dst, src, true, curr);
 	return (1);
 }
 
@@ -123,10 +133,10 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 		s_lines = ft_strsplit(lines->line, '-');
 		node[0] = get_node(lst_node, s_lines[0], nodes_c);
 		node[1] = get_node(lst_node, s_lines[1], nodes_c);
-		add_edge(node[0], node[1]);
-		ft_printf("node %s, %d --- edge %s\n", node[0]->name,
-				  node[0]->type	,node[0]->edges->node_dst->name);
-		add_edge(node[1], node[0]);
+		add_edge(node[0], node[1], false, NULL);
+		/* ft_printf("node %s, %d --- edge %s\n", node[0]->name, */
+		/* 		  node[0]->type	,node[0]->edges->node_dst->name); */
+		/* add_edge(node[1], node[0]); */
 		// ft_printf("node %s --- from %s to %s\n", node[1]->name,
 		// node[1]->edges->node_src->name, node[1]->edges->node_dst->name);
 		// ft_printf("node %s --- edge %s\n", node[1]->name, node[1]->edges->node_dst->name);
