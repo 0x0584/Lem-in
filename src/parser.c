@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/08 21:45:18 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/11 09:50:58 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_node	*new_node(int index, t_parse *line, int prop)
 	new_n->type = NODE_DEFAULT;
 	new_n->seen = false;
 	new_n->index = index;
-	ft_printf("prop : %d\n", prop);
+	// ft_printf("prop : %d\n", prop);
 	if (prop > 1)
 		new_n->type = (prop == 2 ? NODE_START : NODE_END);
 	return (new_n);
@@ -85,12 +85,13 @@ t_node	*get_node(t_node **lst_node, char *name, int nodes_c)
 int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 {
 	t_edge *curr;
+	t_edge *tmp;
 
 	is_residual ^= true;
 	if (src->edges == NULL)
 	{
 		src->edges = (t_edge *)malloc(sizeof(t_edge));
-		curr = src->edges;
+		tmp = src->edges;
 		src->edges->node_src = src;
 		src->edges->node_dst = dst;
 		src->edges->next = NULL;
@@ -101,18 +102,18 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 		while (curr->next)
 			curr = curr->next;
 		curr->next = (t_edge *)malloc(sizeof(t_edge));
-		curr = curr->next;
-		curr->node_src = src;
-		curr->node_dst = dst;
-		curr->next = NULL;
+		curr->next->node_src = src;
+		curr->next->node_dst = dst;
+		curr->next->next = NULL;
+		tmp = curr->next;
 	}
 	if (is_residual == false)
 	{
-		curr->residual = e;
-		e->residual = curr;
-		return 0;
+		tmp->residual = e;
+		e->residual = tmp;
+		return (0);
 	}
-	add_edge(dst, src, true, curr);
+	add_edge(dst, src, true, tmp);
 	return (1);
 }
 

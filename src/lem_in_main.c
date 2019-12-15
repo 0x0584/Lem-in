@@ -6,16 +6,17 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/06 02:02:56 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/11 11:23:03 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
+# include "visu.h"
 
 void node_info(t_node *node)
 {
 	char *type;
-	char *seen;
+	// char *seen;
 
 	ft_putendl("========================================");
 	ft_printf("index: %d -- name: '%s'\n", node->index, node->name);
@@ -30,7 +31,7 @@ void node_info(t_node *node)
 void node_dump(t_qnode *e)
 {
 	t_node *node;
-	t_edge *e_walk;
+	// t_edge *e_walk;
 
 	node_info(node = e->blob);
 	/*
@@ -114,7 +115,7 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 		}
 		i++;
 	}
-	return g;
+	return (g);
 }
 
 void	graph_dump(t_graph *g)
@@ -130,11 +131,12 @@ void	graph_dump(t_graph *g)
 		ft_printf(" == edges ==\n");
 		while (e)
 		{
-			ft_printf("<> src %s %d <>\n", e->node_src->name, e->node_src->type);
-			ft_printf("<> dst %s %d <>\n", e->node_dst->name, e->node_dst->type);
+			ft_printf("  <> %s-%s <>\n", e->node_src->name, e->node_dst->name);
+			// ft_printf("<> src %s %d <>\n", e->node_src->name, e->node_src->type);
+			// ft_printf("<> dst %s %d <>\n", e->node_dst->name, e->node_dst->type);
 			e = e->next;
 		}
-		ft_printf("\n == ==  ==\n\n");
+		ft_printf(" == ===== ==\n\n");
 		walk = walk->next;
 	}
 
@@ -157,7 +159,6 @@ int		main(void)
 
 	/* (void)getchar(); */
 
-	ft_printf(" // ");
 	i = 0;
 	pp = get_lines(&nodes_c);
 
@@ -165,25 +166,26 @@ int		main(void)
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
 	edges_fill(nodes, pp, nodes_c);
-
 	g = graph_init(refs, nodes, nodes_c);
+	ft_printf("graph init done\n");
+	graph_dump(g);
+	visu_init(g);
+	// t_queue *paths;
+	// t_queue *tmp_path;
+	// t_qnode *tmp;
 
-	t_queue *paths;
-	t_queue *tmp_path;
-	t_qnode *tmp;
-
-	paths = list_shortest_paths(g);
-	while (queue_size(paths))
-	{
-		ft_putendl("-----------");
-		tmp = queue_deq(paths);
-		tmp_path = tmp->blob;
-		queue_iter(tmp_path, node_dump);
-		queue_del(&tmp_path, queue_del_helper);
-		ft_putendl("-----------");
-		/* sleep(3); */
-	}
-	queue_del(&paths, queue_del_helper);
+	// paths = list_shortest_paths(g);
+	// while (queue_size(paths))
+	// {
+	// 	ft_putendl("-----------");
+	// 	tmp = queue_deq(paths);
+	// 	tmp_path = tmp->blob;
+	// 	queue_iter(tmp_path, node_dump);
+	// 	queue_del(&tmp_path, queue_del_helper);
+	// 	ft_putendl("-----------");
+	// 	/* sleep(3); */
+	// }
+	// queue_del(&paths, queue_del_helper);
 
 	/* sp1 = bfs(g); */
 	/* sp2 = bfs(g); */
