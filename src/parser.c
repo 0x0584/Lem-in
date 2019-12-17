@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/08 21:45:18 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/17 03:15:48 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,9 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 	{
 		curr->residual = e;
 		e->residual = curr;
+		ft_printf("edge: <%s, %s> | residual <%s, %s>\n",
+				  e->node_src->name, e->node_dst->name,
+				  e->residual->node_src->name, e->residual->node_dst->name);
 		return 0;
 	}
 	add_edge(dst, src, true, curr);
@@ -121,8 +124,11 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 	char	**s_lines;
 	t_node	*node[2];
 
-	while (lines && lines->type < 2)
+	while (lines && lines->type < 2) /* ????? */
+	{
+		ft_printf(">>> %s\n", lines->line);
 		lines = lines->next;
+	}
 	while (lines)
 	{
 		if (lines->line[0] == '#')
@@ -134,12 +140,14 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 		node[0] = get_node(lst_node, s_lines[0], nodes_c);
 		node[1] = get_node(lst_node, s_lines[1], nodes_c);
 		add_edge(node[0], node[1], false, NULL);
-		/* ft_printf("node %s, %d --- edge %s\n", node[0]->name, */
-		/* 		  node[0]->type	,node[0]->edges->node_dst->name); */
-		/* add_edge(node[1], node[0]); */
-		// ft_printf("node %s --- from %s to %s\n", node[1]->name,
-		// node[1]->edges->node_src->name, node[1]->edges->node_dst->name);
-		// ft_printf("node %s --- edge %s\n", node[1]->name, node[1]->edges->node_dst->name);
+		ft_printf("node %s, %d --- edge %s\n", node[0]->name,
+				  node[0]->type	,node[0]->edges->node_dst->name);
+  		/* add_edge(node[1], node[0]); */
+		ft_printf("node %s --- from %s to %s\n", node[1]->name,
+				  node[1]->edges->node_src->name,
+				  node[1]->edges->node_dst->name);
+		ft_printf("node %s --- edge %s\n", node[1]->name,
+				  node[1]->edges->node_dst->name);
 		lines = lines->next;
 		free_tab(s_lines);
 	}

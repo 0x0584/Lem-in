@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/08 22:13:17 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/17 14:55:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,13 @@ struct s_edge
 typedef struct s_graph		t_graph;
 struct s_graph
 {
-	t_node			*nodes_lst;	 /* FIXME: really implement adjlst, that was just a list of all nodes */
-	t_node			**nodes_ref; /* array where each node is indexed based on order of appearance.
-								  * however if the # of nodes of big, this would consume
-								  * large space. used to find parent of each node while
-								  * traversing the graph using BFS() */
+	t_node			*nodes_lst;	 /* FIXME: really implement adjlst, that was
+									just a list of all nodes
+
+									NOTE: probably won't need it. */
+	t_node			**nodes_ref;
 	size_t			n_nodes;
-	struct s_node	*start;
+	struct s_node	*start;		/* FIXME: rename to source */
 	struct s_node	*sink;
 };
 
@@ -108,4 +108,5 @@ int							add_node(t_node **lst_node, t_parse *lines,
 t_node						**h_table(t_node **refs, t_parse *lines, int nodes_c);
 int							edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
 
+void	node_oneline_dump(t_qnode *e);
 #endif

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/04 03:22:31 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/16 22:14:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ t_qnode							*queue_node(void *blob, size_t size);
 void							queue_node_del(t_qnode **a_node,
 												void (*del)(void *, size_t));
 t_queue							*queue_init(void);
-void							queue_iter(t_queue *q, void (*f)(t_qnode *));
+void							queue_iter(t_queue *q, bool from_head,
+											void (*f)(t_qnode *));
 size_t							queue_size(t_queue *q);
 void							queue_del(t_queue **a_queue,
 											void (*del)(void *, size_t));

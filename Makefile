@@ -35,8 +35,8 @@ $(NAME): $(OBJ)
 	@cd libft ; make
 	$(CC) $(LDFLIBS) $^ -o $@
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
-	@mkdir $(OBJ_PATH) 2> /dev/null || true
-	$(CC) $(CFLAGS) -o $@ -c $<
+	@mkdir $(@D)
+	$(CC) $(CFLAGS) -o $@ -c $< -Ilibft -Llibft -lft
 clean:
 	@make -C libft clean
 	@rm -vf $(OBJ)

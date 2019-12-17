@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/06 01:27:06 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/17 16:57:26 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ void	reset_graph_discovery(t_graph *g)
 	}
 }
 
+/* FIXME: save edges instead of nodes
+ * NOTE: this should save edges instead of nodes!! */
 t_queue		*bfs(t_graph *graph)
 {
 	t_queue		*q;
@@ -76,18 +78,25 @@ t_queue		*bfs(t_graph *graph)
 
 	if (!graph || !graph->start || !graph->sink)
 		return (false);
+
 	nodes_ref = ft_memset(malloc(graph->n_nodes * sizeof(int)), -1,
-						graph->n_nodes * sizeof(int));
+							graph->n_nodes * sizeof(int));
 	q = queue_init();
 	graph->start->seen = NODE_SEEN;
 	queue_enq(q, queue_node(graph->start, sizeof(t_node)));
 	while (queue_size(q))
 	{
+		queue_iter(q, false, node_oneline_dump);
 		if ((node = queue_deq(q)->blob) == graph->sink)
 			break ;		/* reached */
+		ft_printf("\n>>> current: %s", node->name);
+
 		edge_walk = node->edges;
+		/* getchar(); */
 		while (edge_walk)
 		{
+			/* queue_enq(q, queue_node(edge_walk->residual->node_dst, */
+			/* 							sizeof(t_node))); */
 			if (edge_walk->node_dst->seen == NODE_FRESH)
 			{
 				edge_walk->node_dst->seen = NODE_SEEN;
@@ -112,11 +121,19 @@ t_queue		*list_shortest_paths(t_graph *graph)
 	while ((tmp = bfs(graph)))
 	{
 		queue_enq(paths, queue_node(tmp, sizeof(t_queue)));
-		queue_del(&tmp, queue_del_helper); /* queue_node() allocates a copy, but we're
-											* not duplicating the actual queue, we're
-											* just duplicating tmp. so nothing to free, again!
-											* since it's all would be free'd at the very end
-											* with graph_free() */
+		/* FIXME: free things */
 	}
 	return (paths);
+}
+
+void		re_wire_paths(t_queue *paths)
+{
+	/* TODO:
+	 *
+	 * move through all the paths one edge per time
+	 * if two edges have same destination, follow them
+	 * see which hits on a residual edge,
+	 * set  e1->next = e2->next, e2->next = f1->next
+	 * repeat
+	 */
 }
