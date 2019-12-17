@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/11 11:23:03 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/17 15:44:16 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	i = 0;
 	g = (t_graph *)ft_memalloc(sizeof(t_graph));
 	g->nodes_ref = refs;
+	g->max_c.x = 0;
+	g->max_c.y = 0;
 	g->n_nodes = nodes_c;
 	while ((int)i < nodes_c)
 	{
@@ -111,6 +113,8 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 				walk->next = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
 				walk = walk->next;
 			}
+			g->max_c.x = (g->max_c.x > curr->cords.x ? g->max_c.x : curr->cords.x);
+			g->max_c.y = (g->max_c.y > curr->cords.y ? g->max_c.y : curr->cords.y);
 			curr = curr->next;
 		}
 		i++;

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/11 09:50:58 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/17 15:13:42 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ t_node	*new_node(int index, t_parse *line, int prop)
 	s_line = ft_strsplit(line->line, ' ');
 	new_n = (t_node *)malloc(sizeof(t_node));
 	new_n->name = ft_strdup(s_line[0]);
+	new_n->cords.x = ft_atoi(s_line[1]);
+	new_n->cords.y = ft_atoi(s_line[2]);
 	free_tab(s_line);
 	new_n->edges = NULL;
 	new_n->next = NULL;

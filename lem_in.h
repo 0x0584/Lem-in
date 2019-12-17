@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/15 04:08:31 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/17 15:42:05 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,19 @@ enum e_node_state
 	NODE_SEEN, NODE_TAKEN
 }				seen;
 
+typedef struct	s_cords
+{
+	int x;
+	int y;
+}				t_cords;
+
+
 typedef struct s_node		t_node;
 struct s_node					/* vertex list */
 {
 	char				*name;
 	size_t				index;
+	t_cords				cords;
 	enum e_node_type	type;
 	enum e_node_state	seen;
 	struct s_edge		*edges;
@@ -66,6 +74,7 @@ struct s_graph
 								  * large space. used to find parent of each node while
 								  * traversing the graph using BFS() */
 	size_t			n_nodes;
+	t_cords			max_c;
 	struct s_node	*start;
 	struct s_node	*sink;
 };
