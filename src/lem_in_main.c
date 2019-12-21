@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 03:17:14 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 05:00:47 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,6 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 		curr = nodes[i];
 		while (curr)
 		{
-
 			if (curr->type == NODE_START)
 				g->start = curr;
 			else if (curr->type == NODE_END)
@@ -186,6 +185,21 @@ void	node_oneline_dump(t_qnode *e)
 	ft_printf(" %s", node->name);
 }
 
+void	edge_oneline_dump(t_qnode *e)
+{
+	t_node *node;
+	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
+								 * but let's get it working first, the fix
+								 * design issues. */
+
+	if (!e)
+		return ;
+	edge = e->blob;
+	ft_printf(" <%s-%s> ",
+			  edge->node_src->name,
+			  edge->node_dst->name);
+}
+
 int		main(void)
 {
 	t_parse		*pp;
@@ -215,16 +229,18 @@ int		main(void)
 	t_qnode *tmp;
 
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
+
 	paths = list_shortest_paths(g);
+
 	while (queue_size(paths))
 	{
 		ft_putendl("-----------");
 		tmp = queue_deq(paths);
 		tmp_path = tmp->blob;
-		queue_iter(tmp_path, false, node_oneline_dump);
+		queue_iter(tmp_path, false, edge_oneline_dump);
 		ft_putendl("\n");
-		queue_iter(tmp_path, false, node_full_dump);
-		ft_putendl("\n");
+		/* queue_iter(tmp_path, false, edge_full_dump); */
+		/* ft_putendl("\n"); */
 		queue_del(&tmp_path, queue_del_helper);
 		ft_putendl("-----------");
 		/* sleep(3); */

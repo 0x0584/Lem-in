@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/16 22:15:05 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 05:59:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,6 @@ void		queue_enq(t_queue *queue, t_qnode *node)
 {
 	if (!queue || !node)
 		return ;
-
-
 	queue->tail->prev->next = node;
 	node->prev = queue->tail->prev;
 	node->next = queue->tail;
@@ -105,6 +103,24 @@ t_qnode 	*queue_deq(t_queue *queue)
 	node = queue->head->next;
 	node->next->prev = queue->head;
 	queue->head->next = node->next;
+	return (node);
+}
+
+void queue_node_del_dry(void *blob, size_t size)
+{
+	(void)blob;
+	(void)size;
+	return ;
+}
+
+t_qnode		*queue_dry_node(void *data, size_t size)
+{
+	t_qnode *node;
+
+	node = ft_memalloc(sizeof(t_qnode));
+	node->blob = data;
+	node->size = size;
+
 	return (node);
 }
 
@@ -178,3 +194,10 @@ int			main(int ac, char **av)
 	return 0;
 }
 */
+
+t_qnode *queue_last(t_queue *q)
+{
+	if (!q || !queue_size(q))
+		return NULL;
+	return q->tail->prev->blob;
+}

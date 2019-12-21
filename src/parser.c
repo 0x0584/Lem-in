@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 03:15:48 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 05:06:11 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,10 @@ t_node	*get_node(t_node **lst_node, char *name, int nodes_c)
 	return (NULL);
 }
 
+/*
+   add the edge and it's residual
+*/
+
 int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 {
 	t_edge *curr;
@@ -110,6 +114,10 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 	{
 		curr->residual = e;
 		e->residual = curr;
+
+		e->seen = false;
+		curr->seen = false;
+
 		ft_printf("edge: <%s, %s> | residual <%s, %s>\n",
 				  e->node_src->name, e->node_dst->name,
 				  e->residual->node_src->name, e->residual->node_dst->name);

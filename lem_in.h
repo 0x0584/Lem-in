@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 14:55:16 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 08:19:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ struct s_node					/* vertex list */
 typedef struct s_edge		t_edge;
 struct s_edge
 {
-	bool			seen;
+	int				seen;
+
 	struct s_edge	*residual;
 	struct s_node	*node_dst;
 	struct s_node	*node_src;
