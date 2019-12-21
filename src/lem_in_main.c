@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/21 05:00:47 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 10:25:28 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,7 +237,9 @@ int		main(void)
 		ft_putendl("-----------");
 		tmp = queue_deq(paths);
 		tmp_path = tmp->blob;
-		queue_iter(tmp_path, false, edge_oneline_dump);
+		queue_iter(tmp_path, false, edge_oneline_dump); /* from tail: source -> sink */
+		ft_putendl("\n");
+		queue_iter(tmp_path, true, edge_oneline_dump); /* from head sink -> source */
 		ft_putendl("\n");
 		/* queue_iter(tmp_path, false, edge_full_dump); */
 		/* ft_putendl("\n"); */

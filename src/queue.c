@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/21 05:59:34 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 12:11:43 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ size_t		queue_size(t_queue *q)
 		return (0);
 	size = 0;
 	walk = q->head->next;
-	while (walk)
+	while (walk != q->tail)
 	{
 		size++;
 		walk = walk->next;
