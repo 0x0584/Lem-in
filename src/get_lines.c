@@ -6,11 +6,14 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/18 16:28:38 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/22 06:08:32 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
+#include <fcntl.h>
+
+int debug_fd;
 
 int check_node(char *line) // func that check if the node is a valid node
 {
@@ -19,7 +22,7 @@ int check_node(char *line) // func that check if the node is a valid node
 
 	if (line && line[0] == '#' && line[1] != '#') // jumping the comments
 		return (-1);
-	else if (line && line[0] == '#' && line[1] == '#') // 
+	else if (line && line[0] == '#' && line[1] == '#') // test the command is a start or end command if not its considerade as a command
 	{
 		if (ft_strequ(line + 2, "start"))
 			return (NODE_START);
@@ -113,6 +116,7 @@ t_parse	*get_lines(int *nodes_c)
 	int		type;
 	int		prop;
 
+	debug_fd = open("barfarm", O_RDONLY);
 	p_lines = NULL;
 	type = 0;
 	*nodes_c = 0;
@@ -131,6 +135,6 @@ t_parse	*get_lines(int *nodes_c)
 		// ft_printf("line |%s| --- type : %d --- prop : %d\n", current->next->line, type, prop);
 		current = current->next;
 	}
+	close(debug_fd);
 	return (p_lines);
 }
-

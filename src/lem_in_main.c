@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 15:44:16 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/22 14:17:51 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,19 +98,20 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 		curr = nodes[i];
 		while (curr)
 		{
-
 			if (curr->type == NODE_START)
 				g->start = curr;
 			else if (curr->type == NODE_END)
 				g->sink = curr;
 			if (g->nodes_lst == NULL)
 			{
-				g->nodes_lst = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
+				g->nodes_lst = ft_memcpy(malloc(sizeof(t_node)),
+											curr, sizeof(t_node));
 				walk = g->nodes_lst;
 			}
 			else
 			{
-				walk->next = ft_memcpy(malloc(sizeof(t_node)), curr, sizeof(t_node));
+				walk->next = ft_memcpy(malloc(sizeof(t_node)),
+										curr, sizeof(t_node));
 				walk = walk->next;
 			}
 			g->max_c.x = (g->max_c.x > curr->cords.x ? g->max_c.x : curr->cords.x);
@@ -135,9 +136,10 @@ void	graph_dump(t_graph *g)
 		ft_printf(" == edges ==\n");
 		while (e)
 		{
-			ft_printf("  <> %s-%s <>\n", e->node_src->name, e->node_dst->name);
-			// ft_printf("<> src %s %d <>\n", e->node_src->name, e->node_src->type);
-			// ft_printf("<> dst %s %d <>\n", e->node_dst->name, e->node_dst->type);
+			ft_printf("<> src %s type: %d <> ", e->node_src->name,
+					  e->node_src->type);
+			ft_printf("<> dst %s type: %d <>\n", e->node_dst->name,
+					  e->node_dst->type);
 			e = e->next;
 		}
 		ft_printf(" == ===== ==\n\n");
@@ -152,6 +154,56 @@ void	graph_free(t_graph *g)
 	free(g);
 }
 
+
+void	node_full_dump(t_qnode *e)
+{
+	t_node *node;
+	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
+								 * but let's get it working first, the fix
+								 * design issues. */
+
+	if (!e)
+		return ;
+	node = e->blob;
+	edge = node->edges;
+	ft_printf("node: %s\n", node->name);
+	while (edge && edge->node_src != node)
+	{
+		ft_printf("<%s,%s>\n", edge->node_src->name, edge->node_dst->name);
+		edge = edge->next;
+	}
+	ft_putendl("");
+}
+
+void	node_oneline_dump(t_qnode *e)
+{
+	t_node *node;
+	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
+								 * but let's get it working first, the fix
+								 * design issues. */
+
+	if (!e)
+		return ;
+	node = e->blob;
+	edge = node->edges;
+	ft_printf(" %s", node->name);
+}
+
+void	edge_oneline_dump(t_qnode *e)
+{
+	// t_node *node;
+	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
+								 * but let's get it working first, the fix
+								 * design issues. */
+
+	if (!e)
+		return ;
+	edge = e->blob;
+	ft_printf(" <%s-%s> ",
+			  edge->node_src->name,
+			  edge->node_dst->name);
+}
+
 int		main(void)
 {
 	t_parse		*pp;
@@ -160,6 +212,7 @@ int		main(void)
 	int			i;
 	t_graph		*g;
 	t_node		**refs;
+	t_dvisu		data;
 
 	/* (void)getchar(); */
 
@@ -169,27 +222,38 @@ int		main(void)
 	/* `node' array of nodes */
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
+	ft_putendl(" === filling edges === ");
 	edges_fill(nodes, pp, nodes_c);
 	g = graph_init(refs, nodes, nodes_c);
-	ft_printf("graph init done\n");
+	data = visu_init(g);
+	g->data = &data;
 	graph_dump(g);
-	visu_init(g);
-	// t_queue *paths;
-	// t_queue *tmp_path;
-	// t_qnode *tmp;
+	t_queue *paths;
+	t_queue *tmp_path;
+	t_qnode *tmp;
 
-	// paths = list_shortest_paths(g);
-	// while (queue_size(paths))
-	// {
-	// 	ft_putendl("-----------");
-	// 	tmp = queue_deq(paths);
-	// 	tmp_path = tmp->blob;
-	// 	queue_iter(tmp_path, node_dump);
-	// 	queue_del(&tmp_path, queue_del_helper);
-	// 	ft_putendl("-----------");
-	// 	/* sleep(3); */
-	// }
-	// queue_del(&paths, queue_del_helper);
+	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
+	paths = list_shortest_paths(g);
+	SDL_Delay(2000);
+	visu_quit(data);
+	return (0);
+
+	while (queue_size(paths))
+	{
+		ft_putendl("-----------");
+		tmp = queue_deq(paths);
+		tmp_path = tmp->blob;
+		queue_iter(tmp_path, false, edge_oneline_dump); /* from tail: source -> sink */
+		ft_putendl("\n");
+		queue_iter(tmp_path, true, edge_oneline_dump); /* from head sink -> source */
+		ft_putendl("\n");
+		/* queue_iter(tmp_path, false, edge_full_dump); */
+		/* ft_putendl("\n"); */
+		queue_del(&tmp_path, queue_del_helper);
+		ft_putendl("-----------");
+		/* sleep(3); */
+	}
+	queue_del(&paths, queue_del_helper);
 
 	/* sp1 = bfs(g); */
 	/* sp2 = bfs(g); */

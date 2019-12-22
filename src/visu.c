@@ -6,15 +6,22 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 05:14:31 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/22 14:59:58 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "visu.h"
+#include "../lem_in.h"
 
 int	map(int val, int *ranges)
 {
-	return ((val - ranges[0]) * (ranges[3] - ranges[2]) / (ranges[1] - ranges[0]) + ranges[2]);
+	int d;
+	int result;
+
+	d = (ranges[1] - ranges[0]) + ranges[2];
+	d = (!d) ? 1 : d;
+	result = (val - ranges[0]) * (ranges[3] - ranges[2]) / d;
+	// ft_printf("result %d --- %d %d d %d\n", result, ranges[0], ranges[1], d);
+	return (result);
 }
 
 void	data_init(t_dvisu *data)
@@ -24,6 +31,7 @@ void	data_init(t_dvisu *data)
 	data->rend = NULL;
 	data->window = NULL;
 	data->s_surface = NULL;
+	data->tex = NULL;
 }
 
 int	init(t_dvisu *data)
@@ -54,7 +62,7 @@ int	init(t_dvisu *data)
 	return (1);
 }
 
-static void	visu_quit(t_dvisu data)
+void	visu_quit(t_dvisu data)
 {
 	SDL_DestroyRenderer(data.rend);
 	SDL_DestroyWindow(data.window);
@@ -94,6 +102,34 @@ int	*range_comp(int in_s, int in_e, int out_s, int out_e)
 	return (comp_range);
 }
 
+int	edge_draw(t_graph *g, t_edge *edge, int type)
+{
+	// int		*ranges_x;
+	// int		*ranges_y;
+	// t_cords	src;
+	// t_cords	dst;
+	SDL_Rect	dstr;
+
+	edge->v_c = type;
+	dstr.w = 20;
+	dstr.h = 20;
+	// ft_printf("edge %s - %s to color\n", edge->node_src->name, edge->node_dst->name);
+	nodes_draw(*(g->data), g, dstr);
+	// SDL_SetRenderDrawColor(g->data->rend, 255, 150, 0, 255);
+	// ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
+	// src.x = map(edge->node_src->cords.x, ranges_x) + 10;
+	// ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
+	// src.y = map(edge->node_src->cords.y, ranges_y) + 10;
+	// dst.x = map(edge->node_dst->cords.x, ranges_x) + 10;
+	// dst.y = map(edge->node_dst->cords.y, ranges_y) + 10;
+	// SDL_RenderDrawLine(g->data->rend, src.x, src.y, dst.x, dst.y);
+	// free(ranges_x);
+	// free(ranges_y);
+	SDL_RenderPresent(g->data->rend);
+	// SDL_SetRenderDrawColor(g->data->rend, 0, 0, 0, 255);
+	return (1);
+}
+
 int	edges_draw(t_dvisu data, t_graph *g, t_node *node)
 {
 	t_edge	*curr;
@@ -102,7 +138,6 @@ int	edges_draw(t_dvisu data, t_graph *g, t_node *node)
 	t_cords	src;
 	t_cords	dst;
 
-	SDL_SetRenderDrawColor(data.rend, 255, 0, 0, 255);
 	curr = node->edges;
 	ranges_x = range_comp(0, g->max_c.x, 0, data.w_width - 100);
 	src.x = map(node->cords.x, ranges_x) + 10;
@@ -110,6 +145,27 @@ int	edges_draw(t_dvisu data, t_graph *g, t_node *node)
 	src.y = map(node->cords.y, ranges_y) + 10;
 	while (curr)
 	{
+	// ft_printf("drawing edge %s - %s\n", curr->node_src->name, curr->node_dst->name);
+	if (curr->v_c > 0 || curr->residual->v_c > 0)
+	{
+		SDL_SetRenderDrawColor(data.rend, 255, 150, 0, 255);
+		curr->v_c++;
+		curr->residual->v_c++;
+		if(curr->v_c == 1 || curr->residual->v_c == 1)
+			SDL_Delay(300);
+		// ft_printf ("     colored\n");
+	}
+	else if (curr->v_c < 0 || curr->residual->v_c < 0)
+	{
+		SDL_SetRenderDrawColor(data.rend, 255, 150, 255, 255);
+		curr->v_c--;
+		curr->residual->v_c--;
+		if(curr->v_c == -1 || curr->residual->v_c == -1)
+			SDL_Delay(300);
+		// ft_printf ("     colored\n");
+	}
+	else
+		SDL_SetRenderDrawColor(data.rend, 255, 0, 0, 255);
 		dst.x = map(curr->node_dst->cords.x, ranges_x) + 10;
 		dst.y = map(curr->node_dst->cords.y, ranges_y) + 10;
 		SDL_RenderDrawLine(data.rend, src.x, src.y, dst.x, dst.y);
@@ -127,9 +183,8 @@ int	nodes_draw(t_dvisu data, t_graph *g, SDL_Rect dstr)
 	t_node		*curr;
 	int			*ranges;
 
-	ft_printf("screen width : %d --- screen height : %d\n", data.w_width, data.w_height);
-	ft_printf("nbr of nodes : %zu --- max_cords x : %d - y : %d\n", g->n_nodes, g->max_c.x, g->max_c.y);
-	tex = get_imagetex(data, "resources/circle.png");
+	// ft_printf("screen width : %d --- screen height : %d\n", data.w_width, data.w_height);
+	// ft_printf("nbr of nodes : %zu --- max_cords x : %d - y : %d\n", g->n_nodes, g->max_c.x, g->max_c.y);
 	// dstr.w = 20; //temp zoom effects (not really a zoom)
 	// dstr.h = 20;
 	curr = g->nodes_lst;
@@ -138,6 +193,12 @@ int	nodes_draw(t_dvisu data, t_graph *g, SDL_Rect dstr)
 	curr = g->nodes_lst;
 	while (curr)
 	{
+		if (ft_strequ(curr->name, g->start->name))
+			tex = get_imagetex(data, "resources/start.png");
+		else if (ft_strequ(curr->name, g->sink->name))
+			tex = get_imagetex(data, "resources/end.png");
+		else
+			tex = get_imagetex(data, "resources/circle.png");
 		ranges = range_comp(0, g->max_c.x, 0, data.w_width - 100);
 		dstr.x = map(curr->cords.x, ranges);
 		ranges = range_comp(0, g->max_c.y, 0, data.w_height - 100);
@@ -145,8 +206,8 @@ int	nodes_draw(t_dvisu data, t_graph *g, SDL_Rect dstr)
 		// edges_draw(data, g, curr);
 		SDL_RenderCopy(data.rend, tex, NULL, &dstr);
 		curr = curr->next;
+		SDL_DestroyTexture(tex);
 	}
-	SDL_DestroyTexture(tex);
 	return (0);
 }
 
@@ -161,8 +222,8 @@ t_dvisu	visu_init(t_graph *g)
 	init(&data);
 	dstr.w = 20;
 	dstr.h = 20;
-	// while (!close_requested)
-	// {
+	while (!close_requested)
+	{
 		SDL_RenderClear(data.rend);
 		while (SDL_PollEvent(&event))
 		{
@@ -183,6 +244,6 @@ t_dvisu	visu_init(t_graph *g)
 		nodes_draw(data, g, dstr);
 		SDL_RenderPresent(data.rend);
 		SDL_PumpEvents();
-	// }
+	}
 	return (data);
 }

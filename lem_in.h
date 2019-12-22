@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 15:42:05 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/22 13:55:08 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,9 @@ struct s_node					/* vertex list */
 typedef struct s_edge		t_edge;
 struct s_edge
 {
-	bool			seen;
+	int				seen;
+	int				v_c;
+
 	struct s_edge	*residual;
 	struct s_node	*node_dst;
 	struct s_node	*node_src;
@@ -65,18 +67,20 @@ struct s_edge
 };
 
 /* FIXME: move start and sink to solver */
+typedef struct s_dvisu		t_dvisu;
 typedef struct s_graph		t_graph;
 struct s_graph
 {
-	t_node			*nodes_lst;	 /* FIXME: really implement adjlst, that was just a list of all nodes */
-	t_node			**nodes_ref; /* array where each node is indexed based on order of appearance.
-								  * however if the # of nodes of big, this would consume
-								  * large space. used to find parent of each node while
-								  * traversing the graph using BFS() */
+	t_node			*nodes_lst;	 /* FIXME: really implement adjlst, that was
+									just a list of all nodes
+
+									NOTE: probably won't need it. */
+	t_node			**nodes_ref;
 	size_t			n_nodes;
 	t_cords			max_c;
-	struct s_node	*start;
+	struct s_node	*start;		/* FIXME: rename to source */
 	struct s_node	*sink;
+	t_dvisu			*data; /*i need it to pass it to bfs as argument*/
 };
 
 typedef struct s_parse		t_parse;
@@ -97,6 +101,25 @@ struct s_solver
 
 };
 
+/* *************************** visu ****************************************/
+# include "./visu_lib/SDL_LIB/2.0.10/include/SDL2/SDL.h"
+# include "./visu_lib/SDL_IMG_LIB/include/SDL2/SDL_image.h"
+
+struct s_dvisu
+{
+	SDL_Window		*window;
+	SDL_Surface		*s_surface;
+	SDL_Texture		*tex;
+	int				w_width;
+	int				w_height;
+	SDL_Renderer	*rend;
+};
+
+t_dvisu	visu_init(t_graph *g);
+void	visu_quit();
+int		edge_draw(t_graph *g, t_edge *edge, int type);
+int		nodes_draw(t_dvisu data, t_graph *g, SDL_Rect dstr);
+/* *************************** visu end ************************************/
 /* ***** function prototypes *************************************************/
 
 /* FIXME: re-write functions so that they are generalized */
@@ -117,4 +140,5 @@ int							add_node(t_node **lst_node, t_parse *lines,
 t_node						**h_table(t_node **refs, t_parse *lines, int nodes_c);
 int							edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
 
+void	node_oneline_dump(t_qnode *e);
 #endif

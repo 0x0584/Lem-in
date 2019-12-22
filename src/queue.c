@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/11/30 23:10:16 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/21 12:11:43 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ size_t		queue_size(t_queue *q)
 		return (0);
 	size = 0;
 	walk = q->head->next;
-	while (walk)
+	while (walk != q->tail)
 	{
 		size++;
 		walk = walk->next;
@@ -88,8 +88,6 @@ void		queue_enq(t_queue *queue, t_qnode *node)
 {
 	if (!queue || !node)
 		return ;
-
-
 	queue->tail->prev->next = node;
 	node->prev = queue->tail->prev;
 	node->next = queue->tail;
@@ -108,20 +106,37 @@ t_qnode 	*queue_deq(t_queue *queue)
 	return (node);
 }
 
-void		queue_iter(t_queue *q, void (*f)(t_qnode *))
+void queue_node_del_dry(void *blob, size_t size)
+{
+	(void)blob;
+	(void)size;
+	return ;
+}
+
+t_qnode		*queue_dry_node(void *data, size_t size)
+{
+	t_qnode *node;
+
+	node = ft_memalloc(sizeof(t_qnode));
+	node->blob = data;
+	node->size = size;
+
+	return (node);
+}
+
+void		queue_iter(t_queue *q, bool from_head, void (*f)(t_qnode *))
 {
 	t_qnode *walk;
 
 	if (!q || q->head->next == q->tail)
 		return ;
-	walk = q->head->next;
-	while (walk != q->tail)
+	walk = from_head ? q->head->next : q->tail->prev;
+	while (walk != (from_head ? q->tail : q->head))
 	{
 		(*f)(walk);
-		walk = walk->next;
+		walk = from_head ? walk->next : walk->prev;
 	}
 }
-
 
 void		print_int_node(t_qnode *node)
 {
@@ -179,3 +194,10 @@ int			main(int ac, char **av)
 	return 0;
 }
 */
+
+t_qnode *queue_last(t_queue *q)
+{
+	if (!q || !queue_size(q))
+		return NULL;
+	return q->tail->prev->blob;
+}
