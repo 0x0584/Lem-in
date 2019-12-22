@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/21 12:11:43 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/22 15:17:47 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,4 +200,49 @@ t_qnode *queue_last(t_queue *q)
 	if (!q || !queue_size(q))
 		return NULL;
 	return q->tail->prev->blob;
+}
+
+void	queue_swap_halfs(t_queue *head_queue, t_queue *tail_queue,
+							t_qnode *head_split, t_qnode *tail_split)
+{
+	t_qnode *tmp;
+	t_qnode *head;
+	t_qnode *tail;
+
+	if (!head_queue || !tail_queue || !head_split || !tail_split
+			|| head_split == head_queue->tail || tail_split == tail_queue->head)
+		return ;
+
+	/* swap the tails */
+	tmp = head_queue->head;
+	head_queue->head = tail_queue->head;
+	tail_queue->head = tmp;
+
+	/* keeping track of head split */
+	head = tail_split->prev;
+	tail = head_split->next;
+
+
+	/* merge tail split */
+	head_split->next = tail_split;
+	tail_split->prev = head_split;
+
+	/* merge head split */
+	head->next = tail;
+	tail->prev = head;
+}
+
+void	queue_node_del_next(t_queue *q, t_qnode *node,
+								void (*del)(void *, size_t))
+{
+	t_qnode *tmp;
+
+	if (!q || !node || node == q->head || node == q->tail ||
+			node->next == q->tail)
+		return ;
+	tmp = node->next;
+	node->next = node->next->next;
+	node->next->prev = node;
+	del(tmp->blob, tmp->size);
+	free(tmp);
 }

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/21 10:25:28 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/22 19:33:11 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,35 @@ void	graph_dump(t_graph *g)
 
 void	graph_free(t_graph *g)
 {
-	/* ft_lstdel(&g->nodes_lst, lstdel_node); */
+	t_node *node;
+	t_node *nwalk;
+	t_edge *edge;
+	t_edge *tmp;
+	t_edge *ewalk;
+
+	nwalk = g->nodes_lst;
+	while (nwalk)
+	{
+		node = nwalk;
+		nwalk = nwalk->next;
+		ewalk = node->edges;
+		while (ewalk)
+		{
+			/* FIXME:  */
+			edge = ewalk;
+			ewalk = ewalk->next;
+			if (edge->node_src->edges)
+			{
+				tmp = edge->node_dst->edges;
+				edge->node_dst->edges = NULL;
+				free(tmp);
+			}
+			free(edge->node_src->edges);
+			edge->node_src->edges = NULL;
+		}
+		free(node->name);
+		free(node);
+	}
 	free(g);
 }
 
@@ -200,6 +228,21 @@ void	edge_oneline_dump(t_qnode *e)
 			  edge->node_dst->name);
 }
 
+void	parser_free(t_parse *p)
+{
+	t_parse *walk;
+	t_parse *hold;
+
+	walk = p;
+	while (walk)
+	{
+		hold = walk;
+		walk = walk->next;
+		free(hold->line);
+		free(hold);
+	}
+}
+
 int		main(void)
 {
 	t_parse		*pp;
@@ -221,6 +264,8 @@ int		main(void)
 	ft_putendl(" === filling edges === ");
 	edges_fill(nodes, pp, nodes_c);
 
+	parser_free(pp);
+
 	g = graph_init(refs, nodes, nodes_c);
 	graph_dump(g);
 
@@ -231,7 +276,6 @@ int		main(void)
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 
 	paths = list_shortest_paths(g);
-
 	while (queue_size(paths))
 	{
 		ft_putendl("-----------");
@@ -247,6 +291,7 @@ int		main(void)
 		ft_putendl("-----------");
 		/* sleep(3); */
 	}
+
 	queue_del(&paths, queue_del_helper);
 
 	/* sp1 = bfs(g); */
@@ -259,7 +304,10 @@ int		main(void)
 	/* queue_del(&sp2, queue_del_helper); */
 
 	/* graph_dump(g); */
-	graph_free(g);
+
+	/* FIXME: fix double free  */
+	/* graph_free(g); */
+
 
 	return (0);
 }
