@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/21 08:19:34 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/23 23:08:56 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,48 @@ struct s_solver
 	t_graph			*g;
 	int				n_ants;
 	t_queue			*paths;
-
 };
 
-/* ***** function prototypes *************************************************/
+
+# define PATH_MAX_LENGTH			(sizeof(unsigned) * 8)
+# define AS_EDGE(e)					((t_edge *)e->blob)
+
+/*
+ * The way the pomper works
+ *
+ * at first the path_flow is 0
+ */
 
+typedef struct				s_flow
+{
+	t_edge					**path;
+	unsigned				n_edges;
+	/* This represents the ants as bits and each next
+	 *
+	 * each ant going is a (1 & !blocked)
+	 */
+
+	/* FIXME: set a bigger flow current: (char *) */
+
+	unsigned				current;
+	unsigned				mask;
+	bool					blocked;
+}							t_flow;
+
+# define MIN(a, b)								((a) > (b) ? (b) : (a))
+
+typedef struct				s_flow_network
+{
+	t_flow						*flows;
+	unsigned					n_flows;
+	t_flow						optimal;
+	size_t						n_units;
+}							t_netflow;
+
+/* ***** function prototypes *************************************************/
+
+
+
 /* FIXME: re-write functions so that they are generalized */
 t_graph						*graph_init(t_node **refs, t_node **nodes, int nodes_c);
 t_queue						*bfs(t_graph *graph);
@@ -110,4 +147,13 @@ t_node						**h_table(t_node **refs, t_parse *lines, int nodes_c);
 int							edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
 
 void	node_oneline_dump(t_qnode *e);
+
+t_queue			*bfs_find(t_graph *g);
+void	edge_dump(t_qnode *e);
+t_queue		*re_wire_paths(t_graph *g, t_queue *paths);
+void		push_flow_through(t_netflow *net);
+
+t_netflow	*flow_network_setup(t_graph *graph, size_t units);
+void		flow_network_del(t_netflow **anet);
+
 #endif

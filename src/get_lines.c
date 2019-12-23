@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/17 02:56:25 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/23 22:08:50 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,8 @@ t_parse	*get_lines(int *nodes_c)
 			current = current->next;
 			continue;
 		}
-		// ft_printf("line |%s| --- type : %d --- prop : %d\n", current->next->line, type, prop);
+		// ft_printf("line |%s| --- type : %d --- prop : %d\n",
+		// current->next->line, type, prop);
 		current = current->next;
 	}
 	close(debug_fd);

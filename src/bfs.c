@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/22 18:21:36 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/23 22:17:05 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ t_queue			*bfs_find(t_graph *g)
 
 		ft_putendl("current queue: ");
 		queue_iter(helper, true, list_edges_dump);
-		/* getchar(); */
+		/* // getchar(); */
 
 		tmp = queue_deq(helper);
 
@@ -180,7 +180,7 @@ t_queue			*bfs_find(t_graph *g)
 			if (e->node_dst == g->sink && e->seen != 1)
 			{
 				ft_putendl_fd("sink found!!", 2);
-				getchar();
+				// getchar();
 				arrived = true;
 				break;
 			}
@@ -206,7 +206,7 @@ t_queue			*bfs_find(t_graph *g)
 
 		/* } */
 		ft_putendl("\n ---\n move \n");
-		/* getchar(); */
+		/* // getchar(); */
 	}
 
 	t_queue *path;
@@ -270,7 +270,7 @@ void		sort_by_node_src_name(t_queue **base, t_qnode **node, size_t size)
 	}
 }
 
-void		re_wire_paths(t_graph *g, t_queue *paths)
+t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 {
 	/* TODO:
 	 *
@@ -291,7 +291,7 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 	if (!paths || !(n_paths = queue_size(paths)))
 	{
 		ft_putendl("no paths are found!");
-		return ;
+		return NULL;
 	}
 
 	curr = 0;
@@ -321,6 +321,7 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 			queue_iter(apath[curr++], true, edge_dump);
 			ft_putendl("");
 		}
+
 		/* if all paths have arrived, that means edge is all NULLs */
 		curr = 0;
 		done = true;
@@ -338,7 +339,7 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 		sort_by_node_src_name(apath, walk_edge, n_paths);
 
 		ft_putendl(" checking the edge ");
-		getchar();
+		// getchar();
 
 		curr = 0;
 		while (curr < n_paths - 1)
@@ -352,7 +353,7 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(walk_edge[curr]);	 /* path 1 */
 				edge_dump(walk_edge[curr + 1]); /* path 2 */
 				ft_putendl("\n -- \n");
-				getchar();
+				// getchar();
 
 				t_qnode *e1;
 				t_qnode *e2;
@@ -449,7 +450,7 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 				ft_putendl("  collision edges after ");
 				edge_dump(walk_edge[curr + residual]);
 				edge_dump(walk_edge[curr + !residual]);
-				getchar();
+				// getchar();
 			}
 			curr++;
 		}
@@ -480,28 +481,10 @@ void		re_wire_paths(t_graph *g, t_queue *paths)
 			curr++;
 		}
 
-		getchar();
+		// getchar();
 	}
 
 	free(apath);
 	free(walk_edge);
-}
-
-t_queue		*list_shortest_paths(t_graph *graph)
-{
-	t_queue *paths;
-	t_queue *tmp;
-
-	paths = queue_init();
-	while ((tmp = bfs_find(graph)))
-	{
-		ft_putendl(" path:  \n ");
-		queue_iter(tmp, true, edge_dump);
-		queue_iter(tmp, false, edge_dump); /* from tail: source -> sink */
-
-		queue_enq(paths, queue_dry_node(tmp, sizeof(t_queue *)));
-		/* FIXME: free things */
-	}
-	re_wire_paths(graph, paths);
 	return (paths);
 }

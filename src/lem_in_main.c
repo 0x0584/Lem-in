@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 19:33:11 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/23 22:09:14 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,6 +258,15 @@ int		main(void)
 	i = 0;
 	pp = get_lines(&nodes_c);
 
+	t_parse *walk;
+
+	size_t n_ants;
+
+	/* parsing n ants */
+
+	n_ants = (size_t)ft_atoi(pp->line);
+	ft_printf(" >>> %lu\n", n_ants);
+	/* return 0; */
 	/* `node' array of nodes */
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
@@ -275,24 +284,11 @@ int		main(void)
 
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 
-	paths = list_shortest_paths(g);
-	while (queue_size(paths))
-	{
-		ft_putendl("-----------");
-		tmp = queue_deq(paths);
-		tmp_path = tmp->blob;
-		queue_iter(tmp_path, false, edge_oneline_dump); /* from tail: source -> sink */
-		ft_putendl("\n");
-		queue_iter(tmp_path, true, edge_oneline_dump); /* from head sink -> source */
-		ft_putendl("\n");
-		/* queue_iter(tmp_path, false, edge_full_dump); */
-		/* ft_putendl("\n"); */
-		queue_del(&tmp_path, queue_del_helper);
-		ft_putendl("-----------");
-		/* sleep(3); */
-	}
+	/* paths = list_shortest_paths(g); */
 
-	queue_del(&paths, queue_del_helper);
+	t_netflow *farm = flow_network_setup(g, n_ants);
+	push_flow_through(farm);
+	flow_network_del(&farm);
 
 	/* sp1 = bfs(g); */
 	/* sp2 = bfs(g); */
