@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/27 11:56:42 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 13:26:54 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_flow		flow_nil()
 	t_flow nil;
 
 	nil.path = NULL;
-	nil.latency = 0;
+	nil.latency = (unsigned)-1;
 	nil.current = 0;
 	nil.cut = false;
 	return (nil);
@@ -74,9 +74,7 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 		if(walk > 0)
 			ft_putchar(walk & chunk ? '1' : '0');
 	}
-	ft_putchar('\n');
 }
-
 
 	/*
 	   should avoid possible overflow, shound be a bigint array, where we
@@ -94,30 +92,45 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 	   [0] towards [N-1]
 	*/
 
+# define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
+
 void			flow_dump(t_qnode *e)
 {
 	t_flow *flow;
 	unsigned i;
+	unsigned index;
 
 	if (!e)
 		return ;
 	flow = e->blob;
-	ft_printf(" >> [%s] flow of %u / %zu \n",
+	ft_printf(" >> [%s] flow of %u / %zu ",
 			  flow->cut ? " ": "X", flow->latency, flow->n_arrived);
+	ft_putstr("mask: ");
+	ft_putbits(flow->cmask, flow->cmask);
+	ft_putstr(" current: ");
+	ft_putbits(flow->current, flow->cmask);
+	ft_putchar('\n');
 	i = 0;
-	while (i < flow->latency)
+	while ((flow->current & (1 << i)) && i < flow->latency)
 	{
-		ft_printf(" <%s, %s>", flow->path[i]->node_src->name,
-			flow->path[i]->node_dst->name);
+
+		if (!FLOW_SATURATED(flow))
+		{
+			ft_printf(" L%d-%s using <%s, %s>\n",
+					  i, flow->path[i]->node_dst->name,
+					  flow->path[i]->node_src->name,
+					  flow->path[i]->node_dst->name);
+		}
+		else
+			ft_printf(" L%d-%s using <%s, %s>\n",
+					  /* add latency */
+					  flow->n_arrived + i + flow->latency,
+					  flow->path[i]->node_dst->name,
+					  flow->path[i]->node_src->name,
+					  flow->path[i]->node_dst->name);
 		i++;
 	}
-
-	ft_printf("\n %8s", "mask: ");
-	ft_putbits(flow->cmask, flow->cmask);
-	ft_printf("%8s", "current: ");
-	ft_putbits(flow->current, flow->cmask);
 	ft_putendl("\n");
-
 }
 
 void			netflow_log(t_netflow *net)
@@ -129,8 +142,7 @@ void			netflow_log(t_netflow *net)
 			  net->n_units, queue_size(net->flows));
 
 	queue_iter(net->flows, false, flow_dump);
-	ft_putendl(" ============ sync based on higher latency =========== ");
-	queue_iter(net->sync, true, flow_dump);
+	queue_iter(net->sync, false, flow_dump);
 	ft_putendl(" ============ //// =================================== \n");
 	getchar();
 }
@@ -223,8 +235,6 @@ void		netflow_del(t_netflow **anet)
 
 void		set_flow_cut(t_qnode *e)
 {
-	t_flow *fi;
-
 	if (!e)
 		return ;
 	QNODE_AS(struct s_flow, e)->cut = true;
@@ -253,7 +263,8 @@ size_t		netflow_shrink(t_netflow *net)
 		   the answer is two over rwo.
 		*/
 
-		if (qsize - maxflow)
+		if (qsize - maxflow ||
+				QNODE_AS(struct s_flow, tmp)->latency == (unsigned)-1)
 		{
 			tmp->prev->next = tmp->next;
 			tmp->next->prev = tmp->prev;
@@ -272,8 +283,6 @@ size_t		netflow_shrink(t_netflow *net)
 	netflow_log(net);
 	return maxflow;
 }
-
-# define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
 
 static bool cut_flow(t_flow *f)
 {
