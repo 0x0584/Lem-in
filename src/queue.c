@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/22 15:17:47 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/26 21:49:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,4 +245,37 @@ void	queue_node_del_next(t_queue *q, t_qnode *node,
 	node->next->prev = node;
 	del(tmp->blob, tmp->size);
 	free(tmp);
+}
+
+/* lower priorities are at the head */
+void queue_penq(t_queue *queue, t_qnode *node,
+					bool (*cmp)(t_qnode *, t_qnode *))
+{
+	t_qnode *walk;
+	bool	inserted;
+
+	if (!queue || !node)
+		return ;
+	else if (!cmp)
+	{
+		queue_enq(queue, node);
+		return ;
+	}
+	inserted = false;
+	walk = queue->head->next;
+	while (walk != queue->tail)
+	{
+		if (cmp(node, walk))
+		{
+			node->prev = walk->prev;
+			node->next = walk;
+			walk->prev->next = node;
+			walk->prev = node;
+			inserted = true;
+			break ;
+		}
+		walk = walk->next;
+	}
+	if (!inserted)
+		queue_enq(queue, node);
 }

@@ -24,7 +24,7 @@ static int		ft_nbr_count(const char *s)
 
 int				ft_atoi(const char *str)
 {
-	int		i;
+//	int		i;
 	int		n;
 	int		signe;
 	char	*c_str;
@@ -37,7 +37,7 @@ int				ft_atoi(const char *str)
 		c_str++;
 	else if (*c_str == '+')
 		c_str++;
-	i = 0;
+//	i = 0;
 	while (*c_str == '0')
 		c_str++;
 	if ((ft_nbr_count(c_str) > 10 && signe == 1) && free_sl(to))

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/23 23:24:56 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 11:56:42 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,68 +17,149 @@ t_flow		flow_nil()
 	t_flow nil;
 
 	nil.path = NULL;
-	nil.n_edges = 0;
+	nil.latency = 0;
 	nil.current = 0;
-	nil.blocked = false;
+	nil.cut = false;
 	return (nil);
 }
 
 t_flow		flow_init(t_queue *path)
 {
 	t_flow		p;
-	size_t		n_edges;
+	size_t		latency;
 	t_qnode		*node;
 
-	if (!path || !(n_edges = queue_size(path)))
+	if (!path || !(latency = queue_size(path)))
 		return flow_nil();
-	p.n_edges = queue_size(path);
-	p.path = (t_edge **)malloc(n_edges * sizeof(t_edge *));
-	p.mask = 0;
-	while (n_edges--)
+	p.latency = latency;
+	p.path = (t_edge **)malloc(latency * sizeof(t_edge *));
+	p.current = 0U;
+	p.cmask = 0U;
+	while (latency--)
 	{
-		if (p.mask)
-			p.mask <<= 1;
-		p.mask |= 1;
+		if (p.cmask)
+			p.cmask <<= 1;
+		p.cmask |= 1;
 		node = queue_deq(path);
-		p.path[n_edges] = node->blob;
+		p.path[latency] = node->blob;
 		queue_node_del(&node, queue_node_del_dry);
 	}
-	p.blocked = false;
-	p.current = 0;
+	p.cut = false;
+	p.n_arrived = 0;
 	return (p);
 }
 
-/* capacity is the length, n_edges */
-void		sort_based_on_capacity(t_flow *flows)
+/* this alters the priority of each node */
+bool	lower_latency(t_qnode *in, t_qnode *with)
 {
+	t_flow *f1;
+	t_flow *f2;
+
+	if (!in || !with || !(f1 = in->blob) || !(f2 = with->blob))
+		return (false);
+	if (f1->latency > f2->latency)
+		return true;
+	return false;
+}
+
+/* mask is at max SIGNED_LONG_MIN to avoid overfow */
+static void		ft_putbits(unsigned long chunk, unsigned long mask)
+{
+	unsigned long walk;
+
+	walk = (mask + 1);
+	while (walk)
+	{
+		walk >>= 1;
+		if(walk > 0)
+			ft_putchar(walk & chunk ? '1' : '0');
+	}
+	ft_putchar('\n');
+}
+
+
+	/*
+	   should avoid possible overflow, shound be a bigint array, where we
+	   know the size of bits there
+
+	   given array A[] of N integers of 32 bit, then we have at total N * 32 bits,
+	   if a number n has m bits, then at least (m / 32 bits + m % 32 bits),
+	   or array of (m / 32 + (m % 32)),
+
+	   this representation is suitable for th kind of support the flow have,
+	   since we only need to maintain a current going, so not much to do with
+	   bits that are within.
+
+	   check is always done starting from [n-1], since the current is going from
+	   [0] towards [N-1]
+	*/
+
+void			flow_dump(t_qnode *e)
+{
+	t_flow *flow;
+	unsigned i;
+
+	if (!e)
+		return ;
+	flow = e->blob;
+	ft_printf(" >> [%s] flow of %u / %zu \n",
+			  flow->cut ? " ": "X", flow->latency, flow->n_arrived);
+	i = 0;
+	while (i < flow->latency)
+	{
+		ft_printf(" <%s, %s>", flow->path[i]->node_src->name,
+			flow->path[i]->node_dst->name);
+		i++;
+	}
+
+	ft_printf("\n %8s", "mask: ");
+	ft_putbits(flow->cmask, flow->cmask);
+	ft_printf("%8s", "current: ");
+	ft_putbits(flow->current, flow->cmask);
+	ft_putendl("\n");
 
 }
 
-t_netflow		*flow_network_init(t_queue *paths)
+void			netflow_log(t_netflow *net)
+{
+	if (!net)
+		return ;
+	ft_printf(" ====== network has %zu over %zu flow(s) =====\n"
+				" // flows based on lower latency\n",
+			  net->n_units, queue_size(net->flows));
+
+	queue_iter(net->flows, false, flow_dump);
+	ft_putendl(" ============ sync based on higher latency =========== ");
+	queue_iter(net->sync, true, flow_dump);
+	ft_putendl(" ============ //// =================================== \n");
+	getchar();
+}
+
+t_netflow		*netflow_init(t_queue *paths)
 {
 	t_netflow		*net;
 	size_t			n_paths;
 	t_qnode			*path;
+	t_flow			flow;
 
 	if (!paths || !(n_paths = queue_size(paths)) ||
 			!(net = (t_netflow *)malloc(sizeof(t_netflow))))
 		return (NULL);
-	net->n_flows = n_paths;
-	net->flows = (t_flow *)malloc(sizeof(t_netflow) * n_paths);
+	net->flows = queue_init();
+	net->sync = queue_init();
 	/* setting them back from the source to the sink */
-	while (n_paths--)
+	while (queue_size(paths))
 	{
 		path = queue_deq(paths);
-		net->flows[n_paths] = flow_init(path->blob);
+		flow = flow_init(path->blob);
+		queue_penq(net->flows, queue_node(&flow, sizeof(t_flow)),
+					lower_latency);
 		queue_node_del(&path, queue_node_del_dry);
 	}
-	sort_based_on_capacity(&net->flows[n_paths]);
-	net->optimal = net->flows[0];
 	return (net);
 }
 
-
-t_netflow	*flow_network_setup(t_graph *graph, size_t units)
+t_netflow	*netflow_setup(t_graph *graph, size_t units)
 {
 	t_queue		*paths;
 	t_queue		*tmp;
@@ -92,105 +173,183 @@ t_netflow	*flow_network_setup(t_graph *graph, size_t units)
 		queue_iter(tmp, false, edge_dump); /* from tail: source -> sink */
 		queue_enq(paths, queue_dry_node(tmp, sizeof(t_queue *)));
 	}
-	re_wire_paths(graph, paths);
-	net = flow_network_init(paths);
+	if (!queue_size(paths))
+	{
+		ft_putendl("no paths were found!");
+		return NULL;
+	}
+	net = netflow_init(re_wire_paths(graph, paths));
 	net->n_units = units;
 	queue_del(&paths, queue_node_del_dry);
+	netflow_log(net);
 	return (net);
 }
 
-void		flow_network_del(t_netflow **anet)
+void		queue_flow_del(void *blob, size_t size)
 {
+	t_flow *f1;
 
-	size_t i;
+	if (!blob || !size)
+		return ;
+	f1 = blob;
+	free(f1->path);
+	free(f1);
+}
+
+void		netflow_del(t_netflow **anet)
+{
 
 	if (!anet || !*anet)
 		return ;
-	i = 0;
-	while (i < (*anet)->n_flows)
-		free ((*anet)->flows[i++].path);
-	free((*anet)->flows);
+	queue_del(&(*anet)->flows, queue_flow_del);
+	queue_del(&(*anet)->sync, queue_flow_del);
 	free(*anet);
 	*anet = NULL;
 }
 
-void		flow_log(t_flow f)
-{
-	/* TODO: this simulate the action of
-	 * pomp.current = (pomp.current << 1) & !pomp.blocked;
-	 *
-	 * probably gonna need to turn path into an array in order
-	 * to print efficiently
-	*/
+
 
+/*
+   to name the bits raveling the network, since all flows are sorted based on
+   latency, then the ants would be like
+
+   if n_arrived > latency, we have `latency' of ants as
+    (index + n_arrived at once)
+   else n_arrived - index
+
+ */
+
+# define MAX(a, b)					(MIN(b, a) ? (a) : (b))
+
+void		set_flow_cut(t_qnode *e)
+{
+	t_flow *fi;
+
+	if (!e)
+		return ;
+	QNODE_AS(struct s_flow, e)->cut = true;
 }
 
-void		push_flow_through(t_netflow *net)
+size_t		netflow_shrink(t_netflow *net)
 {
-	t_flow		*pomp;
-	unsigned	turn;
-	unsigned	n_blocked;
+	t_qnode *walk;
+	t_qnode *tmp;
+	size_t	maxflow;
+	size_t  qsize;
 
-	n_blocked = 0;
-	ft_printf("number of ants: %lu\n", net->n_units);
-	while (net->n_units)
+	qsize = queue_size(net->flows);
+	maxflow = MIN(qsize, net->n_units);
+	walk = net->flows->head->next;
+	/* looking for sigma set */
+	while (net->n_units && walk != net->flows->tail)
 	{
-		/* if only one path is remaining, use the shortest to send remaining units */
-		// ft_printf("push everything left from the shortest path(%u)\n", turn);
-		while ((n_blocked == net->n_flows) && net->n_units)
+		tmp = walk;
+
+		if ((walk = walk->next) == net->flows->tail)
+			break ;
+
+		/*
+		   which one is better? two ants over two paths of 4 or one of 4
+		   the answer is two over rwo.
+		*/
+
+		if (qsize - maxflow)
 		{
-			net->optimal.current = (((net->optimal.current << 1) | 1)
-										& net->optimal.mask);
-			net->n_units += (!net->n_units ? 0 : -1);
-			flow_log(net->optimal);
-
-			char *tmp;
-			tmp = ft_utoa_base(net->optimal.current, "01");
-			ft_printf(" (%s)\n", tmp);
-			ft_printf("remaining ants: %lu\n", net->n_units);
-			free(tmp);
-
-			getchar();
-			if (!net->n_units)
-				break ;
-
-		}
-		/* pushing flow through teh network */
-		turn = 0;
-		while (turn < net->n_flows)
-		{
-			pomp = &net->flows[turn];
-			if (net->n_units < net->flows[turn].n_edges)
-			{
-				ft_printf("path(%u) is blocked: still got %lu ants\n",
-							turn, net->n_units);
-				net->flows[turn].blocked = true;
-				n_blocked++;
-				turn++;
-				continue ;
-			}
-			char *tmp;
-
-
-			pomp->current = (((pomp->current << 1) | !pomp->blocked) & pomp->mask);
-			net->n_units += (!net->n_units ? 0 : -1);
-
-			char	buff[sizeof(unsigned) * 8 + 1];
-			short rem_bits;
-
-			rem_bits = MIN(sizeof(unsigned) * 8 - ft_strlen(tmp), pomp->n_edges);
-
-			buff[rem_bits] = '\0';
-			while (rem_bits--)
-				buff[rem_bits] = '0';
-
-			tmp = ft_utoa_base(pomp->current, "01");
-			ft_printf("path(%u) flow (%s)\n", turn, tmp);
-			ft_printf("remaining ants: %lu\n", net->n_units);
-			free(tmp);
-
-			turn++;
-			getchar();
+			tmp->prev->next = tmp->next;
+			tmp->next->prev = tmp->prev;
+			QNODE_AS(struct s_flow, tmp)->cut = true;
+			queue_penq(net->sync, tmp, lower_latency);
+			qsize--;
 		}
 	}
+	if (!net->n_units)
+	{
+		queue_iter(net->flows, true, set_flow_cut);
+		while (queue_size(net->flows))
+			queue_penq(net->sync, queue_deq(net->flows), lower_latency);
+	}
+	ft_printf("maxflow is: %zu\n", maxflow);
+	netflow_log(net);
+	return maxflow;
+}
+
+# define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
+
+static bool cut_flow(t_flow *f)
+{
+	if (!f || !f->cut)
+		return false;
+	if (!(f->current & f->cmask))
+		return (true);
+	f->current <<= 1;
+	f->n_arrived++;
+	return false;
+}
+
+static bool sync_flow(t_flow *f)
+{
+	if (FLOW_SATURATED(f) && !f->cut)
+		f->n_arrived++;
+	else if (f->cut)
+		return !cut_flow(f);
+	else						/* still loading */
+	{
+		if (!f->current)
+			f->current = 1;
+		else if (!FLOW_SATURATED(f))
+		{
+			f->current <<= 1;
+			f->current |= 1;
+		}
+	}
+	return true;
+}
+
+bool		netflow_sync(t_netflow *net)
+{
+	t_qnode *walk;
+	t_qnode *del;
+	int		turn;
+	size_t maxflow;
+	bool state;
+
+	turn = 0;
+	walk = net->flows->tail->prev;
+	maxflow = netflow_shrink(net); /* optimal netflow / n_unites */
+	state = false;
+	while (net->n_units && walk != net->flows->head)
+	{
+		net->n_units--;
+		sync_flow(QNODE_AS(struct s_flow, walk));
+		ft_printf("current of flow (%d) is %d\n",
+				  turn++,
+				  QNODE_AS(struct s_flow, walk)->current);
+		state = true;
+		walk = walk->prev;
+	}
+	ft_putendl("\n ====== after pushing ===== ");
+	netflow_log(net);
+	walk = net->sync->head->next;
+	while (walk != net->sync->tail)
+	{
+		ft_putendl("sync!");
+		if (sync_flow(QNODE_AS(struct s_flow, walk)))
+			state = true;
+		walk = walk->next;
+	}
+	ft_putendl("\n ====== after syncing ===== ");
+	netflow_log(net);
+	return state;
+}
+
+void		netflow_pushflow(t_netflow *net)
+{
+	size_t allflows;
+	bool state;
+
+	ft_printf("number of ants: %lu\n", net->n_units);
+	allflows = queue_size(net->flows);
+	state = true;
+	while (state)
+		state = netflow_sync(net);
 }

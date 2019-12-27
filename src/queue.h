@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/22 03:50:42 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/26 21:43:35 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 # define QUEUE_H
 
 # include "../libft/libft.h"
+# include <limits.h>
 
-typedef struct s_queue_node	t_qnode;
+# define QNODE_AS(t, e)			((t *)e->blob)
+
+typedef struct s_queue_node		t_qnode;
 struct							s_queue_node
 {
 	void				*blob;
@@ -48,13 +51,19 @@ size_t							queue_size(t_queue *q);
 void							queue_del(t_queue **a_queue,
 											void (*del)(void *, size_t));
 void							queue_enq(t_queue *queue, t_qnode *node);
+void							queue_penq(t_queue *queue, t_qnode *node,
+											bool (*cmp)(t_qnode *, t_qnode *));
 t_qnode 						*queue_deq(t_queue *queue);
 
 t_qnode							*queue_last(t_queue *q);
 void							queue_node_del_next(t_queue *q, t_qnode *node,
-														void (*del)(void *, size_t));
+														void (*del)(void *,
+																	size_t));
 void							queue_node_del_dry(void *blob, size_t size);
 t_qnode							*queue_dry_node(void *data, size_t size);
-void							queue_swap_halfs(t_queue *head_queue, t_queue *tail_queue,
-													t_qnode *head_split, t_qnode *tail_split);
+void							queue_swap_halfs(t_queue *head_queue,
+												 t_queue *tail_queue,
+												 t_qnode *head_split,
+												 t_qnode *tail_split);
+
 #endif

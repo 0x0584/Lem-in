@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/23 23:08:56 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/26 22:22:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ struct s_solver
 	t_queue			*paths;
 };
 
-
 # define PATH_MAX_LENGTH			(sizeof(unsigned) * 8)
 # define AS_EDGE(e)					((t_edge *)e->blob)
 
@@ -100,28 +99,27 @@ struct s_solver
 
 typedef struct				s_flow
 {
-	t_edge					**path;
-	unsigned				n_edges;
+	t_edge			**path;
+	unsigned		latency;
 	/* This represents the ants as bits and each next
 	 *
 	 * each ant going is a (1 & !blocked)
 	 */
 
-	/* FIXME: set a bigger flow current: (char *) */
-
-	unsigned				current;
-	unsigned				mask;
-	bool					blocked;
+	/* FIXME: set a bigger flow current: (unsigned char *) */
+	unsigned		current;
+	unsigned		cmask;
+	bool			cut;
+	size_t			n_arrived;
 }							t_flow;
 
 # define MIN(a, b)								((a) > (b) ? (b) : (a))
 
 typedef struct				s_flow_network
 {
-	t_flow						*flows;
-	unsigned					n_flows;
-	t_flow						optimal;
-	size_t						n_units;
+	t_queue			*flows;
+	t_queue			*sync;
+	size_t			n_units;
 }							t_netflow;
 
 /* ***** function prototypes *************************************************/
@@ -129,7 +127,8 @@ typedef struct				s_flow_network
 
 
 /* FIXME: re-write functions so that they are generalized */
-t_graph						*graph_init(t_node **refs, t_node **nodes, int nodes_c);
+t_graph						*graph_init(t_node **refs, t_node **nodes,
+											int nodes_c);
 t_queue						*bfs(t_graph *graph);
 void						node_info(t_node *node);
 void						node_dump(t_qnode *e);
@@ -143,17 +142,19 @@ unsigned long				hash(unsigned char *str);
 int							add_node(t_node **lst_node, t_parse *lines,
 										int nodes_c, int prop,
 										t_node **refs);
-t_node						**h_table(t_node **refs, t_parse *lines, int nodes_c);
-int							edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
+t_node						**h_table(t_node **refs, t_parse *lines,
+										int nodes_c);
+int							edges_fill(t_node **lst_node, t_parse *lines,
+										int nodes_c);
 
 void	node_oneline_dump(t_qnode *e);
 
-t_queue			*bfs_find(t_graph *g);
 void	edge_dump(t_qnode *e);
-t_queue		*re_wire_paths(t_graph *g, t_queue *paths);
-void		push_flow_through(t_netflow *net);
 
-t_netflow	*flow_network_setup(t_graph *graph, size_t units);
-void		flow_network_del(t_netflow **anet);
+t_queue						*bfs_find(t_graph *g);
+t_queue						*re_wire_paths(t_graph *g, t_queue *paths);
+void						netflow_pushflow(t_netflow *net);
+t_netflow					*netflow_setup(t_graph *graph, size_t units);
+void						netflow_del(t_netflow **anet);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/23 22:09:14 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/26 22:23:22 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,9 +286,9 @@ int		main(void)
 
 	/* paths = list_shortest_paths(g); */
 
-	t_netflow *farm = flow_network_setup(g, n_ants);
-	push_flow_through(farm);
-	flow_network_del(&farm);
+	t_netflow *farm = netflow_setup(g, n_ants);
+	netflow_pushflow(farm);
+	netflow_del(&farm);
 
 	/* sp1 = bfs(g); */
 	/* sp2 = bfs(g); */
