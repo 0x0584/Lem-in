@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/26 16:20:50 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 19:05:01 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ t_queue			*bfs_find(t_graph *g)
 			if (e->node_dst == g->sink && e->seen != 1)
 			{
 				ft_putendl_fd("sink found!!", 2);
-				getchar();
+				// getchar();
 				arrived = true;
 				break;
 			}
@@ -261,7 +261,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 		sort_by_node_src_name(apath, walk_edge, n_paths);
 
 		ft_putendl(" checking the edge ");
-		getchar();
+		// getchar();
 
 		curr = 0;
 		while (curr < n_paths - 1)
@@ -292,7 +292,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(walk_edge[curr + 1]); /* path 2 */
 				edge_dump(e2);
 				ft_putendl("\n -- \n");
-				getchar();
+				// getchar();
 
 				int		residual;
 				t_qnode *after1;
@@ -316,7 +316,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				ft_putendl("after 2");
 				edge_dump(after2);
 
-				getchar();
+				// getchar();
 
 				/* preparing target edges */
 				bool move_edge;
@@ -361,7 +361,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				queue_iter(apath[curr + !residual], false, edge_dump);
 				ft_putendl("\n /////////////////// \n");
 
-				getchar();
+				// getchar();
 
 				if (move_edge)
 				{
@@ -423,7 +423,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(walk_edge[curr + residual]);
 				edge_dump(walk_edge[curr + !residual]);
 
-				getchar();
+				// getchar();
 			}
 			curr++;
 		}
@@ -454,7 +454,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 			curr++;
 		}
 
-		getchar();
+		// getchar();
 	}
 
 	free(apath);

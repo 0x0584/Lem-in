@@ -6,11 +6,13 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/27 18:08:33 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 19:07:19 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
+
+/* #define DEBUG_FLOW */
 
 t_flow		flow_nil()
 {
@@ -164,7 +166,9 @@ void			netflow_log(t_netflow *net)
 	queue_iter(net->flows, false, flow_dump);
 	queue_iter(net->sync, false, flow_dump);
 	ft_putendl(" ============ //// =================================== ");
+#ifdef DEBUG_FLOW
 	getchar();
+#endif
 }
 
 t_netflow		*netflow_init(t_queue *paths)
