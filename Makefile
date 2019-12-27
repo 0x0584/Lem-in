@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/27 19:12:17 by archid-          ###   ########.fr        #
+#    Updated: 2019/12/27 19:17:27 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@cd libft ; make
-	$(CC) $(LDFLIBS) $^ -o $@
+	$(CC) $(LDFLIBS) $^ -o $@ -Llibft -lft -Ilibft
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@mkdir -p $(@D)
