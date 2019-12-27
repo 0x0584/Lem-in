@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/26 22:22:18 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 17:28:58 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ typedef struct				s_flow_network
 	t_queue			*flows;
 	t_queue			*sync;
 	size_t			n_units;
+	size_t			maxflow;
 }							t_netflow;
 
 /* ***** function prototypes *************************************************/

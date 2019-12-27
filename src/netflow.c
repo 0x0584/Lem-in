@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/27 13:26:54 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/27 18:08:33 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,37 +99,57 @@ void			flow_dump(t_qnode *e)
 	t_flow *flow;
 	unsigned i;
 	unsigned index;
+	char *cut;
 
 	if (!e)
 		return ;
 	flow = e->blob;
+	cut = flow->cut ? "C": " ";
+	if (flow->cut && (flow->current & flow->cmask) == 0)
+		cut = "X";
 	ft_printf(" >> [%s] flow of %u / %zu ",
-			  flow->cut ? " ": "X", flow->latency, flow->n_arrived);
+			  cut, flow->latency, flow->n_arrived);
 	ft_putstr("mask: ");
 	ft_putbits(flow->cmask, flow->cmask);
 	ft_putstr(" current: ");
 	ft_putbits(flow->current, flow->cmask);
 	ft_putchar('\n');
 	i = 0;
-	while ((flow->current & (1 << i)) && i < flow->latency)
+	while (i < flow->latency)
 	{
-
-		if (!FLOW_SATURATED(flow))
+		/* sync-in */
+		if (!FLOW_SATURATED(flow) && (flow->current & (1 << i)))
 		{
-			ft_printf(" L%d-%s using <%s, %s>\n",
+			ft_printf(" v L%d-%s using <%s, %s>\n",
 					  i, flow->path[i]->node_dst->name,
 					  flow->path[i]->node_src->name,
 					  flow->path[i]->node_dst->name);
 		}
-		else
-			ft_printf(" L%d-%s using <%s, %s>\n",
+		/* sync */
+		else if (FLOW_SATURATED(flow))
+			ft_printf(" ^ L%d-%s using <%s, %s>\n",
 					  /* add latency */
-					  flow->n_arrived + i + flow->latency,
-					  flow->path[i]->node_dst->name,
-					  flow->path[i]->node_src->name,
-					  flow->path[i]->node_dst->name);
+					  (flow->n_arrived) + (flow->latency - i - 1),
+					  flow->path[flow->latency - i - 1]->node_dst->name,
+					  flow->path[flow->latency - i - 1]->node_src->name,
+					  flow->path[flow->latency - i - 1]->node_dst->name);
+
+		/* sync-out */
+		else
+		{
+			/* i++; */
+		    /* if (((flow->current >> i) & ((flow->cmask >> i) + 1))) */
+			/* { */
+			/* 	ft_printf(" v L%d-%s using <%s, %s>\n", */
+			/* 			  i, flow->path[flow->latency - i - 1]->node_dst->name, */
+			/* 			  flow->path[flow->latency - i - 1]->node_src->name, */
+			/* 			  flow->path[flow->latency - i - 1]->node_dst->name); */
+			/* } */
+			/* continue ; */
+		}
 		i++;
 	}
+
 	ft_putendl("\n");
 }
 
@@ -143,7 +163,7 @@ void			netflow_log(t_netflow *net)
 
 	queue_iter(net->flows, false, flow_dump);
 	queue_iter(net->sync, false, flow_dump);
-	ft_putendl(" ============ //// =================================== \n");
+	ft_putendl(" ============ //// =================================== ");
 	getchar();
 }
 
@@ -192,6 +212,7 @@ t_netflow	*netflow_setup(t_graph *graph, size_t units)
 	}
 	net = netflow_init(re_wire_paths(graph, paths));
 	net->n_units = units;
+	net->maxflow = units;
 	queue_del(&paths, queue_node_del_dry);
 	netflow_log(net);
 	return (net);
@@ -244,11 +265,10 @@ size_t		netflow_shrink(t_netflow *net)
 {
 	t_qnode *walk;
 	t_qnode *tmp;
-	size_t	maxflow;
 	size_t  qsize;
 
 	qsize = queue_size(net->flows);
-	maxflow = MIN(qsize, net->n_units);
+	net->maxflow = MIN(qsize, net->n_units);
 	walk = net->flows->head->next;
 	/* looking for sigma set */
 	while (net->n_units && walk != net->flows->tail)
@@ -263,7 +283,7 @@ size_t		netflow_shrink(t_netflow *net)
 		   the answer is two over rwo.
 		*/
 
-		if (qsize - maxflow ||
+		if (qsize - net->maxflow ||
 				QNODE_AS(struct s_flow, tmp)->latency == (unsigned)-1)
 		{
 			tmp->prev->next = tmp->next;
@@ -279,9 +299,9 @@ size_t		netflow_shrink(t_netflow *net)
 		while (queue_size(net->flows))
 			queue_penq(net->sync, queue_deq(net->flows), lower_latency);
 	}
-	ft_printf("maxflow is: %zu\n", maxflow);
-	netflow_log(net);
-	return maxflow;
+	ft_printf("maxflow is: %zu\n", net->maxflow);
+	/* netflow_log(net); */
+	return net->maxflow;
 }
 
 static bool cut_flow(t_flow *f)
@@ -317,15 +337,13 @@ static bool sync_flow(t_flow *f)
 bool		netflow_sync(t_netflow *net)
 {
 	t_qnode *walk;
-	t_qnode *del;
 	int		turn;
-	size_t maxflow;
-	bool state;
+	bool	sync_in;
+	bool	sync_out;
 
 	turn = 0;
 	walk = net->flows->tail->prev;
-	maxflow = netflow_shrink(net); /* optimal netflow / n_unites */
-	state = false;
+	sync_in = false;
 	while (net->n_units && walk != net->flows->head)
 	{
 		net->n_units--;
@@ -333,22 +351,33 @@ bool		netflow_sync(t_netflow *net)
 		ft_printf("current of flow (%d) is %d\n",
 				  turn++,
 				  QNODE_AS(struct s_flow, walk)->current);
-		state = true;
+		sync_in = true;
 		walk = walk->prev;
 	}
-	ft_putendl("\n ====== after pushing ===== ");
-	netflow_log(net);
+	if (net->n_units < net->maxflow)
+		netflow_shrink(net); /* optimal netflow / n_unites */
+	if (sync_in)
+	{
+		ft_putendl("\n ====== after pushing ===== ");
+		netflow_log(net);
+	}
+	sync_out = false;
 	walk = net->sync->head->next;
 	while (walk != net->sync->tail)
 	{
-		ft_putendl("sync!");
 		if (sync_flow(QNODE_AS(struct s_flow, walk)))
-			state = true;
+		{
+			ft_putendl("sync!");
+			sync_out = true;
+		}
 		walk = walk->next;
 	}
-	ft_putendl("\n ====== after syncing ===== ");
-	netflow_log(net);
-	return state;
+	if (sync_out)
+	{
+		ft_putendl("\n ====== after syncing ===== ");
+		netflow_log(net);
+	}
+	return (sync_out || sync_in);
 }
 
 void		netflow_pushflow(t_netflow *net)
@@ -360,5 +389,10 @@ void		netflow_pushflow(t_netflow *net)
 	allflows = queue_size(net->flows);
 	state = true;
 	while (state)
+	{
+		if (net->maxflow > queue_size(net->flows))
+			netflow_shrink(net); /* optimal netflow / n_unites */
 		state = netflow_sync(net);
+
+	}
 }
