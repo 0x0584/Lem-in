@@ -6,14 +6,13 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 06:08:32 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/26 01:20:38 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 #include <fcntl.h>
 
-int debug_fd;
 
 int check_node(char *line) // func that check if the node is a valid node
 {
@@ -88,6 +87,11 @@ int		parse_line(t_parse **p_lines, int *type, int *prop)
 		*prop = -1;
 	else if (!(*type) && ft_isnumber(line))
 	{
+		if (ft_atoi(line) <= 0)
+		{
+			ft_printf("number of ants is not valid\n");
+			exit(1);
+		}
 		*p_lines = add_pline(line, *type, *prop);
 		(*type)++;
 	}
@@ -116,11 +120,11 @@ t_parse	*get_lines(int *nodes_c)
 	int		type;
 	int		prop;
 
-	debug_fd = open("barfarm", O_RDONLY);
 	p_lines = NULL;
 	type = 0;
 	*nodes_c = 0;
-	parse_line(&(current), &type, &prop);
+	while (!type)
+		parse_line(&(current), &type, &prop);
 	p_lines = current;
 	while (p_lines && type >= 0)
 	{
@@ -135,6 +139,5 @@ t_parse	*get_lines(int *nodes_c)
 		// ft_printf("line |%s| --- type : %d --- prop : %d\n", current->next->line, type, prop);
 		current = current->next;
 	}
-	close(debug_fd);
 	return (p_lines);
 }

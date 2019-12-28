@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 13:55:08 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/23 23:39:38 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ struct s_edge
 {
 	int				seen;
 	int				v_c;
+	int				path_n;
+	int				drawn;
 
 	struct s_edge	*residual;
 	struct s_node	*node_dst;
@@ -113,13 +115,22 @@ struct s_dvisu
 	int				w_width;
 	int				w_height;
 	SDL_Renderer	*rend;
+	int				path_n;
 };
 
-t_dvisu	visu_init(t_graph *g);
+int	visu_init(t_graph *g);
 void	visu_quit();
+int		graph_draw(t_graph *g);
 int		edge_draw(t_graph *g, t_edge *edge, int type);
-int		nodes_draw(t_dvisu data, t_graph *g, SDL_Rect dstr);
+int		edges_draw(t_graph *g, t_node *node);
+int		nodes_draw(t_graph *g, SDL_Rect dstr);
 /* *************************** visu end ************************************/
+
+/* *************************** tools ***************************************/
+int	map(int val, int *ranges);
+int	*range_comp(int in_s, int in_e, int out_s, int out_e);
+/* *************************** tools end ***********************************/
+
 /* ***** function prototypes *************************************************/
 
 /* FIXME: re-write functions so that they are generalized */

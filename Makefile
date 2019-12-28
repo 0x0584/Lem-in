@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/22 05:28:46 by melalj           ###   ########.fr        #
+#    Updated: 2019/12/23 20:12:07 by melalj           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,10 @@ SRC_NAME = lem_in_main.c\
 			get_lines.c\
 			queue.c\
 			bfs.c\
-			visu.c
+			visu.c\
+			tools.c\
+			graph_draw.c\
+			edges_draw.c
 
 OBJ_PATH = obj
 

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 14:17:51 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/26 01:31:06 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	g->max_c.x = 0;
 	g->max_c.y = 0;
 	g->n_nodes = nodes_c;
+	g->data = (t_dvisu *)malloc(sizeof(t_dvisu));
 	while ((int)i < nodes_c)
 	{
 		curr = nodes[i];
@@ -150,7 +151,35 @@ void	graph_dump(t_graph *g)
 
 void	graph_free(t_graph *g)
 {
-	/* ft_lstdel(&g->nodes_lst, lstdel_node); */
+	t_node *node;
+	t_node *nwalk;
+	t_edge *edge;
+	t_edge *tmp;
+	t_edge *ewalk;
+
+	nwalk = g->nodes_lst;
+	while (nwalk)
+	{
+		node = nwalk;
+		nwalk = nwalk->next;
+		ewalk = node->edges;
+		while (ewalk)
+		{
+			/* FIXME:  */
+			edge = ewalk;
+			ewalk = ewalk->next;
+			if (edge->node_src->edges)
+			{
+				tmp = edge->node_dst->edges;
+				edge->node_dst->edges = NULL;
+				free(tmp);
+			}
+			free(edge->node_src->edges);
+			edge->node_src->edges = NULL;
+		}
+		free(node->name);
+		free(node);
+	}
 	free(g);
 }
 
@@ -204,6 +233,21 @@ void	edge_oneline_dump(t_qnode *e)
 			  edge->node_dst->name);
 }
 
+void	parser_free(t_parse *p)
+{
+	t_parse *walk;
+	t_parse *hold;
+
+	walk = p;
+	while (walk)
+	{
+		hold = walk;
+		walk = walk->next;
+		free(hold->line);
+		free(hold);
+	}
+}
+
 int		main(void)
 {
 	t_parse		*pp;
@@ -212,7 +256,6 @@ int		main(void)
 	int			i;
 	t_graph		*g;
 	t_node		**refs;
-	t_dvisu		data;
 
 	/* (void)getchar(); */
 
@@ -224,9 +267,12 @@ int		main(void)
 	nodes = h_table(refs, pp, nodes_c);
 	ft_putendl(" === filling edges === ");
 	edges_fill(nodes, pp, nodes_c);
+	return (0);
+
+	parser_free(pp);
+
 	g = graph_init(refs, nodes, nodes_c);
-	data = visu_init(g);
-	g->data = &data;
+	visu_init(g);
 	graph_dump(g);
 	t_queue *paths;
 	t_queue *tmp_path;
@@ -235,8 +281,7 @@ int		main(void)
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 	paths = list_shortest_paths(g);
 	SDL_Delay(2000);
-	visu_quit(data);
-	return (0);
+	visu_quit(g->data);
 
 	while (queue_size(paths))
 	{
@@ -253,6 +298,7 @@ int		main(void)
 		ft_putendl("-----------");
 		/* sleep(3); */
 	}
+
 	queue_del(&paths, queue_del_helper);
 
 	/* sp1 = bfs(g); */
@@ -265,7 +311,10 @@ int		main(void)
 	/* queue_del(&sp2, queue_del_helper); */
 
 	/* graph_dump(g); */
-	graph_free(g);
+
+	/* FIXME: fix double free  */
+	/* graph_free(g); */
+
 
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/22 13:26:31 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/26 01:49:57 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,8 +105,17 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 	else
 	{
 		curr = src->edges;
+			ft_printf("%s - %s | %s - %s\n", curr->node_src->name, src->name, curr->node_dst->name, dst->name);
+			if ((ft_strequ(curr->node_src->name, src->name) && ft_strequ(curr->node_dst->name, dst->name))
+				|| (ft_strequ(curr->node_src->name, dst->name) && ft_strequ(curr->node_dst->name, src->name)))
+			{
+				ft_printf("error : duplicated edge\n");
+				exit(1);
+			}
 		while (curr->next)
+		{
 			curr = curr->next;
+		}
 		curr->next = (t_edge *)malloc(sizeof(t_edge));
 		curr->next->node_src = src;
 		curr->next->node_dst = dst;
@@ -114,6 +123,8 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 		tmp = curr->next;
 	}
 	tmp->v_c = 0;
+	tmp->path_n = -1;
+	tmp->drawn = 0;
 	if (is_residual == false)
 	{
 		// this need to stay tmp not curr

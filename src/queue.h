@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/22 05:18:31 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/23 17:21:04 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,10 @@ void							queue_enq(t_queue *queue, t_qnode *node);
 t_qnode 						*queue_deq(t_queue *queue);
 
 t_qnode							*queue_last(t_queue *q);
+void							queue_node_del_next(t_queue *q, t_qnode *node,
+														void (*del)(void *, size_t));
 void							queue_node_del_dry(void *blob, size_t size);
 t_qnode							*queue_dry_node(void *data, size_t size);
-
+void							queue_swap_halfs(t_queue *head_queue, t_queue *tail_queue,
+													t_qnode *head_split, t_qnode *tail_split);
 #endif
