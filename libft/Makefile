@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/11/05 17:14:14 by melalj           ###   ########.fr        #
+#    Updated: 2019/12/23 22:56:23 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -88,6 +88,7 @@ ft_striteri.c\
 ft_strjoin.c\
 ft_strlcat.c\
 ft_strlen.c\
+ft_uitoa_base.c\
 ft_strlowcase.c\
 ft_strmap.c\
 ft_strmapi.c\

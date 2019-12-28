@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/10/05 22:56:53 by melalj            #+#    #+#             */
-/*   Updated: 2019/11/30 09:15:21 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/23 22:22:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,4 +118,8 @@ char				*my_strcat(char **s1, char **s2);
 void				my_bzero(void *s, size_t n);
 char				*ft_itoa_base_u(unsigned long long value,
 						int base, int cap);
+
+char			*ft_utoa_base(unsigned long int nb, const char *base);
+char			*ft_itoa_base(long int nb, const char *base);
+
 #endif
