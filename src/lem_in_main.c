@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/26 01:31:06 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/29 07:33:54 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,6 @@ int		main(void)
 	nodes = h_table(refs, pp, nodes_c);
 	ft_putendl(" === filling edges === ");
 	edges_fill(nodes, pp, nodes_c);
-	return (0);
 
 	parser_free(pp);
 
