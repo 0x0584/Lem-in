@@ -6,13 +6,13 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/29 20:25:41 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/29 22:27:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-/* #define DEBUG_FLOW */
+#define DEBUG_FLOW
 
 t_flow		flow_nil()
 {
@@ -147,7 +147,8 @@ void			flow_ants_log(t_flow *flow)
 	/* either there's a current or not! */
 	else if (flow->current & flow->cmask)
 	{
-		ant = flow->n_arrived;
+		/* here! */
+		ant = flow->n_arrived;	/* + how many ants have arrived on the previous flows */
 		while (i < flow->latency)
 		{
 			ft_printf("o L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
@@ -159,11 +160,8 @@ void			flow_ants_log(t_flow *flow)
 
 void			flow_dump(t_qnode *e)
 {
-	t_flow *flow;
-	unsigned i;
-	unsigned index;
-
-	char *cut;
+	t_flow	*flow;
+	char	*cut;
 
 	if (!e)
 		return ;
