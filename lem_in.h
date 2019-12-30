@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/29 22:16:54 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/30 23:25:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,9 @@ struct s_node					/* vertex list */
 	char				*name;
 	size_t				index;
 	enum e_node_type	type;
-	enum e_node_state	seen;
+
+	int					seen;
+
 	struct s_edge		*edges;
 	struct s_node		*next;
 };

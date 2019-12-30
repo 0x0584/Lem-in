@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/29 22:27:16 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/30 23:35:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,7 +308,8 @@ size_t		netflow_shrink(t_netflow *net)
 		prev = walk;
 		if ((walk = walk->prev) == QHEAD(net->flows))
 			break ;
-		if (net->n_units > QNODE_AS(struct s_flow, walk)->latency
+		/* here!! */
+		if (net->n_units >= QNODE_AS(struct s_flow, walk)->latency
 				|| (QNODE_AS(struct s_flow, walk)->latency
 						== QNODE_AS(struct s_flow, prev)->latency && net->n_units - 1))
 		{
