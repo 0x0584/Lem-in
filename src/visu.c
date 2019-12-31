@@ -6,12 +6,12 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/23 20:57:10 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/31 17:57:19 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
-
+#ifdef USE_VISU
 void	data_init(t_dvisu *data)
 {
 	data->w_width = 1280;
@@ -121,3 +121,4 @@ int	visu_init(t_graph *g)
 	}
 	return (0);
 }
+#endif

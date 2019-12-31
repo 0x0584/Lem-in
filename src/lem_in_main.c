@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 05:46:17 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 20:03:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void node_info(t_node *node)
 		type = "NODE";
 	else
 		type = (node->type == NODE_START ? "source" : "sink");
-	ft_printf("type: %s -- seen: '%s'\n", type, node->seen == NODE_TAKEN ? "taken" : "fresh-or-seen");
+	ft_printf("type: %s -- seen: '%d'\n", type, node->seen);
 	ft_putendl("========================================");
 }
 
@@ -93,7 +93,9 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	g->max_c.x = 0;
 	g->max_c.y = 0;
 	g->n_nodes = nodes_c;
+#ifdef USE_VISU
 	g->data = (t_dvisu *)malloc(sizeof(t_dvisu));
+#endif
 	while ((int)i < nodes_c)
 	{
 		curr = nodes[i];
@@ -115,8 +117,10 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 										curr, sizeof(t_node));
 				walk = walk->next;
 			}
-			g->max_c.x = (g->max_c.x > curr->cords.x ? g->max_c.x : curr->cords.x);
-			g->max_c.y = (g->max_c.y > curr->cords.y ? g->max_c.y : curr->cords.y);
+			g->max_c.x = (g->max_c.x > curr->cords.x ?
+							g->max_c.x : curr->cords.x);
+			g->max_c.y = (g->max_c.y > curr->cords.y ?
+							g->max_c.y : curr->cords.y);
 			curr = curr->next;
 		}
 		i++;
@@ -273,12 +277,14 @@ int		main(void)
 	parser_free(pp);
 
 	g = graph_init(refs, nodes, nodes_c);
-	visu_init(g);
 	graph_dump(g);
 
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 
 	t_netflow *farm = netflow_setup(g, n_ants);
+
+#ifdef USE_VISU
+	visu_init(g);
 	SDL_Event event;
 	int close_requested = 0;
 	while (!close_requested)
@@ -290,6 +296,8 @@ int		main(void)
 				close_requested = 1;
 		}
 	}
+#endif
+
 	netflow_pushflow(farm);
 	netflow_del(&farm);
 

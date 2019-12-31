@@ -6,13 +6,12 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 05:25:45 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 20:03:15 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEMIN_H
 # define LEMIN_H
-
 # include "libft/libft.h"
 # include "src/queue.h"
 
@@ -27,13 +26,6 @@ enum e_node_type
 	NODE_DEFAULT = 1,
 	NODE_START, NODE_END
 };
-
-typedef enum e_node_state	t_node_state;
-enum e_node_state
-{
-	NODE_FRESH = 0,
-	NODE_SEEN, NODE_TAKEN
-}				seen;
 
 typedef struct	s_cords
 {
@@ -60,9 +52,12 @@ typedef struct s_edge		t_edge;
 struct s_edge
 {
 	int				seen;
+
+#  ifdef USE_VISU
 	int				v_c;
 	int				path_n;
 	int				drawn;
+#  endif
 
 	struct s_edge	*residual;
 	struct s_node	*node_dst;
@@ -141,8 +136,10 @@ typedef struct				s_flow_network
 }							t_netflow;
 
 /* *************************** visu ****************************************/
-# include "./visu_lib/SDL_LIB/2.0.10/include/SDL2/SDL.h"
-# include "./visu_lib/SDL_IMG_LIB/include/SDL2/SDL_image.h"
+
+# ifdef USE_VISU
+#  include "./visu_lib/SDL_LIB/2.0.10/include/SDL2/SDL.h"
+#  include "./visu_lib/SDL_IMG_LIB/include/SDL2/SDL_image.h"
 
 struct s_dvisu
 {
@@ -155,18 +152,21 @@ struct s_dvisu
 	int				path_n;
 };
 
-int	visu_init(t_graph *g);
+int		visu_init(t_graph *g);
 void	visu_quit();
 int		graph_draw(t_graph *g);
 int		edge_draw(t_graph *g, t_edge *edge, int type);
 int		edges_draw(t_graph *g, t_node *node);
 int		nodes_draw(t_graph *g, SDL_Rect dstr);
+
 /* *************************** visu end ************************************/
 
 /* *************************** tools ***************************************/
-int	map(int val, int *ranges);
-int	*range_comp(int in_s, int in_e, int out_s, int out_e);
+int		map(int val, int *ranges);
+int		*range_comp(int in_s, int in_e, int out_s, int out_e);
 /* *************************** tools end ***********************************/
+
+# endif
 
 /* ***** function prototypes *************************************************/
 

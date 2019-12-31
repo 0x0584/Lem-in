@@ -6,12 +6,12 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 20:06:04 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/23 23:53:13 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/31 17:57:36 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
-
+#ifdef USE_VISU
 int		edge_bfs_iter(t_graph *g, t_edge *edge)
 {
 	if (edge->v_c < 0 || edge->residual->v_c < 0)
@@ -58,7 +58,7 @@ int	edges_draw(t_graph *g, t_node *node)
 	t_cords	dst;
 
 	curr = node->edges;
-	// make the line 
+	// make the line
 	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
 	src.x = map(node->cords.x, ranges_x) + 10;
 	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
@@ -90,3 +90,4 @@ int	edges_draw(t_graph *g, t_node *node)
 	SDL_SetRenderDrawColor(g->data->rend, 0, 0, 0, 255);
 	return (0);
 }
+#endif

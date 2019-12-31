@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 05:39:45 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 20:10:13 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,9 +122,13 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 		curr->next->next = NULL;
 		tmp = curr->next;
 	}
+
+#ifdef USE_VISU
 	tmp->v_c = 0;
 	tmp->path_n = -1;
 	tmp->drawn = 0;
+#endif
+
 	if (is_residual == false)
 	{
 		// this need to stay tmp not curr
@@ -148,7 +152,9 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 	char	**s_lines;
 	t_node	*node[2];
 
-	while (lines && lines->type < 2) /* this just to walk till the edges in the stored lines ant number has type 0 and nodes has type 1 */
+	while (lines && lines->type < 2) /* this just to walk till the edges
+										in the stored lines ant number has
+										type 0 and nodes has type 1 */
 	{
 		ft_printf(">>> %s\n", lines->line);
 		lines = lines->next;

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/31 05:34:50 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 17:52:30 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,9 @@ static t_queue	*bfs_helper(t_graph *g, t_edge **parent)
 		parent[prev]->seen = true;
 		// ft_printf("%s-%s ", parent[prev]->node_dst->name,
 		// 		  parent[prev]->node_src->name);
+#ifdef USE_VISU
 		edge_draw(g, parent[prev], 1);
+#endif
 		queue_enq(path, queue_dry_node(parent[prev], sizeof(t_edge *)));
 		if (parent[prev]->node_src == g->start)
 			break ;
@@ -116,7 +118,9 @@ t_queue			*bfs_find(t_graph *g)
 				ft_putendl("this is a is used");
 			if (e->seen != turn && e->seen != 1)
 			{
+#ifdef USE_VISU
 				edge_draw(g, e, -1);
+#endif
 				if (e->residual->seen == turn)
 					queue_enq(residuals, queue_dry_node(e->residual,
 														sizeof(t_edge *)));
@@ -141,7 +145,9 @@ t_queue			*bfs_find(t_graph *g)
 			}
 			e = e->next;
 		}
+#ifdef USE_VISU
 		graph_draw(g);
+#endif
 		ft_putstr("\n\n(residuals)\n");
 		if (!queue_size(residuals))
 			ft_putstr(" // no residuals\n");

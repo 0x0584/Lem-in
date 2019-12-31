@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/23 22:56:23 by archid-          ###   ########.fr        #
+#    Updated: 2019/12/31 16:02:15 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -127,8 +127,8 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	@rm -vf $(OBJ)
+	@rm -f $(OBJ)
 	@rmdir $(OBJ_PATH) 2> /dev/null || true
 fclean: clean
-	@rm -vf $(NAME)
+	@rm -f $(NAME)
 re: fclean all

@@ -6,12 +6,12 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:30:44 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/23 22:42:21 by melalj           ###   ########.fr       */
+/*   Updated: 2019/12/31 18:09:33 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
-
+#ifdef USE_VISU
 SDL_Texture	*get_imagetex(t_dvisu *data, char *image_path)
 {
 	SDL_Surface *sur;
@@ -26,7 +26,7 @@ SDL_Texture	*get_imagetex(t_dvisu *data, char *image_path)
 	SDL_FreeSurface(sur);
 	if (!tex)
 	{
-		ft_printf("error creating texture\n");
+		ft_printf("error creating texture: %s\n", SDL_GetError());
 		return (NULL);
 	}
 	return (tex);
@@ -78,3 +78,4 @@ int	graph_draw(t_graph *g)
 	nodes_draw(g, nodes_size);
 	return (1);
 }
+#endif
