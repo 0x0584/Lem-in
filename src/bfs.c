@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bfs.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/30 23:34:56 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 05:34:50 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +59,16 @@ static t_queue	*bfs_helper(t_graph *g, t_edge **parent)
 	while (true)
 	{
 		parent[prev]->seen = true;
-		ft_printf("%s-%s ", parent[prev]->node_dst->name,
-				  parent[prev]->node_src->name);
+		// ft_printf("%s-%s ", parent[prev]->node_dst->name,
+		// 		  parent[prev]->node_src->name);
+		edge_draw(g, parent[prev], 1);
 		queue_enq(path, queue_dry_node(parent[prev], sizeof(t_edge *)));
 		if (parent[prev]->node_src == g->start)
 			break ;
 		prev = parent[prev]->node_src->index;
 	}
 	ft_putendl("\n");
-	queue_iter(path, false, edge_dump);
+	// queue_iter(path, false, edge_dump);
 	/* bfs_reset_graph(g); */
 	return path;
 }
@@ -115,6 +116,7 @@ t_queue			*bfs_find(t_graph *g)
 				ft_putendl("this is a is used");
 			if (e->seen != turn && e->seen != 1)
 			{
+				edge_draw(g, e, -1);
 				if (e->residual->seen == turn)
 					queue_enq(residuals, queue_dry_node(e->residual,
 														sizeof(t_edge *)));
@@ -123,8 +125,8 @@ t_queue			*bfs_find(t_graph *g)
 					queue_enq(helper, queue_dry_node(e->node_dst->edges,
 													 sizeof(t_edge *)));
 					parent[e->node_dst->index] = e;
-					ft_printf(" enq > (%s # %s) \n", e->node_src->name,
-							  e->node_dst->name);
+					// ft_printf(" enq > (%s # %s) \n", e->node_src->name,
+							//   e->node_dst->name);
 					/* we're at that node */
 					e->node_dst->seen = turn;
 					e->seen = turn;
@@ -139,6 +141,7 @@ t_queue			*bfs_find(t_graph *g)
 			}
 			e = e->next;
 		}
+		graph_draw(g);
 		ft_putstr("\n\n(residuals)\n");
 		if (!queue_size(residuals))
 			ft_putstr(" // no residuals\n");

@@ -6,16 +6,17 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/26 22:23:22 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/31 05:46:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
+# include "visu.h"
 
 void node_info(t_node *node)
 {
 	char *type;
-	char *seen;
+	// char *seen;
 
 	ft_putendl("========================================");
 	ft_printf("index: %d -- name: '%s'\n", node->index, node->name);
@@ -30,7 +31,7 @@ void node_info(t_node *node)
 void node_dump(t_qnode *e)
 {
 	t_node *node;
-	t_edge *e_walk;
+	// t_edge *e_walk;
 
 	node_info(node = e->blob);
 	/*
@@ -89,7 +90,10 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	i = 0;
 	g = (t_graph *)ft_memalloc(sizeof(t_graph));
 	g->nodes_ref = refs;
+	g->max_c.x = 0;
+	g->max_c.y = 0;
 	g->n_nodes = nodes_c;
+	g->data = (t_dvisu *)malloc(sizeof(t_dvisu));
 	while ((int)i < nodes_c)
 	{
 		curr = nodes[i];
@@ -111,12 +115,13 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 										curr, sizeof(t_node));
 				walk = walk->next;
 			}
-
+			g->max_c.x = (g->max_c.x > curr->cords.x ? g->max_c.x : curr->cords.x);
+			g->max_c.y = (g->max_c.y > curr->cords.y ? g->max_c.y : curr->cords.y);
 			curr = curr->next;
 		}
 		i++;
 	}
-	return g;
+	return (g);
 }
 
 void	graph_dump(t_graph *g)
@@ -138,7 +143,7 @@ void	graph_dump(t_graph *g)
 					  e->node_dst->type);
 			e = e->next;
 		}
-		ft_printf("\n == ==  ==\n\n");
+		ft_printf(" == ===== ==\n\n");
 		walk = walk->next;
 	}
 
@@ -215,7 +220,7 @@ void	node_oneline_dump(t_qnode *e)
 
 void	edge_oneline_dump(t_qnode *e)
 {
-	t_node *node;
+	// t_node *node;
 	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
 								 * but let's get it working first, the fix
 								 * design issues. */
@@ -251,23 +256,15 @@ int		main(void)
 	int			i;
 	t_graph		*g;
 	t_node		**refs;
+	size_t		n_ants;
 
-	/* (void)getchar(); */
 
-	ft_printf(" // ");
 	i = 0;
 	pp = get_lines(&nodes_c);
 
-	t_parse *walk;
-
-	size_t n_ants;
-
-	/* parsing n ants */
-
 	n_ants = (size_t)ft_atoi(pp->line);
 	ft_printf(" >>> %lu\n", n_ants);
-	/* return 0; */
-	/* `node' array of nodes */
+
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
 	ft_putendl(" === filling edges === ");
@@ -276,30 +273,25 @@ int		main(void)
 	parser_free(pp);
 
 	g = graph_init(refs, nodes, nodes_c);
+	visu_init(g);
 	graph_dump(g);
-
-	t_queue *paths;
-	t_queue *tmp_path;
-	t_qnode *tmp;
 
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 
-	/* paths = list_shortest_paths(g); */
-
 	t_netflow *farm = netflow_setup(g, n_ants);
+	SDL_Event event;
+	int close_requested = 0;
+	while (!close_requested)
+	{
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT
+				|| (event.type == SDL_KEYDOWN && event.key.keysym.sym == 27))
+				close_requested = 1;
+		}
+	}
 	netflow_pushflow(farm);
 	netflow_del(&farm);
-
-	/* sp1 = bfs(g); */
-	/* sp2 = bfs(g); */
-	/* ft_printf(" ==== heree ====\n "); */
-	/* queue_iter(sp1, node_dump); */
-	/* queue_del(&sp1, queue_del_helper); */
-	/* queue_iter(sp2, node_dump); */
-
-	/* queue_del(&sp2, queue_del_helper); */
-
-	/* graph_dump(g); */
 
 	/* FIXME: fix double free  */
 	/* graph_free(g); */

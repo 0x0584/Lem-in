@@ -6,18 +6,40 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/27 19:17:27 by archid-          ###   ########.fr        #
+#    Updated: 2019/12/31 05:37:17 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRC_PATH = src
-SRC_FILES = $(shell find $(SRC_PATH) -name '*.c' -type f) 
+SRC_NAME = lem_in_main.c\
+			parser.c\
+			read_line.c\
+			hash_t.c\
+			get_lines.c\
+			queue.c\
+			bfs.c\
+			visu.c\
+			tools.c\
+			graph_draw.c\
+			edges_draw.c\
+			netflow.c
 
-OBJ_PATH = .obj
+OBJ_PATH = obj
 
-OBJS := $(patsubst $(SRC_PATH)/%.c, $(OBJ_PATH)/%.o, $(SRC_FILES))
-#OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
-LDFLIBS = -L libft -lft
+OBJ_NAME = $(SRC_NAME:.c=.o)
+OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
+LDFLIBS =	-L ~/.brew/Cellar/sdl2/2.0.10/lib -lSDL2-2.0.0 -lSDL2 \
+			-L ~/.brew/Cellar/sdl2_image/2.0.5/lib -lSDL2_image \
+			-lSDL2_image-2.0.0 \
+			-L ~/.brew/Cellar/sdl2_ttf/2.0.15/lib -lSDL2_ttf \
+			-lSDL2_ttf-2.0.0 \
+			-L libft -lft
+
+CPPFLAGS =	-I ~/.brew/Cellar/sdl2_image/2.0.5/include/SDL2 \
+			-I ~/.brew/Cellar/sdl2/2.0.10/include/SDL2 \
+			-I ~/.brew/Cellar/sdl2_ttf/2.0.15/include/SDL2 \
+			-I include \
+			-I libft/include \
 
 CC = gcc
 CFLAGS = -Wall -Wextra -g
@@ -27,7 +49,7 @@ NAME = lem-in
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJ)
 	@cd libft ; make
 	$(CC) $(LDFLIBS) $^ -o $@ -Llibft -lft -Ilibft
 
@@ -53,4 +75,3 @@ check:
 	ls -lR
 	@make
 	./lem-in && echo $?
-	
