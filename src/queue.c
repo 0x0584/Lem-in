@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/26 21:49:12 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/29 20:09:00 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,22 @@ void		queue_iter(t_queue *q, bool from_head, void (*f)(t_qnode *))
 	while (walk != (from_head ? q->tail : q->head))
 	{
 		(*f)(walk);
+		walk = from_head ? walk->next : walk->prev;
+	}
+}
+
+void		queue_iteri(t_queue *q, bool from_head, void (*f)(t_qnode *, size_t))
+{
+	t_qnode *walk;
+	size_t	i;
+
+	if (!q || q->head->next == q->tail)
+		return ;
+	i = 0;
+	walk = from_head ? q->head->next : q->tail->prev;
+	while (walk != (from_head ? q->tail : q->head))
+	{
+		(*f)(walk, i++);
 		walk = from_head ? walk->next : walk->prev;
 	}
 }

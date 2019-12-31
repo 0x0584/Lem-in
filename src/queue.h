@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/26 21:43:35 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/29 20:09:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,16 @@
 # include <limits.h>
 
 # define QNODE_AS(t, e)			((t *)e->blob)
+
+
+# define QHEAD(q)				(q)->head
+# define QTAIL(q)				(q)->tail
+
+# define QFIRST(q)				(q)->head->next
+# define QLAST(q)				(q)->tail->prev
+
+# define QNODE_GETNEXT(q, e)	((e)->next != QTAIL(q) ? (e)->next : NULL)
+# define QNODE_GETPREV(q, e)	((e)->prev != QHEAD(q) ? (e)->prev : NULL)
 
 typedef struct s_queue_node		t_qnode;
 struct							s_queue_node
@@ -47,6 +57,8 @@ void							queue_node_del(t_qnode **a_node,
 t_queue							*queue_init(void);
 void							queue_iter(t_queue *q, bool from_head,
 											void (*f)(t_qnode *));
+void							queue_iteri(t_queue *q, bool from_head,
+											void (*f)(t_qnode *, size_t));
 size_t							queue_size(t_queue *q);
 void							queue_del(t_queue **a_queue,
 											void (*del)(void *, size_t));

@@ -6,13 +6,13 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/27 19:07:19 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/30 23:35:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-/* #define DEBUG_FLOW */
+#define DEBUG_FLOW
 
 t_flow		flow_nil()
 {
@@ -96,18 +96,78 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 
 # define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
 
+void			flow_ants_log(t_flow *flow)
+{
+	size_t i;
+	size_t ant;
+
+	i = 0;
+	/* ants still coming */
+	if (!FLOW_SATURATED(flow) && flow->current & 1)
+	{
+		ant = 0;
+		while (((flow->current << i) & flow->cmask))
+		{
+			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
+			{
+				/*
+				ft_printf("+ L%d-%s using <%s, %s> ",
+						  ant++,
+						  flow->path[flow->latency - i - 1]->node_dst->name,
+						  flow->path[flow->latency - i - 1]->node_src->name,
+						  flow->path[flow->latency - i - 1]->node_dst->name);
+				*/
+				ft_printf("+ L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
+			}
+			i++;
+		}
+	}
+	/* ants are arriving */
+	else if (!FLOW_SATURATED(flow) && flow->current & (1 << (flow->latency - 1)))
+	{
+		ant = 0;
+		while (i < flow->latency)
+		{
+			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
+			{
+				/*
+				ft_printf("- L%d-%s using <%s, %s> ",
+						  flow->n_arrived + ant,
+						  flow->path[flow->latency - ant - 1]->node_dst->name,
+						  flow->path[flow->latency - ant - 1]->node_src->name,
+						  flow->path[flow->latency - ant - 1]->node_dst->name);
+				*/
+				ft_printf("- L%d-%s ", flow->n_arrived + ant,
+						  flow->path[flow->latency - ant - 1]->node_dst->name);
+				ant++;
+			}
+			i++;
+		}
+	}
+	/* either there's a current or not! */
+	else if (flow->current & flow->cmask)
+	{
+		/* here! */
+		ant = flow->n_arrived;	/* + how many ants have arrived on the previous flows */
+		while (i < flow->latency)
+		{
+			ft_printf("o L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
+			i++;
+		}
+	}
+	i++;
+}
+
 void			flow_dump(t_qnode *e)
 {
-	t_flow *flow;
-	unsigned i;
-	unsigned index;
-	char *cut;
+	t_flow	*flow;
+	char	*cut;
 
 	if (!e)
 		return ;
 	flow = e->blob;
 	cut = flow->cut ? "C": " ";
-	if (flow->cut && (flow->current & flow->cmask) == 0)
+	if (flow->cut && !(flow->current & flow->cmask))
 		cut = "X";
 	ft_printf(" >> [%s] flow of %u / %zu ",
 			  cut, flow->latency, flow->n_arrived);
@@ -116,42 +176,7 @@ void			flow_dump(t_qnode *e)
 	ft_putstr(" current: ");
 	ft_putbits(flow->current, flow->cmask);
 	ft_putchar('\n');
-	i = 0;
-	while (i < flow->latency)
-	{
-		/* sync-in */
-		if (!FLOW_SATURATED(flow) && (flow->current & (1 << i)))
-		{
-			ft_printf(" v L%d-%s using <%s, %s>\n",
-					  i, flow->path[i]->node_dst->name,
-					  flow->path[i]->node_src->name,
-					  flow->path[i]->node_dst->name);
-		}
-		/* sync */
-		else if (FLOW_SATURATED(flow))
-			ft_printf(" ^ L%d-%s using <%s, %s>\n",
-					  /* add latency */
-					  (flow->n_arrived) + (flow->latency - i - 1),
-					  flow->path[flow->latency - i - 1]->node_dst->name,
-					  flow->path[flow->latency - i - 1]->node_src->name,
-					  flow->path[flow->latency - i - 1]->node_dst->name);
-
-		/* sync-out */
-		else
-		{
-			/* i++; */
-		    /* if (((flow->current >> i) & ((flow->cmask >> i) + 1))) */
-			/* { */
-			/* 	ft_printf(" v L%d-%s using <%s, %s>\n", */
-			/* 			  i, flow->path[flow->latency - i - 1]->node_dst->name, */
-			/* 			  flow->path[flow->latency - i - 1]->node_src->name, */
-			/* 			  flow->path[flow->latency - i - 1]->node_dst->name); */
-			/* } */
-			/* continue ; */
-		}
-		i++;
-	}
-
+	flow_ants_log(flow);
 	ft_putendl("\n");
 }
 
@@ -165,7 +190,9 @@ void			netflow_log(t_netflow *net)
 
 	queue_iter(net->flows, false, flow_dump);
 	queue_iter(net->sync, false, flow_dump);
+
 	ft_putendl(" ============ //// =================================== ");
+
 #ifdef DEBUG_FLOW
 	getchar();
 #endif
@@ -268,34 +295,36 @@ void		set_flow_cut(t_qnode *e)
 size_t		netflow_shrink(t_netflow *net)
 {
 	t_qnode *walk;
-	t_qnode *tmp;
-	size_t  qsize;
+	t_qnode *prev;
 
-	qsize = queue_size(net->flows);
-	net->maxflow = MIN(qsize, net->n_units);
-	walk = net->flows->head->next;
+
+	if (QHEAD(net->flows)->next == QTAIL(net->flows))
+		return (0);
+	walk = QLAST(net->flows);
+	net->maxflow = QNODE_AS(struct s_flow, walk)->latency;
 	/* looking for sigma set */
-	while (net->n_units && walk != net->flows->tail)
+	while (net->n_units && walk != QHEAD(net->flows))
 	{
-		tmp = walk;
-
-		if ((walk = walk->next) == net->flows->tail)
+		prev = walk;
+		if ((walk = walk->prev) == QHEAD(net->flows))
 			break ;
-
-		/*
-		   which one is better? two ants over two paths of 4 or one of 4
-		   the answer is two over rwo.
-		*/
-
-		if (qsize - net->maxflow ||
-				QNODE_AS(struct s_flow, tmp)->latency == (unsigned)-1)
+		/* here!! */
+		if (net->n_units >= QNODE_AS(struct s_flow, walk)->latency
+				|| (QNODE_AS(struct s_flow, walk)->latency
+						== QNODE_AS(struct s_flow, prev)->latency && net->n_units - 1))
 		{
-			tmp->prev->next = tmp->next;
-			tmp->next->prev = tmp->prev;
-			QNODE_AS(struct s_flow, tmp)->cut = true;
-			queue_penq(net->sync, tmp, lower_latency);
-			qsize--;
+				ft_putstr(" ////"); flow_dump(walk);
+				net->maxflow += QNODE_AS(struct s_flow, walk)->latency;
+				continue ;
 		}
+		while ((prev = queue_deq(net->flows)))
+		{
+			QNODE_AS(struct s_flow, prev)->cut = true;
+			queue_penq(net->sync, prev, lower_latency);
+			if (prev == walk)
+				break;
+		}
+		break;
 	}
 	if (!net->n_units)
 	{
@@ -388,15 +417,16 @@ void		netflow_pushflow(t_netflow *net)
 {
 	size_t allflows;
 	bool state;
+	size_t i;
 
+	i = 0;
 	ft_printf("number of ants: %lu\n", net->n_units);
 	allflows = queue_size(net->flows);
 	state = true;
 	while (state)
 	{
-		if (net->maxflow > queue_size(net->flows))
-			netflow_shrink(net); /* optimal netflow / n_unites */
+		netflow_shrink(net); /* optimal netflow / n_unites */
 		state = netflow_sync(net);
-
+		ft_printf("n_instructions %zu\n", ++i);
 	}
 }

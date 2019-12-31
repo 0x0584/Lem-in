@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/27 17:28:58 by archid-          ###   ########.fr       */
+/*   Updated: 2019/12/30 23:25:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,9 @@ struct s_node					/* vertex list */
 	char				*name;
 	size_t				index;
 	enum e_node_type	type;
-	enum e_node_state	seen;
+
+	int					seen;
+
 	struct s_edge		*edges;
 	struct s_node		*next;
 };
@@ -61,11 +63,8 @@ struct s_edge
 typedef struct s_graph		t_graph;
 struct s_graph
 {
-	t_node			*nodes_lst;	 /* FIXME: really implement adjlst, that was
-									just a list of all nodes
-
-									NOTE: probably won't need it. */
-	t_node			**nodes_ref;
+	t_node			*nodes_lst;
+	t_node			**nodes_ref; /* FIXME: remove this, no longer needed! */
 	size_t			n_nodes;
 	struct s_node	*start;		/* FIXME: rename to source */
 	struct s_node	*sink;
@@ -87,6 +86,10 @@ struct s_solver
 	int				n_ants;
 	t_queue			*paths;
 };
+
+/* FIXME: implement array of Bytes, and keep track loading level of
+ * each flow, so that the sync-in happens at the rear Byte(s),
+ * while the sync-out would happen starting at the front Byte. */
 
 # define PATH_MAX_LENGTH			(sizeof(unsigned) * 8)
 # define AS_EDGE(e)					((t_edge *)e->blob)
