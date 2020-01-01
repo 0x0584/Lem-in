@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/31 20:50:04 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 00:31:52 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,9 @@ static t_queue	*bfs_helper(t_graph *g, t_edge **parent)
 
 	if (!g || !parent[g->sink->index])
 	{
+#ifdef DEBUG
 		ft_putendl_fd("sink not found", 2);
+#endif
 		return NULL;
 	}
 
@@ -69,7 +71,9 @@ static t_queue	*bfs_helper(t_graph *g, t_edge **parent)
 			break ;
 		prev = parent[prev]->node_src->index;
 	}
+#ifdef DEBUG
 	ft_putendl("\n");
+#endif
 	// queue_iter(path, false, edge_dump);
 	/* bfs_reset_graph(g); */
 	return path;
@@ -105,17 +109,21 @@ t_queue			*bfs_find(t_graph *g)
 	while (!arrived && queue_size(helper))
 	{
 
+#ifdef DEBUG
 		ft_putendl("current queue: ");
 		queue_iter(helper, true, list_edges_dump);
 		ft_putendl(" ---- ");
 		/* getchar(); */
+#endif
 		tmp = queue_deq(helper);
 		e = tmp->blob;
 		while (e)
 		{
+#ifdef DEBUG
 			ft_printf("(%s # %s) ", e->node_src->name, e->node_dst->name);
 			if (e->seen == 1) /* belongs to a path */
 				ft_putendl("this is a is used");
+#endif
 			if (e->seen != turn && e->seen != 1)
 			{
 #ifdef USE_VISU
@@ -138,8 +146,10 @@ t_queue			*bfs_find(t_graph *g)
 			}
 			if (e->node_dst == g->sink && e->seen != 1)
 			{
+#ifdef DEBUG
 				ft_putendl_fd("sink found!!", 2);
 				getchar();
+#endif
 				arrived = true;
 				break;
 			}
@@ -148,11 +158,13 @@ t_queue			*bfs_find(t_graph *g)
 #ifdef USE_VISU
 		graph_draw(g);
 #endif
+#ifdef DEBUG
 		ft_putstr("\n\n(residuals)\n");
 		if (!queue_size(residuals))
 			ft_putstr(" // no residuals\n");
 		queue_iter(residuals, true, edge_dump);
 		ft_putendl("\n ---\n move \n");
+#endif
 	}
 
 	t_queue *path;
@@ -198,7 +210,6 @@ void		sort_by_node_src_name(t_queue **base, t_qnode **node, size_t size)
 						   AS_EDGE(node[j + 1])->node_src->name) > 0)
 			{
 
-				ft_putendl(" // /");
 				q = base[j];
 				base[j] = base[j + 1];
 				base[j + 1] = q;
@@ -236,7 +247,9 @@ static void	set_walk_edges(t_queue *paths, t_queue **apath, t_qnode **walk_edge)
 	size_t curr;
 
 	walk = paths->head->next;
+#ifdef DEBUG
 	ft_putendl("current edges:\n");
+#endif
 	curr = 0;
 	while (walk != paths->tail)
 	{
@@ -246,7 +259,9 @@ static void	set_walk_edges(t_queue *paths, t_queue **apath, t_qnode **walk_edge)
 		curr++;
 		walk = walk->next;
 	}
+#ifdef DEBUG
 	ft_putendl(" /// \n");
+#endif
 }
 
 t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
@@ -261,28 +276,29 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 
 	if (!paths || !(n_paths = queue_size(paths)))
 	{
+#ifdef DEBUG
 		ft_putendl("no paths are found!");
+#endif
 		return NULL;
 	}
 
 	curr = 0;
 	apath = malloc(n_paths * sizeof(t_queue *));
 	walk_edge = malloc(n_paths * sizeof(t_qnode *));
-
 	/* setup all found paths */
 	set_walk_edges(paths, apath, walk_edge);
 
 	bool done;
-
 	while (true)
 	{
+#ifdef DEBUG
 		curr = 0;
 		while (curr < n_paths)
 		{
 			queue_iter(apath[curr++], true, edge_dump);
 			ft_putendl("");
 		}
-
+#endif
 		/* if all paths have arrived, that means edge is all NULLs */
 		curr = 0;
 		done = true;
@@ -298,7 +314,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 		/* moving one edge on each path */
 
 		sort_by_node_src_name(apath, walk_edge, n_paths);
-
+#ifdef DEBUG
 		curr = 0;
 		ft_putendl(" all edges before collision testing  ");
 		while (curr < n_paths)
@@ -309,7 +325,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 
 		ft_putendl(" checking the edge ");
 		getchar();
-
+#endif
 		curr = 0;
 		collision = false;
 		while (curr < n_paths - 1)
@@ -317,14 +333,9 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 			t_qnode *e1;
 			t_qnode *e2;
 
-			ft_putendl(" ///// edges we're testing ///////  ");
-			edge_dump(walk_edge[curr]);
-			edge_dump(walk_edge[curr + 1]);
-			ft_putendl(" ////////////  ");
-
 			e1 = next_edge(g, apath[curr], walk_edge[curr]);
 			e2 = next_edge(g, apath[curr + 1], walk_edge[curr + 1]);
-
+#ifdef DEBUG
 			ft_putendl("// edges");
 			edge_dump(walk_edge[curr]); ft_putstr(" >> ");		/* path 1 */
 			edge_dump(e1);
@@ -332,7 +343,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 			edge_dump(e2);
 			ft_putendl("// ------ ");
 			getchar();
-
+#endif
 			/* looking for edges that cae from the same node */
 			if (/* #1 check current edges first, curr and curr + 1 */
 				(!has_arrived(g, AS_EDGE(walk_edge[curr]))
@@ -347,6 +358,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 					&& !ft_strcmp(AS_EDGE(e1)->node_src->name,
 								  AS_EDGE(walk_edge[curr + 1])->node_src->name)))
 			{
+#ifdef DEBUG
 
 				/* we have found a collision, two nodes have the same start */
 				ft_putendl("edges having the same src node");
@@ -356,24 +368,20 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(e2);
 				ft_putendl("\n -- \n");
 				getchar();
-
+#endif
 				int		residual;
 				t_qnode *after1;
 				t_qnode *after2;
-
 
 				/*
 				   here if one has not moved, hasn't moved then set
 				   it to NULL and test afterwards!
 				*/
-				after1 = next_edge(g, apath[curr], e1);
-
-				if (e1 == after1)
+				if (e1 == (after1 = next_edge(g, apath[curr], e1)))
 					after1 = NULL;
-				after2 = next_edge(g, apath[curr + 1], e2);
-				if (e2 == after2)
+				if (e2 == (after2 = next_edge(g, apath[curr + 1], e2)))
 					after2 = NULL;
-
+#ifdef DEBUG
 				ft_putendl(" next of  ");
 				edge_dump(walk_edge[curr]);
 				ft_putendl(" is  ");
@@ -389,7 +397,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(after2);
 
 				getchar();
-
+#endif
 				/* preparing target edges */
 				bool move_edge;
 
@@ -415,7 +423,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				else
 					/* residual is in path 1 or in path 2 */
 					residual = 0;
-
+#ifdef DEBUG
 				ft_putendl(">>> collision between \nresidual: ");
 				/* BUG: residual is not chosen properly */
 				edge_dump(walk_edge[curr + residual]->next);
@@ -428,15 +436,17 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				ft_putendl("\n /////////////////// \n");
 
 				getchar();
-
+#endif
 				if (move_edge)
 				{
+#ifdef DEBUG
 					ft_putendl(">>> backward in residual since the collision happens\n"
 							   " ahead by an edge");
 					edge_dump(walk_edge[curr + residual]);
-					walk_edge[curr + residual] = walk_edge[curr + residual]->prev;
 					ft_putendl(" and now on ");
-					edge_dump(walk_edge[curr + residual]);
+					edge_dump(walk_edge[curr + residual]->prev);
+#endif
+					walk_edge[curr + residual] = walk_edge[curr + residual]->prev;
 				}
 
 				walk_edge[curr + !residual] = walk_edge[curr + !residual]->prev;
@@ -453,7 +463,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				queue_node_del_next(apath[curr + !residual],
 									walk_edge[curr + !residual],
 									queue_node_del_dry);
-
+#ifdef DEBUG
 				ft_putendl(" // \n path of residual ");
 				queue_iter(apath[curr + residual], false, edge_dump);
 
@@ -467,7 +477,7 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				ft_putendl(" ---- ---- ---- \n");
 				queue_iter(apath[curr + !residual], true, edge_dump);
 				ft_putendl(" ---- paths ---- \n");
-
+#endif
 				t_qnode *old_next = walk_edge[curr + !residual]->next;
 
 				/* merge the other half of each path a-b 0-9 => a-9 0-b */
@@ -475,16 +485,16 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 									walk_edge[curr + !residual],
 									walk_edge[curr + residual]);
 				walk_edge[curr + !residual] = old_next;
-
+#ifdef DEBUG
 				ft_putendl(" ---- after merge ---- \n");
 				queue_iter(apath[curr + residual], true, edge_dump);
 				ft_putendl(" ---- ---- ---- \n");
 				queue_iter(apath[curr + !residual], true, edge_dump);
 				ft_putendl(" ---- paths ---- \n");
-
+#endif
 				if (move_edge)
 					walk_edge[curr + residual] = old_prev;
-
+#ifdef DEBUG
 				ft_putendl("  collision edges after ");
 				edge_dump(walk_edge[curr + residual]);
 				edge_dump(walk_edge[curr + !residual]);
@@ -492,14 +502,15 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				edge_dump(walk_edge[curr]);
 				edge_dump(walk_edge[curr + 1]);
 				ft_putendl(" ////////////  ");
-
 				getchar();
+#endif
 				collision = true;
 				break;
 			}
 			curr++;
 		}
 
+#ifdef DEBUG
 		curr = 0;
 		ft_putendl(" all edges after collision testing  ");
 		while (curr < n_paths)
@@ -507,34 +518,36 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 			edge_dump(walk_edge[curr]);
 			curr++;
 		}
-
+#endif
 		if (collision)
 		{
+#ifdef DEBUG
 			ft_putendl(" /// collision ");
-			/* start from the sink again */
-			set_walk_edges(paths, apath, walk_edge);
 			getchar();
+#endif
+			set_walk_edges(paths, apath, walk_edge); /* start from the sink again */
 			continue ;
 		}
 		curr = 0;
+#ifdef DEBUG
 		ft_putendl(" moving edges \n");
-
+#endif
 		while (curr < n_paths)
 		{
+#ifdef DEBUG
 			ft_putendl(" old ");
 			edge_dump(walk_edge[curr]);
+#endif
 			/* ignoring paths that have reached the source */
 			if (AS_EDGE(walk_edge[curr])->node_src != g->start)
 				walk_edge[curr] = walk_edge[curr]->next;
+#ifdef DEBUG
 			else
 				ft_printf("already arrived! -> ");
 			edge_dump(walk_edge[curr]);
-
-			ft_putendl(" /// ");
+#endif
 			curr++;
 		}
-
-		getchar();
 	}
 
 	free(apath);

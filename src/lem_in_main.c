@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 20:03:59 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 00:38:45 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,19 +267,22 @@ int		main(void)
 	pp = get_lines(&nodes_c);
 
 	n_ants = (size_t)ft_atoi(pp->line);
-	ft_printf(" >>> %lu\n", n_ants);
-
+#ifdef DEBUG
+	ft_printf("%lu\n", n_ants);
+#endif
 	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
 	nodes = h_table(refs, pp, nodes_c);
-	ft_putendl(" === filling edges === ");
+
 	edges_fill(nodes, pp, nodes_c);
 
 	parser_free(pp);
 
 	g = graph_init(refs, nodes, nodes_c);
-	graph_dump(g);
 
+#ifdef DEBUG
+	graph_dump(g);
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
+#endif
 
 	t_netflow *farm = netflow_setup(g, n_ants);
 
@@ -292,7 +295,8 @@ int		main(void)
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT
-				|| (event.type == SDL_KEYDOWN && event.key.keysym.sym == 27))
+					|| (event.type == SDL_KEYDOWN
+						&& event.key.keysym.sym == 27))
 				close_requested = 1;
 		}
 	}

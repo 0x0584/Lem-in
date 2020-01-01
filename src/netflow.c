@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 00:19:51 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 00:33:01 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,14 +242,18 @@ t_netflow	*netflow_setup(t_graph *graph, size_t units)
 	paths = queue_init();
 	while ((tmp = bfs_find(graph)))
 	{
+#ifdef DEBUG
 		ft_putendl(" path:  \n ");
 		queue_iter(tmp, true, edge_dump);
 		queue_iter(tmp, false, edge_dump); /* from tail: source -> sink */
+#endif
 		queue_enq(paths, queue_dry_node(tmp, sizeof(t_queue *)));
 	}
 	if (!queue_size(paths))
 	{
+#ifdef DEBUG
 		ft_putendl("no paths were found!");
+#endif
 		return NULL;
 	}
 	net = netflow_init(re_wire_paths(graph, paths));
