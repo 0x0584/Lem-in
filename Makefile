@@ -6,11 +6,12 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/31 20:13:27 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/01 23:14:39 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 VISU	 ?= 0
+DEBUG	 ?= 0
 
 SRC_PATH = src
 SRC_NAME = lem_in_main.c	\
@@ -42,6 +43,10 @@ ifeq ($(VISU),1)
 				visu.c			\
 				graph_draw.c	\
 				edges_draw.c
+endif
+
+ifeq ($(DEBUG),1)
+	CFLAGS += -DDEBUG
 endif
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
