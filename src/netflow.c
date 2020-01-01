@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/30 23:35:34 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/01 22:51:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ t_flow		flow_init(t_queue *path)
 		queue_node_del(&node, queue_node_del_dry);
 	}
 	p.cut = false;
-	p.n_arrived = 0;
+	p.n_synced = 0;
+	p.ants = queue_init();
 	return (p);
 }
 
@@ -96,7 +97,22 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 
 # define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
 
-void			flow_ants_log(t_flow *flow)
+void			flow_log_ants(t_flow *f)
+{
+	t_qnode *walk;
+	size_t i;
+
+	i = 0;
+	walk = f->ants->head->next;
+	while (walk != f->ants->tail)
+	{
+		ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
+					f->path[i++]->node_dst->name);
+		walk = walk->next;
+	}
+}
+
+void			flow_log(t_flow *flow)
 {
 	size_t i;
 	size_t ant;
@@ -110,14 +126,8 @@ void			flow_ants_log(t_flow *flow)
 		{
 			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
 			{
-				/*
-				ft_printf("+ L%d-%s using <%s, %s> ",
-						  ant++,
-						  flow->path[flow->latency - i - 1]->node_dst->name,
-						  flow->path[flow->latency - i - 1]->node_src->name,
+				ft_printf("+ L%d-%s ", ant++,
 						  flow->path[flow->latency - i - 1]->node_dst->name);
-				*/
-				ft_printf("+ L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
 			}
 			i++;
 		}
@@ -130,14 +140,7 @@ void			flow_ants_log(t_flow *flow)
 		{
 			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
 			{
-				/*
-				ft_printf("- L%d-%s using <%s, %s> ",
-						  flow->n_arrived + ant,
-						  flow->path[flow->latency - ant - 1]->node_dst->name,
-						  flow->path[flow->latency - ant - 1]->node_src->name,
-						  flow->path[flow->latency - ant - 1]->node_dst->name);
-				*/
-				ft_printf("- L%d-%s ", flow->n_arrived + ant,
+				ft_printf("- L%d-%s ", flow->n_synced + ant,
 						  flow->path[flow->latency - ant - 1]->node_dst->name);
 				ant++;
 			}
@@ -148,7 +151,7 @@ void			flow_ants_log(t_flow *flow)
 	else if (flow->current & flow->cmask)
 	{
 		/* here! */
-		ant = flow->n_arrived;	/* + how many ants have arrived on the previous flows */
+		ant = flow->n_synced;	/* + how many ants have arrived on the previous flows */
 		while (i < flow->latency)
 		{
 			ft_printf("o L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
@@ -170,14 +173,17 @@ void			flow_dump(t_qnode *e)
 	if (flow->cut && !(flow->current & flow->cmask))
 		cut = "X";
 	ft_printf(" >> [%s] flow of %u / %zu ",
-			  cut, flow->latency, flow->n_arrived);
+			  cut, flow->latency, flow->n_synced);
 	ft_putstr("mask: ");
 	ft_putbits(flow->cmask, flow->cmask);
 	ft_putstr(" current: ");
 	ft_putbits(flow->current, flow->cmask);
 	ft_putchar('\n');
-	flow_ants_log(flow);
-	ft_putendl("\n");
+	ft_putstr("flow state:  {\n ");
+	flow_log(flow);
+	ft_putstr("\n -- \n");
+	flow_log_ants(flow);
+	ft_putendl("\n}\n");
 }
 
 void			netflow_log(t_netflow *net)
@@ -191,14 +197,15 @@ void			netflow_log(t_netflow *net)
 	queue_iter(net->flows, false, flow_dump);
 	queue_iter(net->sync, false, flow_dump);
 
-	ft_putendl(" ============ //// =================================== ");
+	ft_putendl("\n\n ============ //// =================================== ");
 
 #ifdef DEBUG_FLOW
 	getchar();
 #endif
+
 }
 
-t_netflow		*netflow_init(t_queue *paths)
+static t_netflow		*netflow_init(t_queue *paths)
 {
 	t_netflow		*net;
 	size_t			n_paths;
@@ -277,9 +284,9 @@ void		netflow_del(t_netflow **anet)
    to name the bits raveling the network, since all flows are sorted based on
    latency, then the ants would be like
 
-   if n_arrived > latency, we have `latency' of ants as
-    (index + n_arrived at once)
-   else n_arrived - index
+   if n_synced > latency, we have `latency' of ants as
+    (index + n_synced at once)
+   else n_synced - index
 
  */
 
@@ -339,21 +346,34 @@ size_t		netflow_shrink(t_netflow *net)
 
 static bool cut_flow(t_flow *f)
 {
+	t_qnode *tmp;
+
 	if (!f || !f->cut)
 		return false;
 	if (!(f->current & f->cmask))
 		return (true);
 	f->current <<= 1;
-	f->n_arrived++;
+	f->n_synced++;
+	tmp = queue_deq(f->ants);
+	queue_node_del(&tmp, queue_del_helper);
 	return false;
 }
 
-static bool sync_flow(t_flow *f)
+
+static bool sync_flow(size_t ant, t_flow *f)
 {
-	if (FLOW_SATURATED(f) && !f->cut)
-		f->n_arrived++;
-	else if (f->cut)
+	t_qnode *tmp;
+
+	if (f->cut)
 		return !cut_flow(f);
+	else if (FLOW_SATURATED(f) && !f->cut)
+	{
+		f->n_synced++;
+		/* dequeue arriving ant, enqueue the new ant */
+		tmp = queue_deq(f->ants);
+		queue_node_del(&tmp, queue_del_helper);
+		queue_enq(f->ants, queue_node(&ant, sizeof(size_t)));
+	}
 	else						/* still loading */
 	{
 		if (!f->current)
@@ -363,12 +383,14 @@ static bool sync_flow(t_flow *f)
 			f->current <<= 1;
 			f->current |= 1;
 		}
+		queue_enq(f->ants,  queue_node(&ant, sizeof(size_t)));
 	}
 	return true;
 }
 
 bool		netflow_sync(t_netflow *net)
 {
+	static size_t n_sent = 0;
 	t_qnode *walk;
 	int		turn;
 	bool	sync_in;
@@ -380,7 +402,7 @@ bool		netflow_sync(t_netflow *net)
 	while (net->n_units && walk != net->flows->head)
 	{
 		net->n_units--;
-		sync_flow(QNODE_AS(struct s_flow, walk));
+		sync_flow(n_sent++, QNODE_AS(struct s_flow, walk));
 		ft_printf("current of flow (%d) is %d\n",
 				  turn++,
 				  QNODE_AS(struct s_flow, walk)->current);
@@ -398,7 +420,7 @@ bool		netflow_sync(t_netflow *net)
 	walk = net->sync->head->next;
 	while (walk != net->sync->tail)
 	{
-		if (sync_flow(QNODE_AS(struct s_flow, walk)))
+		if (sync_flow((size_t)-1, QNODE_AS(struct s_flow, walk)))
 		{
 			ft_putendl("sync!");
 			sync_out = true;
@@ -410,6 +432,8 @@ bool		netflow_sync(t_netflow *net)
 		ft_putendl("\n ====== after syncing ===== ");
 		netflow_log(net);
 	}
+	if (!sync_in && !sync_out)
+		n_sent = 0;				/* all bits have arrived */
 	return (sync_out || sync_in);
 }
 

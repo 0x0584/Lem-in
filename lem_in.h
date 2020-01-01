@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 20:03:15 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/01 21:55:45 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ struct s_solver
 
 typedef struct				s_flow
 {
-	t_edge			**path;
+	t_edge			**path;		/* from source to sink */
 	unsigned		latency;
 	/* This represents the ants as bits and each next
 	 *
@@ -122,7 +122,12 @@ typedef struct				s_flow
 	unsigned		current;
 	unsigned		cmask;
 	bool			cut;
-	size_t			n_arrived;
+	size_t			n_synced;
+	/*
+	   this will hold int indicating the ant going in
+	   the index of the ant in the ueue is it's destication
+	*/
+	t_queue			*ants;
 }							t_flow;
 
 # define MIN(a, b)								((a) > (b) ? (b) : (a))

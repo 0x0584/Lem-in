@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/31 05:26:22 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/01 22:04:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,15 @@ struct							s_queue
 	void				(*del)(void *, size_t);
 };
 
-void							queue_del_helper(void *blob, size_t size);
 t_qnode							*queue_node(void *blob, size_t size);
+void							queue_del_helper(void *blob, size_t size);
 void							queue_node_del(t_qnode **a_node,
 												void (*del)(void *, size_t));
+void							queue_node_del_next(t_queue *q, t_qnode *node,
+														void (*del)(void *,
+																	size_t));
+void							queue_node_del_dry(void *blob, size_t size);
+
 t_queue							*queue_init(void);
 void							queue_iter(t_queue *q, bool from_head,
 											void (*f)(t_qnode *));
@@ -68,10 +73,6 @@ void							queue_penq(t_queue *queue, t_qnode *node,
 t_qnode 						*queue_deq(t_queue *queue);
 
 t_qnode							*queue_last(t_queue *q);
-void							queue_node_del_next(t_queue *q, t_qnode *node,
-														void (*del)(void *,
-																	size_t));
-void							queue_node_del_dry(void *blob, size_t size);
 t_qnode							*queue_dry_node(void *data, size_t size);
 void							queue_swap_halfs(t_queue *head_queue,
 												 t_queue *tail_queue,
