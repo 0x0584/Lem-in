@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/01 23:21:26 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 00:19:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,14 +98,17 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 void			flow_log_ants(t_flow *f)
 {
 	t_qnode *walk;
+	size_t	size;
 	size_t i;
 
+	walk = QHEAD(f->ants)->next;
+	size = queue_size(f->ants);
 	i = 0;
-	walk = f->ants->head->next;
-	while (walk != f->ants->tail)
+	while (walk != QTAIL(f->ants))
 	{
 		ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
-					f->path[i++]->node_dst->name);
+					f->path[f->cut ? f->latency - i - 1 : size - i - 1]->node_dst->name);
+		i++;
 		walk = walk->next;
 	}
 }

@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2020/01/01 23:14:39 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/02 00:18:57 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -87,4 +87,4 @@ check:
 	@make fclean
 	ls -lR
 	@make
-	./lem-in < barfarm && echo $?
+	bash -c './lem-in < barfarm; echo "exit status: $?"'
