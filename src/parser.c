@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 00:38:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 11:43:30 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop, t_node *
 		return (0);
 	while (curr->next)
 	{
-		ft_printf("%s | %s\n", s_lines[0], curr->name);
+		// ft_printf("%s | %s\n", s_lines[0], curr->name);
 		if (ft_strequ((curr)->name, s_lines[0]) && free_tab(s_lines))
 			return (0);
 		(curr) = (curr)->next;
@@ -177,6 +177,11 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 		s_lines = ft_strsplit(lines->line, '-');
 		node[0] = get_node(lst_node, s_lines[0], nodes_c);
 		node[1] = get_node(lst_node, s_lines[1], nodes_c);
+		if (!node[0] || !node[1])
+		{
+			ft_printf("edge not found\n");
+			exit(1);
+		}
 		add_edge(node[0], node[1], false, NULL);
 #ifdef DEBUG
 		ft_printf("node %s, %d --- edge %s\n", node[0]->name,

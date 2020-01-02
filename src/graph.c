@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   graph.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 19:03:24 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 00:54:01 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 11:14:13 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	g->max_c.x = 0;
 	g->max_c.y = 0;
 	g->n_nodes = nodes_c;
+	g->start = NULL;
+	g->sink = NULL;
 #ifdef USE_VISU
 	g->data = (t_dvisu *)malloc(sizeof(t_dvisu));
 #endif
@@ -124,6 +126,11 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 			curr = curr->next;
 		}
 		i++;
+	}
+	if (!(g->start) || !(g->sink))
+	{
+		ft_printf("error no start or end\n");
+		exit(1);
 	}
 	return (g);
 }

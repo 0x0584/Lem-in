@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 10:08:08 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/02 11:51:03 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	data_init(t_dvisu *data)
 {
 	data->w_width = 1280;
-	data->w_height = 720;
+	data->w_height = 950;
 	data->rend = NULL;
 	data->window = NULL;
 	data->s_surface = NULL;
@@ -76,7 +76,7 @@ int	edge_draw(t_graph *g, t_edge *edge, int type)
 	}
 	if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
 		path++;
-	ft_printf("path %d --- %s -- %s\n", path, edge->node_dst->name, g->sink->name);
+	// ft_printf("path %d --- %s -- %s\n", path, edge->node_dst->name, g->sink->name);
 	g->data->path_n = path;
 	dstr.w = 30;
 	dstr.h = 30;

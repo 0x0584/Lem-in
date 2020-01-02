@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 20:06:04 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 10:12:47 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/02 12:06:45 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ int	edges_draw(t_graph *g, t_node *node)
 
 	curr = node->edges;
 	// make the line
-	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
+	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 50);
 	src.x = map(node->cords.x, ranges_x) + 10;
-	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
+	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100 - 250);
 	src.y = map(node->cords.y, ranges_y) + 10;
 	while (curr)
 	{
