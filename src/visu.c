@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 17:57:19 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 11:51:03 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	data_init(t_dvisu *data)
 {
 	data->w_width = 1280;
-	data->w_height = 720;
+	data->w_height = 950;
 	data->rend = NULL;
 	data->window = NULL;
 	data->s_surface = NULL;
@@ -26,6 +26,7 @@ void	data_init(t_dvisu *data)
 int	init(t_dvisu *data)
 {
 	data_init(data);
+	ft_printf("initing visu\n");
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -75,7 +76,7 @@ int	edge_draw(t_graph *g, t_edge *edge, int type)
 	}
 	if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
 		path++;
-	ft_printf("path %d --- %s -- %s\n", path, edge->node_dst->name, g->sink->name);
+	// ft_printf("path %d --- %s -- %s\n", path, edge->node_dst->name, g->sink->name);
 	g->data->path_n = path;
 	dstr.w = 30;
 	dstr.h = 30;

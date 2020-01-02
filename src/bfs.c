@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 00:31:52 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 10:45:24 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	edge_dump(t_qnode *e)
 		return ;
 	walk = e->blob;
 	/* ft_printf("edge of source: %s\n\n", walk->node_src->name); */
-	ft_printf("%s %s\n", walk->node_src->name, walk->node_dst->name);
+	// ft_printf("%s %s\n", walk->node_src->name, walk->node_dst->name);
 	/* ft_putendl("---\n"); */
 }
 

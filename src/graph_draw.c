@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:30:44 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 18:09:33 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 12:06:48 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ int	nodes_draw(t_graph *g, SDL_Rect dstr)
 	while (curr && !edges_draw(g, curr))
 		curr = curr->next;
 	curr = g->nodes_lst;
-	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
-	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
+	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 50);
+	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100 - 250);
 	while (curr)
 	{
 		if (ft_strequ(curr->name, g->start->name))

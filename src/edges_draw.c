@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 20:06:04 by melalj            #+#    #+#             */
-/*   Updated: 2019/12/31 17:57:36 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 12:06:45 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int		edge_bfs_path(t_graph *g, t_edge *edge)
 
 	change = (g->data->path_n != 0) ?  g->data->path_n * 100 : 1;
 	change = (edge->path_n == -1) ? change : edge->path_n;
-	ft_printf(" data_path_n : %d --- edge_path_n %d ++++ chage %d\n", g->data->path_n, edge->path_n, change);
+	// ft_printf(" data_path_n : %d --- edge_path_n %d ++++ chage %d\n", g->data->path_n, edge->path_n, change);
 	if (edge->v_c > 0 || edge->residual->v_c > 0)
 	{
 		SDL_SetRenderDrawColor(g->data->rend, 255 * change , 150 * change, 1 * change, 255);
@@ -59,9 +59,9 @@ int	edges_draw(t_graph *g, t_node *node)
 
 	curr = node->edges;
 	// make the line
-	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
+	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 50);
 	src.x = map(node->cords.x, ranges_x) + 10;
-	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
+	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100 - 250);
 	src.y = map(node->cords.y, ranges_y) + 10;
 	while (curr)
 	{
