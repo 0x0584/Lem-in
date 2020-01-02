@@ -6,12 +6,13 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/01 21:55:45 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/02 01:00:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEMIN_H
 # define LEMIN_H
+
 # include "libft/libft.h"
 # include "src/queue.h"
 
@@ -20,18 +21,19 @@
 
 /* ***** data types **********************************************************/
 
-typedef enum e_node_type	t_node_type;
-enum e_node_type
-{
-	NODE_DEFAULT = 1,
-	NODE_START, NODE_END
-};
 
 typedef struct	s_cords
 {
 	int x;
 	int y;
 }				t_cords;
+
+typedef enum e_node_type	t_node_type;
+enum e_node_type
+{
+	NODE_DEFAULT = 1,
+	NODE_START, NODE_END
+};
 
 
 typedef struct s_node		t_node;
@@ -207,5 +209,16 @@ t_queue						*re_wire_paths(t_graph *g, t_queue *paths);
 void						netflow_pushflow(t_netflow *net);
 t_netflow					*netflow_setup(t_graph *graph, size_t units);
 void						netflow_del(t_netflow **anet);
+
+void node_info(t_node *node);
+void node_dump(t_qnode *e);
+void lstdel_node(void *c, size_t size);
+void	helper_lst_alloc(t_node **head, t_node *walk, t_node *node);
+t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c);
+void	graph_dump(t_graph *g);
+void	graph_free(t_graph *g);
+void	node_full_dump(t_qnode *e);
+void	node_oneline_dump(t_qnode *e);
+void	edge_oneline_dump(t_qnode *e);
 
 #endif

@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2020/01/02 00:18:57 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/02 01:02:08 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ SRC_NAME = lem_in_main.c	\
 			hash_t.c		\
 			get_lines.c		\
 			queue.c			\
+			graph.c			\
 			bfs.c			\
 			netflow.c
 
@@ -28,6 +29,10 @@ LDFLAGS  = -L libft -lft
 DEPS	 = -I include -I libft/include
 CC		 = gcc
 CFLAGS   = -Wall -Wextra -g
+
+ifeq ($(DEBUG),1)
+	CFLAGS += -DDEBUG
+endif
 
 ifeq ($(VISU),1)
 	CFLAGS	+= -DUSE_VISU
@@ -43,10 +48,6 @@ ifeq ($(VISU),1)
 				visu.c			\
 				graph_draw.c	\
 				edges_draw.c
-endif
-
-ifeq ($(DEBUG),1)
-	CFLAGS += -DDEBUG
 endif
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
