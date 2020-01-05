@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 11:43:30 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/05 08:55:34 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 	tmp->v_c = 0;
 	tmp->path_n = -1;
 	tmp->drawn = 0;
+	tmp->color.hex = 0;
 #endif
 
 	if (is_residual == false)

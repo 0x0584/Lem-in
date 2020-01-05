@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 11:51:03 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/05 09:51:22 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	data_init(t_dvisu *data)
 	data->window = NULL;
 	data->s_surface = NULL;
 	data->tex = NULL;
+	data->f = 0;
 	data->path_n = 0;
 }
 
@@ -61,39 +62,38 @@ void	visu_quit(t_dvisu data)
 
 int	edge_draw(t_graph *g, t_edge *edge, int type)
 {
-	// int		*ranges_x;
-	// int		*ranges_y;
-	// t_cords	src;
-	// t_cords	dst;
-	static int path = 0;
 	SDL_Rect	dstr;
 
-	edge->v_c = (!(edge->v_c) || edge->v_c * type < 0)  ? type : edge->v_c;
-	if ((edge->v_c) && edge->v_c * type < 0)
+	// edge->v_c = (!(edge->v_c) || edge->v_c * type < 0)  ? type : edge->v_c;
+	g->data->f = type;
+	if (type == -1 && (edge->path_n == -1 && edge->residual->path_n == -1))
 	{
-		edge->v_c = 0;
-		edge->residual->v_c = 0;
+		edge->residual->color.hex = 0x031cfc;
+		edge->color.hex = 0x031cfc;
+		edge->v_c = type;
+		edge->residual->v_c = type;
 	}
-	if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
-		path++;
-	// ft_printf("path %d --- %s -- %s\n", path, edge->node_dst->name, g->sink->name);
-	g->data->path_n = path;
+	if (type == 1)
+	{
+		edge->residual->path_n = g->data->path_n;
+		edge->path_n = g->data->path_n;
+		edge->color.hex = 0x032050 + 50000 * edge->path_n;
+		edge->residual->color.hex = 0x032050 + 50000 * edge->path_n;
+		edge->v_c = type;
+		edge->residual->v_c = type;
+	}
+	// if ((edge->v_c) && edge->v_c * type < 0)
+	// {
+	// 	edge->v_c = 0;
+	// 	edge->residual->v_c = 0;
+	// }
+	// if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
+	// 	path++;
+	// g->data->path_n = path;
 	dstr.w = 30;
 	dstr.h = 30;
-	// ft_printf("edge %s - %s to color\n", edge->node_src->name, edge->node_dst->name);
 	nodes_draw(g, dstr);
-	// SDL_SetRenderDrawColor(g->data->rend, 255, 150, 0, 255);
-	// ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 100);
-	// src.x = map(edge->node_src->cords.x, ranges_x) + 10;
-	// ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100);
-	// src.y = map(edge->node_src->cords.y, ranges_y) + 10;
-	// dst.x = map(edge->node_dst->cords.x, ranges_x) + 10;
-	// dst.y = map(edge->node_dst->cords.y, ranges_y) + 10;
-	// SDL_RenderDrawLine(g->data->rend, src.x, src.y, dst.x, dst.y);
-	// free(ranges_x);
-	// free(ranges_y);
 	SDL_RenderPresent(g->data->rend);
-	// SDL_SetRenderDrawColor(g->data->rend, 0, 0, 0, 255);
 	return (1);
 }
 

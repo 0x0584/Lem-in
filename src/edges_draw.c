@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 20:06:04 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 12:06:45 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/05 09:50:45 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,22 +66,22 @@ int	edges_draw(t_graph *g, t_node *node)
 	while (curr)
 	{
 	// ft_printf("drawing edge %s - %s\n", curr->node_src->name, curr->node_dst->name);
-		if (edge_bfs_path(g, curr) || edge_bfs_iter(g, curr))
-			;
+		// if (edge_bfs_path(g, curr) || edge_bfs_iter(g, curr))
+		// 	;
+		// else
+		curr->color.hex = (g->data->f == 1 && curr->path_n == -1) ? 0 : curr->color.hex;
+		if (curr->color.hex)
+		{
+			SDL_SetRenderDrawColor(g->data->rend, curr->color.rbg[2], curr->color.rbg[1], curr->color.rbg[0], 255);
+			if (curr->v_c == 1 || curr->v_c == -1 || curr->residual->v_c == 1 || curr->residual->v_c == -1)
+				SDL_Delay(200);
+			curr->v_c +=5;
+			curr->residual->v_c +=5;
+		}
 		else
 			SDL_SetRenderDrawColor(g->data->rend, 150, 0, 255, 255);
 		dst.x = map(curr->node_dst->cords.x, ranges_x) + 10;
 		dst.y = map(curr->node_dst->cords.y, ranges_y) + 10;
-		// if (src.x < dst.x)
-		// {
-		// 	src.x+=10;
-		// 	dst.x-=10;
-		// }
-		// if (src.y < dst.y)
-		// {
-		// 	src.y+=10;
-		// 	dst.y-=10;
-		// }
 		SDL_RenderDrawLine(g->data->rend, src.x, src.y, dst.x, dst.y);
 		curr = curr->next;
 	}

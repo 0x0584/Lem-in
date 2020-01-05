@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 10:45:24 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/05 09:01:47 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,9 @@ static t_queue	*bfs_helper(t_graph *g, t_edge **parent)
 			break ;
 		prev = parent[prev]->node_src->index;
 	}
+#ifdef USE_VISU
+		g->data->path_n++;
+#endif
 #ifdef DEBUG
 	ft_putendl("\n");
 #endif
@@ -155,9 +158,6 @@ t_queue			*bfs_find(t_graph *g)
 			}
 			e = e->next;
 		}
-#ifdef USE_VISU
-		graph_draw(g);
-#endif
 #ifdef DEBUG
 		ft_putstr("\n\n(residuals)\n");
 		if (!queue_size(residuals))
@@ -171,6 +171,9 @@ t_queue			*bfs_find(t_graph *g)
 
 	queue_del(&helper, queue_node_del_dry);
 	path = bfs_helper(g, parent);
+// #ifdef USE_VISU
+// 		graph_draw(g);
+// #endif
 	free(parent);
 	turn++;
 	return path;

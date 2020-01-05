@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 01:00:59 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/05 09:53:01 by melalj           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 # define CLONE(foo, size)					ft_memcpy(malloc(size), foo, size)
 # define MID(l, h)							(((l) + (h)) / 2)
-
+// #define USE_VISU
 /* ***** data types **********************************************************/
 
 
@@ -50,6 +50,12 @@ struct s_node					/* vertex list */
 	struct s_node		*next;
 };
 
+typedef union u_rgb
+{
+	int		hex;
+	char	rbg[4];
+}				t_rgb;
+
 typedef struct s_edge		t_edge;
 struct s_edge
 {
@@ -59,6 +65,7 @@ struct s_edge
 	int				v_c;
 	int				path_n;
 	int				drawn;
+	t_rgb			color;
 #  endif
 
 	struct s_edge	*residual;
@@ -156,6 +163,7 @@ struct s_dvisu
 	int				w_width;
 	int				w_height;
 	SDL_Renderer	*rend;
+	int				f;
 	int				path_n;
 };
 
