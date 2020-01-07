@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/07 04:11:17 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/07 07:20:09 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ int		parse_line(t_parse **p_lines, int *type, int *prop)
 {
 	char *line;
 
+	/* read_line(debug_fd, &line); */
 	read_line(0, &line);
 	if (ft_strequ(line, ""))
 		*prop = -1;
@@ -145,4 +146,21 @@ t_parse	*get_lines(int *nodes_c)
 	}
 	close(debug_fd);
 	return (p_lines);
+}
+
+void	read_line(int fd, char **line)
+{
+	char *dump;
+	char tmp[2];
+
+	*line = ft_strdup("");
+	while (read(fd, tmp, 1))
+	{
+		if (tmp[0] == '\n')
+			break ;
+		tmp[1] = 0;
+		dump = ft_strjoin(*line, tmp);
+		free(*line);
+		*line = dump;
+	}
 }

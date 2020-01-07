@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 09:53:01 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/07 07:16:09 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # define CLONE(foo, size)					ft_memcpy(malloc(size), foo, size)
 # define MID(l, h)							(((l) + (h)) / 2)
 // #define USE_VISU
+// #define DEBUG
+
 /* ***** data types **********************************************************/
 
 
@@ -122,14 +124,6 @@ typedef struct				s_flow
 {
 	t_edge			**path;		/* from source to sink */
 	unsigned		latency;
-	/* This represents the ants as bits and each next
-	 *
-	 * each ant going is a (1 & !blocked)
-	 */
-
-	/* FIXME: set a bigger flow current: (unsigned char *) */
-	unsigned		current;
-	unsigned		cmask;
 	bool			cut;
 	size_t			n_synced;
 	/*

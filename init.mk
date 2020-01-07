@@ -6,9 +6,12 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/01/07 04:54:49 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/07 06:43:03 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
+
+NAME		= lem-in
+FARM		= barfarm
 
 VISU		?= 0
 DEBUG		?= 0
@@ -36,12 +39,14 @@ else
 endif
 
 ifeq ($(VISU),1)
-	CFLAGS	  += -DUSE_VISU
+	CFLAGS	  += -DUSE_VISU $(SDL_DEPS)
 	LDFLAGS   += $(SDL_LIB)
-	DEPS	  += $(SDL_DEPS)
 endif
 
-init:
+info:
+	@echo "make [all|clean|fclean|re|ft|check|distcheck|info]"
+
+ft:
 	@make -C libft
 
 distcheck:
@@ -51,5 +56,9 @@ distcheck:
 check:
 	@make fclean
 	ls -lR
-	@make
-	bash -c './lem-in < barfarm; echo "exit status: $?"'
+	@make all
+	./$(NAME) < $(FARM)
+
+# echo "Exit status: $(?)"
+
+.PHONY: ft init check distcheck info

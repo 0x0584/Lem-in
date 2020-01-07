@@ -6,11 +6,28 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 00:33:01 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/07 07:26:46 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
+
+#define NIL_ANT									(size_t)-1
+
+t_qnode		*nil_ant(void)
+{
+	size_t ant;
+
+	ant = NIL_ANT;
+	return queue_node(&ant, sizeof(size_t));
+}
+
+bool		is_nilant(t_qnode *e)
+{
+	if (!e || *QNODE_AS(size_t, e) != NIL_ANT)
+		return false;
+	return true;
+}
 
 t_flow		flow_nil()
 {
@@ -18,36 +35,45 @@ t_flow		flow_nil()
 
 	nil.path = NULL;
 	nil.latency = (unsigned)-1;
-	nil.current = 0;
 	nil.cut = false;
 	return (nil);
 }
 
 t_flow		flow_init(t_queue *path)
 {
-	t_flow		p;
+	t_flow		flow;
 	size_t		latency;
 	t_qnode		*node;
 
 	if (!path || !(latency = queue_size(path)))
 		return flow_nil();
-	p.latency = latency;
-	p.path = (t_edge **)malloc(latency * sizeof(t_edge *));
-	p.current = 0U;
-	p.cmask = 0U;
+	flow.latency = latency;
+	flow.path = (t_edge **)malloc(latency * sizeof(t_edge *));
+	flow.ants = queue_init();
 	while (latency--)
 	{
-		if (p.cmask)
-			p.cmask <<= 1;
-		p.cmask |= 1;
 		node = queue_deq(path);
-		p.path[latency] = node->blob;
+		flow.path[latency] = node->blob;
 		queue_node_del(&node, queue_node_del_dry);
+		queue_enq(flow.ants, nil_ant());
 	}
-	p.cut = false;
-	p.n_synced = 0;
-	p.ants = queue_init();
-	return (p);
+	flow.cut = false;
+	flow.n_synced = 0;
+	return (flow);
+}
+
+bool	flow_has_ants(t_flow *flow)
+{
+	t_qnode *walk;
+
+	walk = QFIRST(flow->ants);
+	while (walk != QTAIL(flow->ants))
+	{
+		if (!is_nilant(walk))
+			return (true);
+		walk = walk->next;
+	}
+	return (false);
 }
 
 /* this alters the priority of each node */
@@ -93,8 +119,6 @@ static void		ft_putbits(unsigned long chunk, unsigned long mask)
 	   [0] towards [N-1]
 	*/
 
-# define FLOW_SATURATED(f)				 ((f->current & f->cmask) == f->cmask)
-
 void			flow_log_ants(t_flow *f)
 {
 	t_qnode *walk;
@@ -106,60 +130,13 @@ void			flow_log_ants(t_flow *f)
 	i = 0;
 	while (walk != QTAIL(f->ants))
 	{
-		ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
-					f->path[f->cut ? f->latency - i - 1 : size - i - 1]->node_dst->name);
+		if (!is_nilant(walk))
+			ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
+					  f->path[f->cut ? f->latency - i - 1
+							  : size - i - 1]->node_dst->name);
 		i++;
 		walk = walk->next;
 	}
-}
-
-void			flow_log(t_flow *flow)
-{
-	size_t i;
-	size_t ant;
-
-	i = 0;
-	/* ants still coming */
-	if (!FLOW_SATURATED(flow) && flow->current & 1)
-	{
-		ant = 0;
-		while (((flow->current << i) & flow->cmask))
-		{
-			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
-			{
-				ft_printf("+ L%d-%s ", ant++,
-						  flow->path[flow->latency - i - 1]->node_dst->name);
-			}
-			i++;
-		}
-	}
-	/* ants are arriving */
-	else if (!FLOW_SATURATED(flow) && flow->current & (1 << (flow->latency - 1)))
-	{
-		ant = 0;
-		while (i < flow->latency)
-		{
-			if (((flow->current << i) & flow->cmask) & (1 << (flow->latency - 1)))
-			{
-				ft_printf("- L%d-%s ", flow->n_synced + ant,
-						  flow->path[flow->latency - ant - 1]->node_dst->name);
-				ant++;
-			}
-			i++;
-		}
-	}
-	/* either there's a current or not! */
-	else if (flow->current & flow->cmask)
-	{
-		/* here! */
-		ant = flow->n_synced;	/* + how many ants have arrived on the previous flows */
-		while (i < flow->latency)
-		{
-			ft_printf("o L%d-%s ", ant++, flow->path[flow->latency - i - 1]->node_dst->name);
-			i++;
-		}
-	}
-	i++;
 }
 
 void			flow_dump(t_qnode *e)
@@ -172,17 +149,12 @@ void			flow_dump(t_qnode *e)
 	flow = e->blob;
 #ifdef DEBUG
 	cut = flow->cut ? "C": " ";
-	if (flow->cut && !(flow->current & flow->cmask))
+	if (flow->cut && !flow_has_ants(flow))
 		cut = "X";
 	ft_printf(" >> [%s] flow of %u / %zu ",
 			  cut, flow->latency, flow->n_synced);
-	ft_putstr("mask: ");
-	ft_putbits(flow->cmask, flow->cmask);
-	ft_putstr(" current: ");
-	ft_putbits(flow->current, flow->cmask);
 	ft_putchar('\n');
 	ft_putstr("flow state:  {\n ");
-	flow_log(flow);
 	ft_putstr("\n -- \n");
 #endif
 	flow_log_ants(flow);
@@ -323,13 +295,14 @@ size_t		netflow_shrink(t_netflow *net)
 		prev = walk;
 		if ((walk = walk->prev) == QHEAD(net->flows))
 			break ;
-		/* here!! */
+		/* FIXME: find a better condition */
 		if (net->n_units >= QNODE_AS(struct s_flow, walk)->latency
 				|| (QNODE_AS(struct s_flow, walk)->latency
-						== QNODE_AS(struct s_flow, prev)->latency && net->n_units - 1))
+						== QNODE_AS(struct s_flow, prev)->latency
+					&& net->n_units - 1))
 		{
-				net->maxflow += QNODE_AS(struct s_flow, walk)->latency;
-				continue ;
+			net->maxflow += QNODE_AS(struct s_flow, walk)->latency;
+			continue ;
 		}
 		while ((prev = queue_deq(net->flows)))
 		{
@@ -353,48 +326,50 @@ size_t		netflow_shrink(t_netflow *net)
 	return net->maxflow;
 }
 
-static bool cut_flow(t_flow *f)
+static bool cut_flow(t_flow *flow)
 {
 	t_qnode *tmp;
 
-	if (!f || !f->cut)
+	if (!flow || !flow->cut)
 		return false;
-	if (!(f->current & f->cmask))
+	/* no more ants are going in */
+	if (!flow_has_ants(flow))
 		return (true);
-	f->current <<= 1;
-	f->n_synced++;
-	tmp = queue_deq(f->ants);
+	/* sync the ant only if !NIL_ANT */
+	if (!is_nilant(tmp = queue_deq(flow->ants)))
+		flow->n_synced++;
 	queue_node_del(&tmp, queue_del_helper);
 	return false;
 }
 
+bool		is_saturated(t_flow *flow)
+{
+	size_t count;
+	t_qnode *walk;
 
-static bool sync_flow(size_t ant, t_flow *f)
+	count = 0;
+	walk = QFIRST(flow->ants);
+	while (walk != QTAIL(flow->ants))
+	{
+		count += !is_nilant(walk);
+		walk = walk->next;
+	}
+	return (count == flow->latency);
+}
+
+static bool sync_flow(size_t ant, t_flow *flow)
 {
 	t_qnode *tmp;
 
-	if (f->cut)
-		return !cut_flow(f);
-	else if (FLOW_SATURATED(f) && !f->cut)
-	{
-		f->n_synced++;
-		/* dequeue arriving ant, enqueue the new ant */
-		tmp = queue_deq(f->ants);
-		queue_node_del(&tmp, queue_del_helper);
-		queue_enq(f->ants, queue_node(&ant, sizeof(size_t)));
-	}
-	else						/* still loading */
-	{
-		if (!f->current)
-			f->current = 1;
-		else if (!FLOW_SATURATED(f))
-		{
-			f->current <<= 1;
-			f->current |= 1;
-		}
-		queue_enq(f->ants,  queue_node(&ant, sizeof(size_t)));
-	}
-	return true;
+	if (flow->cut)
+		return !cut_flow(flow);
+	if (is_saturated(flow))
+		flow->n_synced++;
+	/* dequeue arriving ant, enqueue the new ant */
+	tmp = queue_deq(flow->ants);
+	queue_node_del(&tmp, queue_del_helper);
+	queue_enq(flow->ants, queue_node(&ant, sizeof(size_t)));
+	return (true);
 }
 
 bool		netflow_sync(t_netflow *net)
@@ -410,18 +385,12 @@ bool		netflow_sync(t_netflow *net)
 	sync_in = false;
 	while (net->n_units && walk != net->flows->head)
 	{
+		sync_in = true;
 		net->n_units--;
 		sync_flow(n_sent++, QNODE_AS(struct s_flow, walk));
-#ifdef DEBUG
-		ft_printf("current of flow (%d) is %d\n",
-				  turn++,
-				  QNODE_AS(struct s_flow, walk)->current);
-#endif
-		sync_in = true;
 		walk = walk->prev;
 	}
-	if (net->n_units < net->maxflow)
-		netflow_shrink(net); /* optimal netflow / n_unites */
+	netflow_shrink(net);
 #ifdef DEBUG
 	if (sync_in)
 	{
@@ -433,7 +402,7 @@ bool		netflow_sync(t_netflow *net)
 	walk = net->sync->head->next;
 	while (walk != net->sync->tail)
 	{
-		if (sync_flow((size_t)-1, QNODE_AS(struct s_flow, walk)))
+		if (sync_flow(NIL_ANT, QNODE_AS(struct s_flow, walk)))
 			sync_out = true;
 		walk = walk->next;
 	}
@@ -451,21 +420,17 @@ bool		netflow_sync(t_netflow *net)
 
 void		netflow_pushflow(t_netflow *net)
 {
-	size_t allflows;
 	bool state;
-	size_t i;
 
-	i = 0;
 #ifdef DEBUG
+	size_t i = 0;
 	ft_printf("number of ants: %lu\n", net->n_units);
 #endif
-	allflows = queue_size(net->flows);
 	state = true;
 	while (state)
 	{
-		netflow_shrink(net); /* optimal netflow / n_unites */
+		netflow_shrink(net);
 		state = netflow_sync(net);
-
 #ifdef DEBUG
 		ft_printf("n_instructions %zu\n", ++i);
 #else

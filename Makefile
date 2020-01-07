@@ -6,13 +6,11 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2020/01/07 04:55:31 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/07 06:43:29 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 include init.mk
-
-NAME		= lem-in
 
 SRC_PATH	= src
 SRC_NAME	= parser.c read_line.c hash_t.c get_lines.c	\
@@ -23,17 +21,17 @@ ifeq ($(VISU),1)
 endif
 
 OBJ_PATH	= .obj
-OBJ_NAME	= $(SRC_NAME:.c=.o)
-OBJ			= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
+OBJ_NAME	:= $(SRC_NAME:.c=.o)
+OBJ			:= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
 
-all: init $(NAME)
+all: ft $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ -c $< $(DEPS)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
 	@make -C libft clean
@@ -45,4 +43,4 @@ fclean:
 
 re: fclean all
 
-.PHONY: all, clean, fclean, re
+.PHONY: all $(NAME) clean fclean re
