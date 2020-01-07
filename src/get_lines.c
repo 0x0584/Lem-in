@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 11:47:09 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/07 04:11:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ t_parse	*get_lines(int *nodes_c)
 	p_lines = NULL;
 	type = 0;
 	*nodes_c = 0;
-	debug_fd = open("farms/100k.map", O_RDONLY);
+	debug_fd = open("test_farm", O_RDONLY);
 	while (!type)
 		parse_line(&(current), &type, &prop);
 	p_lines = current;

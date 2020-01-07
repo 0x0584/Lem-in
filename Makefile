@@ -6,86 +6,43 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2020/01/02 01:02:08 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/07 04:55:31 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-VISU	 ?= 0
-DEBUG	 ?= 0
+include init.mk
 
-SRC_PATH = src
-SRC_NAME = lem_in_main.c	\
-			parser.c		\
-			read_line.c		\
-			hash_t.c		\
-			get_lines.c		\
-			queue.c			\
-			graph.c			\
-			bfs.c			\
-			netflow.c
+NAME		= lem-in
 
-OBJ_PATH = obj
-LDFLAGS  = -L libft -lft
-DEPS	 = -I include -I libft/include
-CC		 = gcc
-CFLAGS   = -Wall -Wextra -g
-
-ifeq ($(DEBUG),1)
-	CFLAGS += -DDEBUG
-endif
+SRC_PATH	= src
+SRC_NAME	= parser.c read_line.c hash_t.c get_lines.c	\
+			  queue.c graph.c bfs.c netflow.c lem_in_main.c
 
 ifeq ($(VISU),1)
-	CFLAGS	+= -DUSE_VISU
-	LDFLAGS += -L ~/.brew/Cellar/sdl2/2.0.10/lib -lSDL2-2.0.0 -lSDL2	\
-			   -L ~/.brew/Cellar/sdl2_image/2.0.5/lib -lSDL2_image		\
-			   -lSDL2_image-2.0.0										\
-			   -L ~/.brew/Cellar/sdl2_ttf/2.0.15/lib -lSDL2_ttf			\
-			   -lSDL2_ttf-2.0.0
-	DEPS	+= -I ~/.brew/Cellar/sdl2_image/2.0.5/include/SDL2			\
-			   -I ~/.brew/Cellar/sdl2/2.0.10/include/SDL2				\
-			   -I ~/.brew/Cellar/sdl2_ttf/2.0.15/include/SDL2
-	SRC_NAME += tools.c			\
-				visu.c			\
-				graph_draw.c	\
-				edges_draw.c
+	SRC_NAME += tools.c visu.c graph_draw.c edges_draw.c
 endif
 
-OBJ_NAME = $(SRC_NAME:.c=.o)
-OBJ		 = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
+OBJ_PATH	= .obj
+OBJ_NAME	= $(SRC_NAME:.c=.o)
+OBJ			= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
 
-
-NAME     = lem-in
-
-.PHONY: all, clean, fclean, re
-
-all: $(NAME)
+all: init $(NAME)
 
 $(NAME): $(OBJ)
-	@cd libft ; make
-	$(CC) $(CFLAGS) $^ -o $@ -Llibft -lft -Ilibft $(LDFLAGS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ -c $< -Ilibft $(DEPS)
+	$(CC) $(CFLAGS) -o $@ -c $< $(DEPS)
 
 clean:
 	@make -C libft clean
 	@rm -f $(OBJ)
 
-#	@rmdir $(OBJ_PATH) 2> /dev/null || true
-
-fclean: clean
+fclean:
 	@make -C libft fclean
-	@rm -f $(NAME)
+	@rm -f $(NAME) $(OBJ)
 
 re: fclean all
 
-distcheck:
-	uname -a
-	$(CC) --version
-
-check:
-	@make fclean
-	ls -lR
-	@make
-	bash -c './lem-in < barfarm; echo "exit status: $?"'
+.PHONY: all, clean, fclean, re
