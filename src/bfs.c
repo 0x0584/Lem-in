@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/09 20:18:12 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/09 22:10:39 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ static void	set_walk_edges(t_queue *paths, t_queue **apath, t_qnode **walk_edge)
 		apath[curr] = walk->blob;
 		walk_edge[curr] = apath[curr]->head->next;
 #ifdef USE_VISU
-		edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 1);
+		edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 2);
 #endif
 		/* edge_dump(walk_edge[curr]); */
 		curr++;
@@ -286,6 +286,31 @@ static void	set_walk_edges(t_queue *paths, t_queue **apath, t_qnode **walk_edge)
 #ifdef DEBUG
 	ft_putendl(" /// \n");
 #endif
+}
+
+static void set_paths(t_graph *g, t_queue *paths)
+{
+	t_qnode *walk;
+	t_qnode *edge;
+	int i;
+
+	i = 2;
+	walk = QFIRST(paths);
+	while (walk != QTAIL(paths))
+	{
+		edge = QFIRST(QNODE_AS(t_queue, walk));
+		while (edge != QTAIL(QNODE_AS(t_queue, walk)))
+		{
+			QNODE_AS(t_edge, edge)->path_n = i;
+#ifdef USE_VISU
+			edge_draw(QNODE_AS(t_edge, edge), 1);
+			graph_draw(g);
+#endif
+			edge = edge->next;
+		}
+		i++;
+		walk = walk->next;
+	}
 }
 
 t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
@@ -531,8 +556,8 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				if (move_edge)
 					walk_edge[curr + residual] = old_prev;
 #ifdef USE_VISU
-				edge_draw(QNODE_AS(t_edge, walk_edge[curr + residual]), 2);
-				edge_draw(QNODE_AS(t_edge, walk_edge[curr + !residual]), 2);
+				edge_draw(QNODE_AS(t_edge, walk_edge[curr + residual]), 3);
+				edge_draw(QNODE_AS(t_edge, walk_edge[curr + !residual]), 3);
 				graph_draw(g);
 				SDL_Delay(500);
 #endif
@@ -590,13 +615,14 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 			edge_dump(walk_edge[curr]);
 #endif
 #ifdef USE_VISU
-			edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 1);
+			edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 2);
 			graph_draw(g);
 			ft_putendl("coloring moving edge");
 #endif
 			curr++;
 		}
 	}
+	set_paths(g, paths);
 	free(apath);
 	free(walk_edge);
 	return (paths);
