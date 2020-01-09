@@ -6,16 +6,62 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 09:51:22 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/09 05:19:41 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 #ifdef USE_VISU
-void	data_init(t_dvisu *data)
+
+int	edge_draw(t_edge *edge, int type)
 {
-	data->w_width = 1280;
-	data->w_height = 950;
+	t_dvisu		*data;
+
+	data = get_visu_data();
+	data->f = type;
+	if (type == -1 && (edge->path_n == -1 && edge->residual->path_n == -1))
+	{
+		edge->residual->color.hex = 0x031cfc;
+		edge->color.hex = 0x031cfc;
+		edge->v_c = type;
+		edge->residual->v_c = type;
+	}
+	if (type == 1)
+	{
+		edge->residual->path_n = data->path_n;
+		edge->path_n = data->path_n;
+		edge->color.hex = 0x032050 + 50000 * edge->path_n;
+		edge->residual->color.hex = 0x032050 + 50000 * edge->path_n;
+		edge->v_c = type;
+		edge->residual->v_c = type;
+	}
+	SDL_RenderPresent(data->rend);
+	return (1);
+}
+
+static t_dvisu		*__visu_data(t_dvisu *v)
+{
+	static t_dvisu *visu_data = NULL;
+
+	if (v != NULL)
+		visu_data = v;
+	return (visu_data);
+}
+
+void		set_visu_data(t_dvisu *v)
+{
+	(void)__visu_data(v);
+}
+
+t_dvisu		*get_visu_data(void)
+{
+	return (__visu_data(NULL));
+}
+
+static void	data_init(t_dvisu *data)
+{
+	data->w_width = VISU_WIN_WIDTH;
+	data->w_height = VISU_WIN_HEIGHT;
 	data->rend = NULL;
 	data->window = NULL;
 	data->s_surface = NULL;
@@ -24,10 +70,12 @@ void	data_init(t_dvisu *data)
 	data->path_n = 0;
 }
 
-int	init(t_dvisu *data)
+int	init(void)
 {
-	data_init(data);
+	t_dvisu *data;
+
 	ft_printf("initing visu\n");
+	data_init(data = get_visu_data());
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -53,71 +101,36 @@ int	init(t_dvisu *data)
 	return (1);
 }
 
-void	visu_quit(t_dvisu data)
+void	visu_quit(void)
 {
-	SDL_DestroyRenderer(data.rend);
-	SDL_DestroyWindow(data.window);
+	t_dvisu *data;
+
+	data = get_visu_data();
+	SDL_DestroyRenderer(data->rend);
+	SDL_DestroyWindow(data->window);
 	SDL_Quit();
-}
-
-int	edge_draw(t_graph *g, t_edge *edge, int type)
-{
-	SDL_Rect	dstr;
-
-	// edge->v_c = (!(edge->v_c) || edge->v_c * type < 0)  ? type : edge->v_c;
-	g->data->f = type;
-	if (type == -1 && (edge->path_n == -1 && edge->residual->path_n == -1))
-	{
-		edge->residual->color.hex = 0x031cfc;
-		edge->color.hex = 0x031cfc;
-		edge->v_c = type;
-		edge->residual->v_c = type;
-	}
-	if (type == 1)
-	{
-		edge->residual->path_n = g->data->path_n;
-		edge->path_n = g->data->path_n;
-		edge->color.hex = 0x032050 + 50000 * edge->path_n;
-		edge->residual->color.hex = 0x032050 + 50000 * edge->path_n;
-		edge->v_c = type;
-		edge->residual->v_c = type;
-	}
-	// if ((edge->v_c) && edge->v_c * type < 0)
-	// {
-	// 	edge->v_c = 0;
-	// 	edge->residual->v_c = 0;
-	// }
-	// if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
-	// 	path++;
-	// g->data->path_n = path;
-	dstr.w = 30;
-	dstr.h = 30;
-	nodes_draw(g, dstr);
-	SDL_RenderPresent(g->data->rend);
-	return (1);
 }
 
 int	visu_init(t_graph *g)
 {
-	SDL_Rect	dstr;
 	SDL_Event	event;
 	int			close_requested;
+	t_dvisu *data;
 
+	init();
 	close_requested = 0;
-	init(g->data);
-	dstr.w = 20;
-	dstr.h = 20;
+	data = get_visu_data();
 	while (!close_requested)
 	{
-		SDL_RenderClear(g->data->rend);
+		SDL_RenderClear(data->rend);
+		graph_draw(g);
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT
 				|| (event.type == SDL_KEYDOWN && event.key.keysym.sym == 27))
 				close_requested = 1;
 		}
-		graph_draw(g);
-		SDL_RenderPresent(g->data->rend);
+		SDL_RenderPresent(data->rend);
 		SDL_PumpEvents();
 	}
 	return (0);

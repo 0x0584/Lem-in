@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:30:44 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 12:06:48 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/09 04:09:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,50 +32,43 @@ SDL_Texture	*get_imagetex(t_dvisu *data, char *image_path)
 	return (tex);
 }
 
-int	nodes_draw(t_graph *g, SDL_Rect dstr)
+int	graph_draw(t_graph *g)
 {
+	SDL_Rect	nodes_size;
 	SDL_Texture	*tex;
 	t_node		*curr;
 	int			*ranges_x;
 	int			*ranges_y;
+	t_dvisu		*data;
 
-	// ft_printf("screen width : %d --- screen height : %d\n", data.w_width, data.w_height);
-	// ft_printf("nbr of nodes : %zu --- max_cords x : %d - y : %d\n", g->n_nodes, g->max_c.x, g->max_c.y);
-	// dstr.w = 20; //temp zoom effects (not really a zoom)
-	// dstr.h = 20;
+	nodes_size.w = 30;
+	nodes_size.h = 30;
+
+	data = get_visu_data();
 	curr = g->nodes_lst;
-	while (curr && !edges_draw(g, curr))
+	while (curr && !edges_draw(curr))
 		curr = curr->next;
+	ft_putendl(" edges are drawn");
 	curr = g->nodes_lst;
-	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 50);
-	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100 - 250);
+	ranges_x = range_comp(0, data->max_c.x, 0, data->w_width - 50);
+	ranges_y = range_comp(0, data->max_c.y, 0, data->w_height - 100 - 250);
 	while (curr)
 	{
-		if (ft_strequ(curr->name, g->start->name))
-			tex = get_imagetex(g->data, "resources/start.png");
+		if (ft_strequ(curr->name, g->source->name))
+			tex = get_imagetex(data, "resources/start.png");
 		else if (ft_strequ(curr->name, g->sink->name))
-			tex = get_imagetex(g->data, "resources/end.png");
+			tex = get_imagetex(data, "resources/end.png");
 		else
-			tex = get_imagetex(g->data, "resources/circle.png");
-		dstr.x = map(curr->cords.x, ranges_x);
-		dstr.y = map(curr->cords.y, ranges_y);
-		// edges_draw(g->data, g, curr); // edges drawn on top of nodes
-		SDL_RenderCopy(g->data->rend, tex, NULL, &dstr);
+			tex = get_imagetex(data, "resources/circle.png");
+		nodes_size.x = map(curr->cords.x, ranges_x);
+		nodes_size.y = map(curr->cords.y, ranges_y);
+		/* edges_draw(curr); // edges drawn on top of nodes */
+		SDL_RenderCopy(data->rend, tex, NULL, &nodes_size);
 		curr = curr->next;
 		SDL_DestroyTexture(tex);
 	}
 	free(ranges_x);
 	free(ranges_y);
-	return (0);
-}
-
-int	graph_draw(t_graph *g)
-{
-	SDL_Rect	nodes_size;
-
-	nodes_size.w = 30;
-	nodes_size.h = 30;
-	nodes_draw(g, nodes_size);
 	return (1);
 }
 #endif

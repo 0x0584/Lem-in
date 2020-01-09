@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 08:55:34 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/08 06:19:56 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,22 @@ t_node	*new_node(int index, t_parse *line, int prop)
 	return (new_n);
 }
 
-int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop, t_node **refs)
+int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop)
 {
 	static size_t	index = 0;
 	char			**s_lines;
 	t_node			*curr;
+	t_node			*tmp;
 	int				hash_h;
 
 	s_lines = ft_strsplit(lines->line, ' ');
 	hash_h = hash((unsigned char*)s_lines[0]) % nodes_c;
-	refs[index] = new_node(index, lines, prop);
+	tmp = new_node(index++, lines, prop);
 	// ft_printf("added node %s in the hash %d\n", s_lines[0],
 	//						hash((unsigned char*)s_lines[0]) % nodes_c);
 	if (!lst_node[hash_h])
 	{
-		lst_node[hash_h] = refs[index++];
+		lst_node[hash_h] = tmp;
 		free_tab(s_lines);
 		return (1);
 	}
@@ -62,7 +63,7 @@ int		add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop, t_node *
 			return (0);
 		(curr) = (curr)->next;
 	}
-	(curr)->next = refs[index++];
+	(curr)->next = tmp;
 	free_tab(s_lines);
 	return (1);
 }

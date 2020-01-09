@@ -6,12 +6,12 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/01/07 06:43:03 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/09 05:40:33 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME		= lem-in
-FARM		= barfarm
+FARM		= map1
 
 VISU		?= 0
 DEBUG		?= 0
@@ -44,7 +44,7 @@ ifeq ($(VISU),1)
 endif
 
 info:
-	@echo "make [all|clean|fclean|re|ft|check|distcheck|info]"
+	@echo "make [all|clean|fclean|re|ft|check|distcheck]"
 
 ft:
 	@make -C libft
@@ -54,9 +54,9 @@ distcheck:
 	$(CC) --version
 
 check:
-	@make fclean
+#	@make fclean
 	ls -lR
-	@make all
+	@make all VISU=$(VISU) DEBUG=$(DEBUG)
 	./$(NAME) < $(FARM)
 
 # echo "Exit status: $(?)"

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/02 11:17:21 by melalj           ###   ########.fr       */
+/*   Updated: 2020/01/09 05:24:49 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,36 +33,36 @@ int		main(void)
 	t_parse		*pp;
 	t_node		**nodes;
 	int			nodes_c;
-	int			i;
 	t_graph		*g;
-	t_node		**refs;
 	size_t		n_ants;
 
-
-	i = 0;
 	pp = get_lines(&nodes_c);
 
 	n_ants = (size_t)ft_atoi(pp->line);
 #ifdef DEBUG
 	ft_printf("%lu\n", n_ants);
 #endif
-	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
-	nodes = h_table(refs, pp, nodes_c);
+	nodes = h_table(pp, nodes_c);
 	edges_fill(nodes, pp, nodes_c);
 
 	parser_free(pp);
 
-	g = graph_init(refs, nodes, nodes_c);
+#ifdef USE_VISU
+	set_visu_data((t_dvisu *)ft_memalloc(sizeof(t_dvisu)));
+#endif
+	g = graph_init(nodes, nodes_c);
+
+#ifdef USE_VISU
+	visu_init(g);
+#endif
 
 #ifdef DEBUG
 	graph_dump(g);
 	ft_printf("source: %s | sink: %s\n", g->start->name, g->sink->name);
 #endif
 
-#ifdef USE_VISU
-	visu_init(g);
-#endif
 	t_netflow *farm = netflow_setup(g, n_ants);
+
 #ifdef USE_VISU
 	SDL_Event event;
 	int close_requested = 0;

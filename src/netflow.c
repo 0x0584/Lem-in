@@ -6,13 +6,13 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/07 07:26:46 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/09 05:47:01 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-#define NIL_ANT									(size_t)-1
+#define NIL_ANT									((size_t)-1)
 
 t_qnode		*nil_ant(void)
 {
@@ -88,52 +88,48 @@ bool	lower_latency(t_qnode *in, t_qnode *with)
 		return true;
 	return false;
 }
-
-/* mask is at max SIGNED_LONG_MIN to avoid overfow */
-static void		ft_putbits(unsigned long chunk, unsigned long mask)
+#ifdef USE_VISU
+void	visu_move_ant(t_edge *e, size_t ant)
 {
-	unsigned long walk;
+	SDL_Texture *tex;
+	SDL_Rect dstr;
+	t_dvisu *data;
+	int		*ranges_x;
+	int		*ranges_y;
 
-	walk = (mask + 1);
-	while (walk)
-	{
-		walk >>= 1;
-		if(walk > 0)
-			ft_putchar(walk & chunk ? '1' : '0');
-	}
+	(void)ant;
+	data = get_visu_data();
+	tex = get_imagetex(data, "resources/dot.png");
+	ranges_x = range_comp(0, data->max_c.x, 0, data->w_width - 50);
+	ranges_y = range_comp(0, data->max_c.y, 0, data->w_height - 100 - 250);
+
+	dstr.x = map(e->node_src->cords.x, ranges_x);
+	dstr.y = map(e->node_dst->cords.y, ranges_y);
+
+	SDL_RenderCopy(data->rend, tex, NULL, &dstr);
+	SDL_DestroyTexture(tex);
 }
-
-	/*
-	   should avoid possible overflow, shound be a bigint array, where we
-	   know the size of bits there
-
-	   given array A[] of N integers of 32 bit, then we have at total N * 32 bits,
-	   if a number n has m bits, then at least (m / 32 bits + m % 32 bits),
-	   or array of (m / 32 + (m % 32)),
-
-	   this representation is suitable for th kind of support the flow have,
-	   since we only need to maintain a current going, so not much to do with
-	   bits that are within.
-
-	   check is always done starting from [n-1], since the current is going from
-	   [0] towards [N-1]
-	*/
-
+#endif
 void			flow_log_ants(t_flow *f)
 {
 	t_qnode *walk;
+	t_edge	*e;
 	size_t	size;
-	size_t i;
+	size_t	i;
 
+	i = 0;
 	walk = QHEAD(f->ants)->next;
 	size = queue_size(f->ants);
-	i = 0;
 	while (walk != QTAIL(f->ants))
 	{
 		if (!is_nilant(walk))
-			ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
-					  f->path[f->cut ? f->latency - i - 1
-							  : size - i - 1]->node_dst->name);
+		{
+			e = f->path[f->cut ? f->latency - i - 1 : size - i - 1];
+			ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk), e->node_dst->name);
+#ifdef USE_VISU
+			visu_move_ant(e, *QNODE_AS(size_t, walk));
+#endif
+		}
 		i++;
 		walk = walk->next;
 	}
@@ -142,12 +138,12 @@ void			flow_log_ants(t_flow *f)
 void			flow_dump(t_qnode *e)
 {
 	t_flow	*flow;
-	char	*cut;
 
 	if (!e)
 		return ;
 	flow = e->blob;
 #ifdef DEBUG
+	char	*cut;
 	cut = flow->cut ? "C": " ";
 	if (flow->cut && !flow_has_ants(flow))
 		cut = "X";
@@ -376,11 +372,9 @@ bool		netflow_sync(t_netflow *net)
 {
 	static size_t n_sent = 0;
 	t_qnode *walk;
-	int		turn;
 	bool	sync_in;
 	bool	sync_out;
 
-	turn = 0;
 	walk = net->flows->tail->prev;
 	sync_in = false;
 	while (net->n_units && walk != net->flows->head)

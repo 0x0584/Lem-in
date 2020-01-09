@@ -6,7 +6,7 @@
 #    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2019/12/31 16:02:15 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/09 03:56:10 by archid-          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -118,10 +118,14 @@ OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra
 NAME = libft.a
+
 .PHONY: all, clean, fclean, re
+
 all: $(NAME)
+
 $(NAME): $(OBJ)
 	ar rc $@ $^
+
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@mkdir $(OBJ_PATH) 2> /dev/null || true
 	$(CC) $(CFLAGS) -o $@ -c $<
