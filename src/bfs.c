@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/09 22:10:39 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/09 22:20:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,7 @@ static void set_paths(t_graph *g, t_queue *paths)
 	t_qnode *edge;
 	int i;
 
-	i = 2;
+	i = 1;
 	walk = QFIRST(paths);
 	while (walk != QTAIL(paths))
 	{
@@ -303,7 +303,7 @@ static void set_paths(t_graph *g, t_queue *paths)
 		{
 			QNODE_AS(t_edge, edge)->path_n = i;
 #ifdef USE_VISU
-			edge_draw(QNODE_AS(t_edge, edge), 1);
+			edge_draw(QNODE_AS(t_edge, edge), 3);
 			graph_draw(g);
 #endif
 			edge = edge->next;
