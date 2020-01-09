@@ -6,12 +6,12 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/01/09 05:40:33 by archid-          ###   ########.fr        #
+#    Updated: 2020/01/09 20:06:20 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME		= lem-in
-FARM		= map1
+FARM		= barfar
 
 VISU		?= 0
 DEBUG		?= 0

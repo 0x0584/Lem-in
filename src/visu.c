@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/09 05:19:41 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/09 20:15:39 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,24 @@ int	edge_draw(t_edge *edge, int type)
 		edge->path_n = data->path_n;
 		edge->color.hex = 0x032050 + 50000 * edge->path_n;
 		edge->residual->color.hex = 0x032050 + 50000 * edge->path_n;
+		edge->v_c = type;
+		edge->residual->v_c = type;
+	}
+	if (type == 2)
+	{
+		edge->residual->path_n = data->path_n;
+		edge->path_n = data->path_n;
+		edge->color.hex = 0x032050 + 20000 * edge->path_n;
+		edge->residual->color.hex = 0x032050 + 20000 * edge->path_n;
+		edge->v_c = type;
+		edge->residual->v_c = type;
+	}
+	if (type == 3)
+	{
+		edge->residual->path_n = data->path_n;
+		edge->path_n = data->path_n;
+		edge->color.hex = 0x00ff00;
+		edge->residual->color.hex = 0x00ff00;
 		edge->v_c = type;
 		edge->residual->v_c = type;
 	}

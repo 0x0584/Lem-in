@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/09 05:49:10 by archid-          ###   ########.fr       */
+/*   Updated: 2020/01/09 20:18:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,14 +145,16 @@ t_queue			*bfs_find(t_graph *g)
 #endif
 			if (e->seen != turn && e->seen != 1)
 			{
-#ifdef USE_VISU
-				edge_draw(e, -1);
-#endif
 				if (e->residual->seen == turn)
 					queue_enq(residuals, queue_dry_node(e->residual,
 														sizeof(t_edge *)));
 				else if (e->node_dst->seen != turn)
 				{
+#ifdef USE_VISU
+					edge_draw(e, -1);
+					graph_draw(g);
+#endif
+
 					queue_enq(helper, queue_dry_node(e->node_dst->edges,
 													 sizeof(t_edge *)));
 					parent[e->node_dst->index] = e;
@@ -163,9 +165,6 @@ t_queue			*bfs_find(t_graph *g)
 					e->seen = turn;
 				}
 			}
-#ifdef	USE_VISU
-			graph_draw(g);
-#endif
 			if (e->node_dst == g->sink && e->seen != 1)
 			{
 #ifdef DEBUG
@@ -276,10 +275,14 @@ static void	set_walk_edges(t_queue *paths, t_queue **apath, t_qnode **walk_edge)
 	{
 		apath[curr] = walk->blob;
 		walk_edge[curr] = apath[curr]->head->next;
-		edge_dump(walk_edge[curr]);
+#ifdef USE_VISU
+		edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 1);
+#endif
+		/* edge_dump(walk_edge[curr]); */
 		curr++;
 		walk = walk->next;
 	}
+
 #ifdef DEBUG
 	ft_putendl(" /// \n");
 #endif
@@ -323,9 +326,16 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 		/* if all paths have arrived, that means edge is all NULLs */
 		curr = 0;
 		done = true;
+#ifdef USE_VISU
+	graph_draw(g);
+	ft_putendl("moving..");
+#endif
+
 		while (curr < n_paths && done)
+		{
 			if (QNODE_AS(t_edge, walk_edge[curr++])->node_src != g->source)
 				done = false;
+		}
 		if (done)
 			break ;
 
@@ -471,6 +481,12 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 
 				walk_edge[curr + !residual] = walk_edge[curr + !residual]->prev;
 
+#ifdef USE_VISU
+		edge_draw(QNODE_AS(t_edge, walk_edge[curr + residual]), 3);
+		edge_draw(QNODE_AS(t_edge, walk_edge[curr + !residual]), 3);
+		graph_draw(g);
+		SDL_Delay(500);
+#endif
 				t_qnode *old_prev = walk_edge[curr + !residual]->prev;
 
 				/* remove residual edge from its path */
@@ -514,6 +530,13 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 #endif
 				if (move_edge)
 					walk_edge[curr + residual] = old_prev;
+#ifdef USE_VISU
+				edge_draw(QNODE_AS(t_edge, walk_edge[curr + residual]), 2);
+				edge_draw(QNODE_AS(t_edge, walk_edge[curr + !residual]), 2);
+				graph_draw(g);
+				SDL_Delay(500);
+#endif
+
 #ifdef DEBUG
 				ft_putendl("  collision edges after ");
 				edge_dump(walk_edge[curr + residual]);
@@ -566,10 +589,14 @@ t_queue		*re_wire_paths(t_graph *g, t_queue *paths)
 				ft_printf("already arrived! -> ");
 			edge_dump(walk_edge[curr]);
 #endif
+#ifdef USE_VISU
+			edge_draw(QNODE_AS(t_edge, walk_edge[curr]), 1);
+			graph_draw(g);
+			ft_putendl("coloring moving edge");
+#endif
 			curr++;
 		}
 	}
-
 	free(apath);
 	free(walk_edge);
 	return (paths);
