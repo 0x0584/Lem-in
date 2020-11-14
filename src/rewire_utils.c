@@ -1,6 +1,6 @@
 #include "../lem_in.h"
 
-void sort_by_node_src_name(struct s_rewire_handy *info) {
+void sort_by_src_name(struct s_rewire_handy *info) {
     size_t i;
     size_t j;
     t_queue *q;
@@ -12,8 +12,8 @@ void sort_by_node_src_name(struct s_rewire_handy *info) {
     while (i < info->n_paths - 1) {
         j = 0;
         while (j < info->n_paths - 1) {
-            if (ft_strcmp(AS_EDGE(info->walk_edge[j])->node_src->name,
-                          AS_EDGE(info->walk_edge[j + 1])->node_src->name) >
+            if (ft_strcmp(AS_EDGE(info->walk_edge[j])->src->name,
+                          AS_EDGE(info->walk_edge[j + 1])->src->name) >
                 0) {
                 q = info->apath[j];
                 info->apath[j] = info->apath[j + 1];
@@ -31,7 +31,7 @@ void sort_by_node_src_name(struct s_rewire_handy *info) {
 bool has_arrived(t_graph *g, t_edge *e) {
     if (!e)
         return false;
-    return (g->start == e->node_src);
+    return (g->source == e->src);
 }
 
 t_qnode *next_edge(t_graph *g, t_qnode *edge) {

@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/07 07:20:09 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 int debug_fd;
 
-int check_node(char *line) // func that check if the node is a valid node
+int check_vertex(char *line) // func that check if the node is a valid node
 {
 	char **sline;
 	int i;
@@ -25,9 +25,9 @@ int check_node(char *line) // func that check if the node is a valid node
 	else if (line && line[0] == '#' && line[1] == '#') // test the command is a start or end command if not its considerade as a command
 	{
 		if (ft_strequ(line + 2, "start"))
-			return (NODE_START);
+			return (V_SOURCE);
 		if (ft_strequ(line + 2, "end"))
-			return (NODE_END);
+			return (V_SINK);
 	}
 	sline = ft_strsplit(line, ' ');
 	i = -1;
@@ -98,7 +98,7 @@ int		parse_line(t_parse **p_lines, int *type, int *prop)
 		*p_lines = add_pline(line, *type, *prop);
 		(*type)++;
 	}
-	else if ((*type) == 1 && ((*prop) = check_node(line)))
+	else if ((*type) == 1 && ((*prop) = check_vertex(line)))
 	{
 		*p_lines = add_pline(line, *type, *prop);
 	}
@@ -116,7 +116,7 @@ int		parse_line(t_parse **p_lines, int *type, int *prop)
 	return ((*type == 1 && *prop == 1) ? 1 : 0);
 }
 
-t_parse	*get_lines(int *nodes_c)
+t_parse	*get_lines(int *vertices_c)
 {
 	t_parse	*p_lines;
 	t_parse	*current;
@@ -125,14 +125,14 @@ t_parse	*get_lines(int *nodes_c)
 
 	p_lines = NULL;
 	type = 0;
-	*nodes_c = 0;
+	*vertices_c = 0;
 	debug_fd = open("test_farm", O_RDONLY);
 	while (!type)
 		parse_line(&(current), &type, &prop);
 	p_lines = current;
 	while (p_lines && type >= 0)
 	{
-		*nodes_c += parse_line(&(current->next), &type, &prop);
+		*vertices_c += parse_line(&(current->next), &type, &prop);
 		if (!current->next && prop != 0)
 			break ;
 		if (!current->next && prop == 0)

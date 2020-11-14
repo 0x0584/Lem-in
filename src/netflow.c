@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/14 15:35:10 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 19:35:04 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ void			flow_log_ants(t_flow *f)
 		if (!is_nilant(walk))
 			ft_printf("L%zu-%s ", *QNODE_AS(size_t, walk),
 					  f->path[f->cut ? f->latency - i - 1
-							  : size - i - 1]->node_dst->name);
+							  : size - i - 1]->dst->name);
 		i++;
 		walk = walk->next;
 	}

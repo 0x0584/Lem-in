@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 18:22:20 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 19:38:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,21 @@ typedef struct s_cords {
     int y;
 } t_cords;
 
-typedef enum e_node_type t_node_type;
-enum e_node_type { NODE_DEFAULT = 1, NODE_START, NODE_END };
+typedef enum e_vertex_type t_vertex_type;
+enum e_vertex_type { V_DEFAULT = 1, V_SOURCE, V_SINK };
 
-typedef struct s_node t_node;
-struct s_node /* vertex list */
+typedef struct s_vertex t_vertex;
+struct s_vertex
 {
     char *name;
     size_t index;
     t_cords cords;
-    enum e_node_type type;
+	t_vertex_type type;
 
     int seen;
 
     struct s_edge *edges;
-    struct s_node *next;
+    struct s_vertex *next;
 };
 
 typedef union u_rgb {
@@ -52,21 +52,21 @@ typedef struct s_edge t_edge;
 struct s_edge {
     int seen;
     struct s_edge *residual;
-    struct s_node *node_dst;
-    struct s_node *node_src;
+    struct s_vertex *dst;
+    struct s_vertex *src;
     struct s_edge *next;
 };
 
-/* FIXME: move start and sink to solver */
+/* FIXME: move source and sink to solver */
 typedef struct s_dvisu t_dvisu;
 typedef struct s_graph t_graph;
 struct s_graph {
-    t_node *nodes_lst;
-    t_node **nodes_ref; /* FIXME: remove this, no longer needed! */
-    size_t n_nodes;
+    t_vertex *vertices_lst;
+    t_vertex **vertices_ref; /* FIXME: remove this, no longer needed! */
+    size_t n_vertices;
     t_cords max_c;
-    struct s_node *start; /* FIXME: rename to source */
-    struct s_node *sink;
+    struct s_vertex *source; /* FIXME: rename to source */
+    struct s_vertex *sink;
     t_dvisu *data; /*i need it to pass it to bfs as argument*/
 };
 
@@ -84,7 +84,7 @@ struct s_rewire_handy {
 typedef struct s_parse t_parse;
 struct s_parse {
     char *line;
-    t_node_type prop;
+    t_vertex_type prop;
     int type;
     struct s_parse *next;
 };
@@ -133,19 +133,19 @@ typedef struct s_flow_network {
 /* ***** function prototypes *************************************************/
 
 /* FIXME: re-write functions so that they are generalized */
-t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c);
+t_graph *graph_init(t_vertex **refs, t_vertex **vertices, int vertices_c);
 t_queue *bfs(t_graph *graph);
 t_queue *list_shortest_paths(t_graph *graph);
 
 void read_line(int fd, char **line);
-t_parse *get_lines(int *nodes_c);
+t_parse *get_lines(int *vertices_c);
 unsigned long hash(unsigned char *str);
 
-/* FIXME: review add_node */
-int add_node(t_node **lst_node, t_parse *lines, int nodes_c, int prop,
-             t_node **refs);
-t_node **h_table(t_node **refs, t_parse *lines, int nodes_c);
-int edges_fill(t_node **lst_node, t_parse *lines, int nodes_c);
+/* FIXME: review add_vertex */
+int add_vertex(t_vertex **lst_vertex, t_parse *lines, int vertices_c, int prop,
+             t_vertex **refs);
+t_vertex **h_table(t_vertex **refs, t_parse *lines, int vertices_c);
+int edges_fill(t_vertex **lst_vertex, t_parse *lines, int vertices_c);
 
 t_queue *bfs_find(t_graph *g);
 t_queue *re_wire_paths(t_graph *g, t_queue *paths);
@@ -153,9 +153,9 @@ void netflow_pushflow(t_netflow *net);
 t_netflow *netflow_setup(t_graph *graph, size_t units);
 void netflow_del(t_netflow **anet);
 
-void lstdel_node(void *c, size_t size);
-void helper_lst_alloc(t_node **head, t_node *walk, t_node *node);
-t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c);
+void lstdel_vertex(void *c, size_t size);
+void helper_lst_alloc(t_vertex **head, t_vertex *walk, t_vertex *vertex);
+t_graph *graph_init(t_vertex **refs, t_vertex **vertices, int vertices_c);
 void graph_free(t_graph *g);
 
 
@@ -165,7 +165,7 @@ bool rewire_done(t_graph *g, struct s_rewire_handy *info);
 void walk_edges(t_graph *g, struct s_rewire_handy *info);
 void pick_pair(t_graph *g, struct s_rewire_handy *info);
 bool prepare_info(struct s_rewire_handy *info, t_queue *paths);
-void sort_by_node_src_name(struct s_rewire_handy *info);
+void sort_by_src_name(struct s_rewire_handy *info);
 bool has_arrived(t_graph *g, t_edge *e);
 t_qnode *next_edge(t_graph *g, t_qnode *edge);
 void set_walk_edges(t_queue *paths, struct s_rewire_handy *info);

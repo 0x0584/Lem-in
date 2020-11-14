@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 20:06:04 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 09:50:45 by melalj           ###   ########.fr       */
+/*   Updated: 2020/11/14 19:35:04 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int		edge_bfs_path(t_graph *g, t_edge *edge)
 		return (0);
 }
 
-int	edges_draw(t_graph *g, t_node *node)
+int	edges_draw(t_graph *g, t_node *vertex)
 {
 	t_edge	*curr;
 	int		*ranges_x;
@@ -57,12 +57,12 @@ int	edges_draw(t_graph *g, t_node *node)
 	t_cords	src;
 	t_cords	dst;
 
-	curr = node->edges;
+	curr = vertex->edges;
 	// make the line
 	ranges_x = range_comp(0, g->max_c.x, 0, g->data->w_width - 50);
-	src.x = map(node->cords.x, ranges_x) + 10;
+	src.x = map(vertex->cords.x, ranges_x) + 10;
 	ranges_y = range_comp(0, g->max_c.y, 0, g->data->w_height - 100 - 250);
-	src.y = map(node->cords.y, ranges_y) + 10;
+	src.y = map(vertex->cords.y, ranges_y) + 10;
 	while (curr)
 	{
 	// ft_printf("drawing edge %s - %s\n", curr->node_src->name, curr->node_dst->name);
@@ -80,8 +80,8 @@ int	edges_draw(t_graph *g, t_node *node)
 		}
 		else
 			SDL_SetRenderDrawColor(g->data->rend, 150, 0, 255, 255);
-		dst.x = map(curr->node_dst->cords.x, ranges_x) + 10;
-		dst.y = map(curr->node_dst->cords.y, ranges_y) + 10;
+		dst.x = map(curr->dst->cords.x, ranges_x) + 10;
+		dst.y = map(curr->dst->cords.y, ranges_y) + 10;
 		SDL_RenderDrawLine(g->data->rend, src.x, src.y, dst.x, dst.y);
 		curr = curr->next;
 	}

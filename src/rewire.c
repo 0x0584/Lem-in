@@ -4,17 +4,17 @@ static bool detect_collition(t_graph *g, struct s_rewire_handy *info) {
     /* looking for edges that cae from the same node */
     return /* #1 check current edges first, curr and curr + 1 */
         (!has_arrived(g, AS_EDGE(info->walk_edge[info->curr])) &&
-         !ft_strcmp(AS_EDGE(info->walk_edge[info->curr])->node_src->name,
-                    AS_EDGE(info->walk_edge[info->curr + 1])->node_src->name))
+         !ft_strcmp(AS_EDGE(info->walk_edge[info->curr])->src->name,
+                    AS_EDGE(info->walk_edge[info->curr + 1])->src->name))
         /* 2# or either path 2 has an edge that does */
         || (info->e2 && !has_arrived(g, AS_EDGE(info->e2)) &&
-            !ft_strcmp(AS_EDGE(info->walk_edge[info->curr])->node_src->name,
-                       AS_EDGE(info->e2)->node_src->name))
+            !ft_strcmp(AS_EDGE(info->walk_edge[info->curr])->src->name,
+                       AS_EDGE(info->e2)->src->name))
         /* 3# path 1 is the one who does  */
         ||
         (info->e1 && !has_arrived(g, AS_EDGE(info->e2)) &&
-         !ft_strcmp(AS_EDGE(info->e1)->node_src->name,
-                    AS_EDGE(info->walk_edge[info->curr + 1])->node_src->name));
+         !ft_strcmp(AS_EDGE(info->e1)->src->name,
+                    AS_EDGE(info->walk_edge[info->curr + 1])->src->name));
 }
 
 static bool discover_collition(t_graph *g, struct s_rewire_handy *info,
@@ -120,7 +120,7 @@ t_queue *re_wire_paths(t_graph *g, t_queue *paths) {
     if (!prepare_info(&info, paths))
         return NULL;
     while (!rewire_done(g, &info)) {
-        sort_by_node_src_name(&info);
+        sort_by_src_name(&info);
         if (handle_collision(g, &info)) {
             set_walk_edges(paths, &info); /* start from the sink again */
             continue;

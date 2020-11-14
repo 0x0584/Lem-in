@@ -18,7 +18,7 @@ static t_queue	*gen_bfs_path(t_graph *graph, int *nodes_ref)
 	q = queue_init();
 	while (true)
 	{
-		if (graph->nodes_ref[prev]->type == NODE_DEFAULT)
+		if (graph->nodes_ref[prev]->type == NODE_V_DEFAULT)
 			graph->nodes_ref[prev]->seen = NODE_TAKEN;
 		queue_enq(q, queue_node(graph->nodes_ref[prev], sizeof(t_node)));
 		if (nodes_ref[prev] == -1)
@@ -63,15 +63,15 @@ t_queue		*bfs(t_graph *graph)
 	int			*nodes_ref;
 	t_queue		*path;
 
-	if (!graph || !graph->start || !graph->sink)
+	if (!graph || !graph->source || !graph->sink)
 		return (false);
 
 	nodes_ref = ft_memset(malloc(graph->n_nodes * sizeof(int)), -1,
 							graph->n_nodes * sizeof(int));
 
 	q = queue_init();
-	graph->start->seen = NODE_SEEN;
-	queue_enq(q, queue_node(graph->start, sizeof(t_node)));
+	graph->source->seen = NODE_SEEN;
+	queue_enq(q, queue_node(graph->source, sizeof(t_node)));
 	while (queue_size(q))
 	{
 

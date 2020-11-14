@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/11 10:38:01 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 09:51:22 by melalj           ###   ########.fr       */
+/*   Updated: 2020/11/14 19:36:22 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,12 @@ int	edge_draw(t_graph *g, t_edge *edge, int type)
 	// 	edge->v_c = 0;
 	// 	edge->residual->v_c = 0;
 	// }
-	// if (type > 0 && ft_strequ(edge->node_dst->name, g->sink->name))
+	// if (type > 0 && ft_strequ(edge->dst->name, g->sink->name))
 	// 	path++;
 	// g->data->path_n = path;
 	dstr.w = 30;
 	dstr.h = 30;
-	nodes_draw(g, dstr);
+	vertices_draw(g, dstr);
 	SDL_RenderPresent(g->data->rend);
 	return (1);
 }

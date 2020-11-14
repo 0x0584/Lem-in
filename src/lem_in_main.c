@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 15:33:57 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,25 +31,25 @@ void	parser_free(t_parse *p)
 int		main(void)
 {
 	t_parse		*pp;
-	t_node		**nodes;
-	int			nodes_c;
+	t_vertex		**vertices;
+	int			vertices_c;
 	int			i;
 	t_graph		*g;
-	t_node		**refs;
+	t_vertex		**refs;
 	size_t		n_ants;
 
 
 	i = 0;
-	pp = get_lines(&nodes_c);
+	pp = get_lines(&vertices_c);
 
 	n_ants = (size_t)ft_atoi(pp->line);
-	refs = (t_node **)malloc(sizeof(t_node *) * nodes_c);
-	nodes = h_table(refs, pp, nodes_c);
-	edges_fill(nodes, pp, nodes_c);
+	refs = (t_vertex **)malloc(sizeof(t_vertex *) * vertices_c);
+	vertices = h_table(refs, pp, vertices_c);
+	edges_fill(vertices, pp, vertices_c);
 
 	parser_free(pp);
 
-	g = graph_init(refs, nodes, nodes_c);
+	g = graph_init(refs, vertices, vertices_c);
 
 	t_netflow *farm = netflow_setup(g, n_ants);
 	netflow_pushflow(farm);

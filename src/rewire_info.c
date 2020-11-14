@@ -21,7 +21,7 @@ void walk_edges(t_graph *g, struct s_rewire_handy *info) {
     info->curr = 0;
     while (info->curr < info->n_paths) {
         /* ignoring paths that have reached the source */
-        if (AS_EDGE(info->walk_edge[info->curr])->node_src != g->start)
+        if (AS_EDGE(info->walk_edge[info->curr])->src != g->source)
             info->walk_edge[info->curr] = info->walk_edge[info->curr]->next;
         info->curr++;
     }
@@ -34,7 +34,7 @@ bool rewire_done(t_graph *g, struct s_rewire_handy *info) {
 	info->curr = 0;
 	done = true;
 	while (info->curr < info->n_paths && done)
-		if (AS_EDGE(info->walk_edge[info->curr++])->node_src != g->start)
+		if (AS_EDGE(info->walk_edge[info->curr++])->src != g->source)
 			done = false;
 	return done;
 }
