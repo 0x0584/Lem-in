@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 16:38:10 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 18:22:20 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 
 #define CLONE(foo, size) ft_memcpy(malloc(size), foo, size)
 #define MID(l, h) (((l) + (h)) / 2)
-// #define USE_VISU
-// #define DEBUG
 
 /* ***** data types **********************************************************/
 
@@ -53,14 +51,6 @@ typedef union u_rgb {
 typedef struct s_edge t_edge;
 struct s_edge {
     int seen;
-
-#ifdef USE_VISU
-    int v_c;
-    int path_n;
-    int drawn;
-    t_rgb color;
-#endif
-
     struct s_edge *residual;
     struct s_node *node_dst;
     struct s_node *node_src;
@@ -78,6 +68,17 @@ struct s_graph {
     struct s_node *start; /* FIXME: rename to source */
     struct s_node *sink;
     t_dvisu *data; /*i need it to pass it to bfs as argument*/
+};
+
+struct s_rewire_handy {
+    t_queue **apath;     /* keeping track of each path */
+    t_qnode **walk_edge; /* moving through the paths one edge at a time */
+    size_t n_paths;      /* number of paths */
+    size_t curr;         /* walk index */
+
+    /* edge pair used while walking */
+    t_qnode *e1;
+    t_qnode *e2;
 };
 
 typedef struct s_parse t_parse;
@@ -129,39 +130,6 @@ typedef struct s_flow_network {
     size_t maxflow;
 } t_netflow;
 
-/* *************************** visu ****************************************/
-
-#ifdef USE_VISU
-#include "./visu_lib/SDL_IMG_LIB/include/SDL2/SDL_image.h"
-#include "./visu_lib/SDL_LIB/2.0.10/include/SDL2/SDL.h"
-
-struct s_dvisu {
-    SDL_Window *window;
-    SDL_Surface *s_surface;
-    SDL_Texture *tex;
-    int w_width;
-    int w_height;
-    SDL_Renderer *rend;
-    int f;
-    int path_n;
-};
-
-int visu_init(t_graph *g);
-void visu_quit();
-int graph_draw(t_graph *g);
-int edge_draw(t_graph *g, t_edge *edge, int type);
-int edges_draw(t_graph *g, t_node *node);
-int nodes_draw(t_graph *g, SDL_Rect dstr);
-
-/* *************************** visu end ************************************/
-
-/* *************************** tools ***************************************/
-int map(int val, int *ranges);
-int *range_comp(int in_s, int in_e, int out_s, int out_e);
-/* *************************** tools end ***********************************/
-
-#endif
-
 /* ***** function prototypes *************************************************/
 
 /* FIXME: re-write functions so that they are generalized */
@@ -189,5 +157,18 @@ void lstdel_node(void *c, size_t size);
 void helper_lst_alloc(t_node **head, t_node *walk, t_node *node);
 t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c);
 void graph_free(t_graph *g);
+
+
+/********************************/
+
+bool rewire_done(t_graph *g, struct s_rewire_handy *info);
+void walk_edges(t_graph *g, struct s_rewire_handy *info);
+void pick_pair(t_graph *g, struct s_rewire_handy *info);
+bool prepare_info(struct s_rewire_handy *info, t_queue *paths);
+void sort_by_node_src_name(struct s_rewire_handy *info);
+bool has_arrived(t_graph *g, t_edge *e);
+t_qnode *next_edge(t_graph *g, t_qnode *edge);
+void set_walk_edges(t_queue *paths, struct s_rewire_handy *info);
+
 
 #endif
