@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/05 08:55:34 by melalj           ###   ########.fr       */
+/*   Updated: 2020/11/14 15:33:03 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,18 +105,11 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 	else
 	{
 		curr = src->edges;
-#ifdef DEBUG
-			ft_printf("%s - %s | %s - %s\n", curr->node_src->name,
-					  src->name, curr->node_dst->name, dst->name);
-#endif
 			if ((ft_strequ(curr->node_src->name, src->name)
 					&& ft_strequ(curr->node_dst->name, dst->name))
 					|| (ft_strequ(curr->node_src->name, dst->name)
 							&& ft_strequ(curr->node_dst->name, src->name)))
 			{
-#ifdef DEBUG
-				ft_printf("error : duplicated edge\n");
-#endif
 				exit(1);
 			}
 		while (curr->next)
@@ -130,13 +123,6 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 		tmp = curr->next;
 	}
 
-#ifdef USE_VISU
-	tmp->v_c = 0;
-	tmp->path_n = -1;
-	tmp->drawn = 0;
-	tmp->color.hex = 0;
-#endif
-
 	if (is_residual == false)
 	{
 		// this need to stay tmp not curr
@@ -145,11 +131,6 @@ int	add_edge(t_node *src, t_node *dst, bool is_residual, t_edge *e)
 
 		e->seen = 0;
 		tmp->seen = 0;
-#ifdef DEBUG
-		ft_printf("edge: <%s, %s> | residual <%s, %s>\n",
-				  e->node_src->name, e->node_dst->name,
-				  e->residual->node_src->name, e->residual->node_dst->name);
-#endif
 		return 0;
 	}
 	add_edge(dst, src, true, tmp);
@@ -184,42 +165,8 @@ int	edges_fill(t_node **lst_node, t_parse *lines, int nodes_c)
 			exit(1);
 		}
 		add_edge(node[0], node[1], false, NULL);
-#ifdef DEBUG
-		ft_printf("node %s, %d --- edge %s\n", node[0]->name,
-				  node[0]->type	,node[0]->edges->node_dst->name);
-  		/* add_edge(node[1], node[0]); */
-		ft_printf("node %s --- from %s to %s\n", node[1]->name,
-				  node[1]->edges->node_src->name,
-				  node[1]->edges->node_dst->name);
-		ft_printf("node %s --- edge %s\n", node[1]->name,
-				  node[1]->edges->node_dst->name);
-#endif
 		lines = lines->next;
 		free_tab(s_lines);
 	}
 	return (1);
 }
-
-
-// !?
-// int	nodes_exract(void)
-// {
-// 	char	*line;
-// 	char	**sline;
-// 	int		i;
-
-// 	line = NULL;
-// 	read_line(0, &line);
-// 	i = -1;
-// 	if (line && (sline = ft_strsplit(line, ' ')))
-// 		while (sline[++i])
-// 		{
-// 			if (!i)
-// 				add_node();
-// 			if (i && !ft_isnumber(sline[i]))
-// 				break ;
-// 		}
-// 	if (i != 3)
-// 		return (0);
-// 	return (1);
-// }

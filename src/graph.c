@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 19:03:24 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/02 11:14:13 by melalj           ###   ########.fr       */
+/*   Updated: 2020/11/14 15:32:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,6 @@ t_graph *graph_init(t_node **refs, t_node **nodes, int nodes_c)
 	g->n_nodes = nodes_c;
 	g->start = NULL;
 	g->sink = NULL;
-#ifdef USE_VISU
-	g->data = (t_dvisu *)malloc(sizeof(t_dvisu));
-#endif
 	while ((int)i < nodes_c)
 	{
 		curr = nodes[i];

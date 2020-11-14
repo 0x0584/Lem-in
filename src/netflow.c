@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/01/07 07:26:46 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/14 15:35:10 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,38 +147,15 @@ void			flow_dump(t_qnode *e)
 	if (!e)
 		return ;
 	flow = e->blob;
-#ifdef DEBUG
-	cut = flow->cut ? "C": " ";
-	if (flow->cut && !flow_has_ants(flow))
-		cut = "X";
-	ft_printf(" >> [%s] flow of %u / %zu ",
-			  cut, flow->latency, flow->n_synced);
-	ft_putchar('\n');
-	ft_putstr("flow state:  {\n ");
-	ft_putstr("\n -- \n");
-#endif
 	flow_log_ants(flow);
-#ifdef DEBUG
-	ft_putendl("\n}\n");
-#endif
 }
 
 void			netflow_log(t_netflow *net)
 {
 	if (!net)
 		return ;
-#ifdef DEBUG
-	ft_printf(" ====== network has %zu over %zu flow(s) =====\n"
-				" // flows based on lower latency\n",
-			  net->n_units, queue_size(net->flows));
-#endif
 	queue_iter(net->flows, false, flow_dump);
 	queue_iter(net->sync, false, flow_dump);
-#ifdef DEBUG
-	ft_putendl("\n\n ============ //// =================================== ");
-	getchar();
-#endif
-
 }
 
 static t_netflow		*netflow_init(t_queue *paths)
@@ -213,21 +190,9 @@ t_netflow	*netflow_setup(t_graph *graph, size_t units)
 
 	paths = queue_init();
 	while ((tmp = bfs_find(graph)))
-	{
-#ifdef DEBUG
-		ft_putendl(" path:  \n ");
-		queue_iter(tmp, true, edge_dump);
-		queue_iter(tmp, false, edge_dump); /* from tail: source -> sink */
-#endif
 		queue_enq(paths, queue_dry_node(tmp, sizeof(t_queue *)));
-	}
 	if (!queue_size(paths))
-	{
-#ifdef DEBUG
-		ft_putendl("no paths were found!");
-#endif
 		return NULL;
-	}
 	net = netflow_init(re_wire_paths(graph, paths));
 	net->n_units = units;
 	net->maxflow = units;
@@ -319,9 +284,6 @@ size_t		netflow_shrink(t_netflow *net)
 		while (queue_size(net->flows))
 			queue_penq(net->sync, queue_deq(net->flows), lower_latency);
 	}
-#ifdef DEBUG
-	ft_printf("maxflow is: %zu\n", net->maxflow);
-#endif
 	/* netflow_log(net); */
 	return net->maxflow;
 }
@@ -391,13 +353,6 @@ bool		netflow_sync(t_netflow *net)
 		walk = walk->prev;
 	}
 	netflow_shrink(net);
-#ifdef DEBUG
-	if (sync_in)
-	{
-		ft_putendl("\n ====== after pushing ===== ");
-		netflow_log(net);
-	}
-#endif
 	sync_out = false;
 	walk = net->sync->head->next;
 	while (walk != net->sync->tail)
@@ -406,13 +361,6 @@ bool		netflow_sync(t_netflow *net)
 			sync_out = true;
 		walk = walk->next;
 	}
-#ifdef DEBUG
-	if (sync_out)
-	{
-		ft_putendl("\n ====== after syncing ===== ");
-		netflow_log(net);
-	}
-#endif
 	if (!sync_in && !sync_out)
 		n_sent = 0;				/* all bits have arrived */
 	return (sync_out || sync_in);
@@ -422,20 +370,12 @@ void		netflow_pushflow(t_netflow *net)
 {
 	bool state;
 
-#ifdef DEBUG
-	size_t i = 0;
-	ft_printf("number of ants: %lu\n", net->n_units);
-#endif
 	state = true;
 	while (state)
 	{
 		netflow_shrink(net);
 		state = netflow_sync(net);
-#ifdef DEBUG
-		ft_printf("n_instructions %zu\n", ++i);
-#else
 		netflow_log(net);
 		ft_putendl("");
-#endif
 	}
 }
