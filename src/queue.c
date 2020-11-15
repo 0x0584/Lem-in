@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2019/12/29 20:09:00 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/15 20:07:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,4 +294,115 @@ void queue_penq(t_queue *queue, t_qnode *node,
 	}
 	if (!inserted)
 		queue_enq(queue, node);
+}
+
+
+void	ft_free(void (*del)(void *o), void *ptr, ...)
+{
+	va_list args;
+	void	*vp;
+
+	if (ptr)
+		del(ptr);
+	va_start(args, ptr);
+	while ((vp = va_arg(args, void *)) != NULL)
+		if (vp)
+			del(vp);
+	va_end(args);
+}
+
+
+void		queue_push_front(t_queue *queue, t_qnode *node)
+{
+	if (!queue || !node)
+		return ;
+	node->next = queue->head->next;
+	queue->head->next->prev = node;
+	node->prev = queue->head;
+	queue->head->next = node;
+}
+
+static t_queue	*helper_merge(t_queue **left, t_queue **right,
+								int (*cmp)(t_qnode *, t_qnode *))
+{
+	t_queue *root;
+	t_qnode *tmp;
+	t_queue **to_free;
+	int		sort;
+
+	root = NULL;
+	if (!QUEUE_ISEMPTY(*right) && !QUEUE_ISEMPTY(*left))
+	{
+		sort = cmp(QFIRST(*left), QFIRST(*right));
+		tmp = sort < 0 ? queue_deq(*left) : queue_deq(*right);
+		if (!(root = helper_merge(left, right, cmp)))
+			return (NULL);
+		queue_push_front(root, tmp);
+	}
+	else if (QUEUE_ISEMPTY(*left) || QUEUE_ISEMPTY(*right))
+	{
+		root = QUEUE_ISEMPTY(*left) ? *right : *left;
+		to_free = QUEUE_ISEMPTY(*left) ? left : right;
+		ft_free(free, QHEAD(*to_free), QTAIL(*to_free), *to_free, NULL);
+		*to_free = NULL;
+	}
+	return (root);
+}
+
+static void		helper_halfsplit(t_queue *root, t_queue **left,
+									t_queue **right)
+{
+	t_qnode *foo;
+	t_qnode *bar;
+
+	bar = QFIRST(root);
+	foo = bar->next;
+	while (foo != QTAIL(root))
+	{
+		foo = foo->next;
+		if (foo != QTAIL(root))
+		{
+			bar = bar->next;
+			foo = foo->next;
+		}
+	}
+	(*left) = malloc(sizeof(t_queue));
+	(*right) = malloc(sizeof(t_queue));
+	(*left)->head = root->head;
+	(*left)->tail = queue_node(NULL, 0);
+	(*right)->head = queue_node(NULL, 0);
+	(*right)->tail = root->tail;
+	(*left)->tail->prev = bar;
+	(*right)->head->next = bar->next;
+	bar->next->prev = (*right)->head;
+	bar->next = (*left)->tail;
+}
+
+void			queue_mergesort(t_queue **q, int (*cmp)(t_qnode *, t_qnode *))
+{
+	t_queue *left;
+	t_queue *right;
+	t_queue *tmp;
+
+	if (!q || !*q || !cmp || QUEUE_ISEMPTY(*q)
+			|| !QNODE_GETNEXT(*q, QFIRST(*q)))
+		return ;
+	helper_halfsplit(*q, &left, &right);
+	queue_mergesort(&left, cmp);
+	queue_mergesort(&right, cmp);
+	tmp = *q;
+	*q = helper_merge(&left, &right, cmp);
+	ft_free(free, tmp, NULL);
+}
+
+t_qnode		*queue_pop(t_queue *queue)
+{
+	t_qnode *node;
+
+	if (!queue || queue->head->next == queue->tail)
+		return (NULL);
+	node = queue->tail->prev;
+	queue->tail->prev = node->prev;
+	node->prev->next = queue->tail;
+	return (node);
 }

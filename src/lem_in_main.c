@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/15 18:46:46 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int		main(void)
 	t_netflow *farm = netflow_setup(g, n_ants);
 	netflow_pushflow(farm);
 	netflow_del(&farm);
+
 
 	/* FIXME: fix double free  */
 	// graph_free(g);

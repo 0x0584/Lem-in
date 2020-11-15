@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 19:38:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/15 20:09:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,9 +123,16 @@ typedef struct s_flow {
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
+typedef struct path
+{
+	char	**nodes;
+	int		*ants;
+	size_t	size;
+} t_path;
+
 typedef struct s_flow_network {
-    t_queue *flows;
-    t_queue *sync;
+    struct path *paths;
+	size_t n_paths;
     size_t n_units;
     size_t maxflow;
 } t_netflow;
@@ -169,6 +176,8 @@ void sort_by_src_name(struct s_rewire_handy *info);
 bool has_arrived(t_graph *g, t_edge *e);
 t_qnode *next_edge(t_graph *g, t_qnode *edge);
 void set_walk_edges(t_queue *paths, struct s_rewire_handy *info);
+
+void node_dump(t_qnode *node);
 
 
 #endif

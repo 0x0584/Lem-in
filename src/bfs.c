@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 09:00:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/14 19:38:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/15 14:14:25 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@
 */
 
 static int g_turn = 2;
+
+void node_dump(t_qnode *node) {
+	t_edge *edge = node->blob;
+	ft_printf("%s-%s ", edge->src->name, edge->dst->name);
+}
 
 static t_queue *bfs_helper(t_graph *g, t_edge **parent) {
     t_queue *path;
@@ -85,6 +90,11 @@ t_queue *bfs_find(t_graph *g) {
     g->source->seen = g_turn;
     bfs_loop(g, residuals, parent);
     path = bfs_helper(g, parent);
+
+	ft_printf("\n");
+	ft_printf("%d>> ", g_turn);
+	queue_iter(path, false, node_dump);
+
     free(parent);
     g_turn++;
     return path;
