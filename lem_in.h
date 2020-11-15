@@ -6,14 +6,14 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/01/09 05:18:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/15 13:44:15 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEMIN_H
 # define LEMIN_H
 
-#define USE_VISU
+// #define USE_VISU
 
 # include "libft/libft.h"
 # include "src/queue.h"
