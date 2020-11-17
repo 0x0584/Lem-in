@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/15 20:07:34 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/17 23:35:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,9 +305,8 @@ void	ft_free(void (*del)(void *o), void *ptr, ...)
 	if (ptr)
 		del(ptr);
 	va_start(args, ptr);
-	while ((vp = va_arg(args, void *)) != NULL)
-		if (vp)
-			del(vp);
+	while ((vp = va_arg(args, void *)))
+		del(vp);
 	va_end(args);
 }
 

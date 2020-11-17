@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/15 20:29:31 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/18 00:51:23 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,18 @@ void init_path(t_path *path, t_queue *edges)
 	i = 0;
 	path->size = queue_size(edges);
 	path->nodes = malloc(path->size * sizeof(char *));
+	path->ants = malloc(path->size * sizeof(int));
 	while (i < path->size)
 	{
 		tmp = queue_pop(edges);
-		path->nodes[i] = AS_EDGE(tmp)->dst->name;
+		path->nodes[i] = ft_strdup(AS_EDGE(tmp)->dst->name);
+		path->ants[i]  = -1;
 		queue_node_del(&tmp, queue_node_del_dry);
 		i++;
 	}
 }
 
-static t_netflow		*netflow_init(t_queue *paths)
+t_netflow		*netflow_init(t_queue *paths)
 {
 	t_netflow	*net;
 	t_qnode		*tmp;
@@ -88,8 +90,92 @@ t_netflow				*netflow_setup(t_graph *graph, size_t units)
 
 void		netflow_del(t_netflow **anet)
 {
+	size_t i;
+	size_t j;
+
+	i = 0;
+	while (i < (*anet)->n_paths) {
+		j = 0;
+		while (j < (*anet)->paths[i].size) {
+			free((*anet)->paths[i].nodes[j]);
+			j++;
+		}
+		free((*anet)->paths[i].nodes);
+		i++;
+	}
+	free((*anet)->paths);
+	*anet = NULL;
+}
+
+int netflow_send(t_netflow *net, int n_paths, bool print) {
+	int ant;
+	int i;
+	int j;
+	int count;
+	bool flag = true;
+
+	count = 0;
+	ant = 0;
+	while (flag) {
+		flag = false;
+		i = 0;
+		while (ant < net->n_units && i < n_paths)
+			net->paths[i++].ants[0] = ant++ + 1;
+		if (print)
+		{
+			i = 0;
+			while (i < n_paths)
+			{
+				j = 0;
+				while (j < net->paths[i].size) {
+					if (net->paths[i].ants[j] != -1)
+						printf("L%d-%s ", net->paths[i].ants[j], net->paths[i].nodes[j]);
+					j++;
+				}
+				i++;
+			}
+			printf("\n");
+		}
+		i = 0;
+		while (i < n_paths) {
+			j = net->paths[i].size - 1;
+			while (j) {
+				if (net->paths[i].ants[j - 1] != -1)
+					flag = true;
+				net->paths[i].ants[j] = net->paths[i].ants[j - 1];
+				j--;
+			}
+			net->paths[i].ants[0] = -1;
+			i++;
+		}
+		count++;
+	}
+
+	return count;
+}
+
+int netflow_simulate(t_netflow *net) {
+	int i = 0;
+	int prev = INT_MAX;
+	int tmp;
+
+	while (i < net->n_paths) {
+		tmp = netflow_send(net, i + 1, false);
+		printf("prev: %d current: %d\n", prev, tmp);
+		if (tmp > prev)
+			break;
+		prev = tmp;
+		i++;
+	}
+
+	return i;
 }
 
 void		netflow_pushflow(t_netflow *net)
 {
+	int n_used;
+
+	n_used = netflow_simulate(net);
+	printf("\nused: %d\n", n_used);
+	netflow_send(net, n_used, true);
 }
