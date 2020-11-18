@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/18 00:51:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/18 19:34:24 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void		netflow_del(t_netflow **anet)
 	*anet = NULL;
 }
 
-int netflow_send(t_netflow *net, int n_paths, bool print) {
+int netflow_send(t_netflow *net, int n_paths) {
 	int ant;
 	int i;
 	int j;
@@ -121,21 +121,6 @@ int netflow_send(t_netflow *net, int n_paths, bool print) {
 		i = 0;
 		while (ant < net->n_units && i < n_paths)
 			net->paths[i++].ants[0] = ant++ + 1;
-		if (print)
-		{
-			i = 0;
-			while (i < n_paths)
-			{
-				j = 0;
-				while (j < net->paths[i].size) {
-					if (net->paths[i].ants[j] != -1)
-						printf("L%d-%s ", net->paths[i].ants[j], net->paths[i].nodes[j]);
-					j++;
-				}
-				i++;
-			}
-			printf("\n");
-		}
 		i = 0;
 		while (i < n_paths) {
 			j = net->paths[i].size - 1;
@@ -156,26 +141,101 @@ int netflow_send(t_netflow *net, int n_paths, bool print) {
 
 int netflow_simulate(t_netflow *net) {
 	int i = 0;
+	int n_used = 0;
 	int prev = INT_MAX;
 	int tmp;
 
-	while (i < net->n_paths) {
-		tmp = netflow_send(net, i + 1, false);
+	while (n_used < net->n_paths) {
+		tmp = netflow_send(net, n_used + 1);
 		printf("prev: %d current: %d\n", prev, tmp);
 		if (tmp > prev)
 			break;
 		prev = tmp;
+		n_used++;
+	}
+	printf("\nused: %d\n", n_used);
+
+	int sum;
+	sum = 0;
+	while (i < n_used)
+	{
+		net->paths[i].n_ants = (net->paths[n_used - 1].size - net->paths[i].size);
+		sum += net->paths[i].n_ants;
 		i++;
 	}
 
-	return i;
+	printf("sum: %d\n", sum);
+
+	if (net->n_units - sum > 0)
+	{
+		int mod = (net->n_units - sum) % n_used;
+		int div = (net->n_units - sum) / n_used;
+
+		i = 0;
+		while (i < n_used)
+		{
+			net->paths[i].n_ants += div;
+			if (mod)
+				net->paths[i].n_ants += mod--;
+			i++;
+		}
+	}
+
+	i = 0;
+	while (i < n_used)
+	{
+		printf("%d = %d\n", i, net->paths[i].n_ants);
+		i++;
+	}
+	return n_used;
 }
 
 void		netflow_pushflow(t_netflow *net)
 {
-	int n_used;
+	int i;
+	int j;
+	int n_paths;
+	bool flag;
+	int ant;
 
-	n_used = netflow_simulate(net);
-	printf("\nused: %d\n", n_used);
-	netflow_send(net, n_used, true);
+	ant = 0;
+	n_paths = netflow_simulate(net);
+	flag = true;
+	while (flag)
+	{
+		i = 0;
+		flag = false;
+		while (i < n_paths && ant < net->n_units) {
+			if (net->paths[i].n_ants)
+				net->paths[i].ants[0] = ++ant;
+			i++;
+		}
+		i = 0;
+		while (i < n_paths)
+		{
+			j = net->paths[i].size - 1;
+			while (j >= 0) {
+				if (net->paths[i].ants[j] != -1)
+					printf("L%d-%s ", net->paths[i].ants[j],
+						   net->paths[i].nodes[j]);
+				j--;
+			}
+			i++;
+		}
+		i = 0;
+		while (i < n_paths)
+		{
+			j = net->paths[i].size - 1;
+			while (j >= 0) {
+				if (net->paths[i].ants[j] != -1)
+					flag = true;
+				net->paths[i].ants[j] = net->paths[i].ants[j - 1];
+				j--;
+			}
+			net->paths[i].ants[0] = -1;
+			i++;
+		}
+		if (flag)
+			printf("\n");
+	}
 }

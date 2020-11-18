@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 09:09:55 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/15 20:09:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/18 18:52:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ typedef struct path
 {
 	char	**nodes;
 	int		*ants;
+	int		n_ants;
 	size_t	size;
 } t_path;
 
