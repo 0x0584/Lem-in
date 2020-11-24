@@ -1,14 +1,22 @@
 #include "hash.h"
 
 size_t compute_hash(char *s, size_t size, size_t sum) {
-    for (size_t i = 0; i < size; ++i)
-	{
-		size_t tmp = 0;
-        for (size_t mul = 1, j = i, k = i + 4; s[j] && j < k; ++j, mul *= 256)
+    size_t i;
+    size_t j;
+    size_t tmp;
+    size_t mul;
+
+    i = 0;
+    while (i < size) {
+        tmp = 0;
+        mul = 1;
+        j = i;
+        while (j < i + 4 && s[j]) {
             tmp += s[i] * mul;
-		sum += tmp;
-		printf("%zu\n", tmp);
-	}
+            j++, mul *= 256;
+        }
+        sum += tmp, i++;
+    }
     return sum;
 }
 
@@ -84,8 +92,8 @@ void hash_free(t_hash *h) {
 		return ;
 	i = 0;
 	while (i < h->size) {
-		if (!h->array[i])
-			continue;
-		queue_del(&h->array[i], h->del);
+		if (h->array[i])
+			queue_del(&h->array[i], h->del);
+		i++;
 	}
 }

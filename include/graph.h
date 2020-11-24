@@ -3,12 +3,6 @@
 
 #include "hash.h"
 
-typedef enum e_vertex_type {
-	V_DEFAULT = 1,
-	V_SOURCE,
-	V_SINK
-} t_vertex_type;
-
 typedef struct s_vertex t_vertex;
 typedef struct s_edge t_edge;
 typedef struct s_graph t_graph;

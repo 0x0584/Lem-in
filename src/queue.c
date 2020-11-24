@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/24 03:44:34 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 00:05:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void		queue_del(t_queue **q, void (*del)(void *, size_t))
 	t_qnode *walk;
 	t_qnode *tmp;
 
-	if (!q)
+	if (!q || !*q)
 		return ;
 
 	walk = (*q)->head->next;

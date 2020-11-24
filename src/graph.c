@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 19:03:24 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/23 20:41:57 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/24 23:45:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,8 @@ void vertex_del(void *vert, size_t size)
 {
 	t_vertex *v;
 
+	if (!vert)
+		return ;
 	(void)size;
 	v = vert;
 	free(v->name);
@@ -126,6 +128,8 @@ void edge_del(void *edge, size_t size)
 {
 	t_edge *e;
 
+	if (!edge)
+		return ;
 	(void)size;
 	e = edge;
 	free(e->residual);
@@ -147,6 +151,8 @@ t_graph *graph_init(t_hash *V, t_hash *E)
 
 void	graph_free(t_graph *g)
 {
+	if (!g)
+		return ;
 	hash_free(g->vertices);
 	hash_free(g->edges);
 	free(g);
