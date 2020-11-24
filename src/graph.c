@@ -6,237 +6,148 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/30 19:03:24 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/14 19:38:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/23 20:41:57 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../lem_in.h"
+#include "graph.h"
 
+void vertex_init(t_vertex *vert, char *name, int x, int y) {
+	vert->name = name;
+	vert->edges = queue_init();
+	vert->x = x;
+	vert->y = y;
+	vert->seen = 0;
+}
 
-void vertex_info(t_vertex *vertex)
+t_hnode vertex_alloc(char *line) {
+	t_vertex *vert;
+	char **split;
+	char **ptr;
+
+	vert = malloc(sizeof(t_vertex));
+	split = ft_strsplit(line, ' ');
+	vertex_init(vert, ft_strdup(split[0]),
+				ft_atoi(split[1]), ft_atoi(split[2]));
+	ptr = split;
+	while (*ptr)
+		ft_strdel(ptr++);
+	free(split);
+	return (t_hnode){vert->name, vert};
+}
+
+void edge_init(t_hnode **e, t_hnode **re, t_vertex *src, t_vertex *dst)
 {
-	char *type;
-	// char *seen;
+	(*e)->blob = malloc(sizeof(t_edge));
+    ((t_edge *)((*e)->blob))->seen = 0;
+    ((t_edge *)((*e)->blob))->src = src;
+	((t_edge *)((*e)->blob))->dst = dst;
+	(*e)->key = ft_strnew(0);
+	ft_strchange(&(*e)->key, ft_strjoin(src->name, "-"));
+	ft_strchange(&(*e)->key, ft_strjoin((*e)->key, dst->name));
+	(*re)->blob = malloc(sizeof(t_edge));
+    ((t_edge *)((*re)->blob))->seen = 0;
+    ((t_edge *)((*re)->blob))->src = dst;
+	((t_edge *)((*re)->blob))->dst = src;
+	(*re)->key = ft_strnew(0);
+	ft_strchange(&(*re)->key, ft_strjoin(dst->name, "-"));
+	ft_strchange(&(*re)->key, ft_strjoin((*re)->key, src->name));
+	((t_edge *)((*e)->blob))->residual = (*re)->blob;
+	((t_edge *)((*re)->blob))->residual = (*e)->blob;
+}
 
-	ft_putendl("========================================");
-	ft_printf("index: %d -- name: '%s'\n", vertex->index, vertex->name);
-	if (vertex->type == V_DEFAULT)
-		type = "VERTEX";
+t_vertex *get_vertex(t_graph *g, char *name) {
+	if (!g || !name)
+		return NULL;
+	return hash_get(g->vertices, name, NULL);
+}
+
+bool edge_alloc(t_graph *g, char *line, t_hnode *e, t_hnode *re)
+{
+	t_vertex *u;
+	t_vertex *v;
+	char **split;
+	char **ptr;
+	bool valid;
+
+	split = ft_strsplit(line, '-');
+	if ((valid = (u = get_vertex(g, split[0])) &&
+		 (v = get_vertex(g, split[1]))))
+		edge_init(&e, &re, u, v);
 	else
-		type = (vertex->type == V_SOURCE ? "source" : "sink");
-	ft_printf("type: %s -- seen: '%d'\n", type, vertex->seen);
-	ft_putendl("========================================");
+		e->blob = NULL, re->blob = NULL;
+	ptr = split;
+	while (*ptr)
+		ft_strdel(ptr++);
+	free(split);
+	return valid;
 }
 
-void vertex_dump(t_qnode *e)
+bool vertex_cmp(void *u, void *v, size_t size)
 {
-	t_vertex *vertex;
-	// t_edge *e_walk;
+	t_vertex *uer;
+	t_vertex *ver;
 
-	vertex_info(vertex = e->blob);
-	/*
-	ft_putendl("\n=========== edges ==========");
-	e_walk = vertex->edges;
-	while (e_walk)
-	{
-		vertex_info(e_walk->dst);
-		if (e_walk->next)
-			ft_putendl("~~~~~~~~~~~~~~~~~~~~~~~~~");
-		e_walk = e_walk->next;
-	}
-	ft_putendl("===========       ==========\n");
-	*/
-	/* sleep(1); */
+	(void) size;
+
+	uer = u;
+	ver = v;
+
+	return !ft_strcmp(uer->name, ver->name);
 }
 
-void lstdel_vertex(void *c, size_t size)
+bool edge_cmp(void *e1, void *e2, size_t size)
 {
-	t_edge *edges;
-	t_edge *tmp;
+	t_edge *e;
+	t_edge *f;
 
-	if (!size || !c)
-		return ;
-	edges = ((t_vertex *)c)->edges;
-	while (edges)
-	{
-		tmp = edges;
-		edges = edges->next;
-		free(tmp);
-	}
-	free(((t_vertex *)c)->name);
+	(void) size;
+
+	e = e1;
+	f = e2;
+
+	return !ft_strcmp(e->src->name, f->src->name) &&
+		!ft_strcmp(e->dst->name, f->dst->name);
 }
 
-void	helper_lst_alloc(t_vertex **head, t_vertex *walk, t_vertex *vertex)
+void vertex_del(void *vert, size_t size)
 {
-	if (!head || !vertex)
-		return ;
+	t_vertex *v;
 
-	if (!*head)
-		*head = CLONE(vertex, sizeof(t_vertex));
-	else
-	{
-		walk->next = CLONE(vertex, sizeof(vertex));
-	}
+	(void)size;
+	v = vert;
+	free(v->name);
+	queue_del(&v->edges, edge_del);
+	free(v);
 }
 
-t_graph *graph_init(t_vertex **refs, t_vertex **vertices, int vertices_c)
+
+void edge_del(void *edge, size_t size)
 {
-	t_graph *g;
-	t_vertex	*curr;
-	t_vertex	*walk;
-
-	size_t	i;
-
-	i = 0;
-	g = (t_graph *)ft_memalloc(sizeof(t_graph));
-	g->vertices_ref = refs;
-	g->max_c.x = 0;
-	g->max_c.y = 0;
-	g->n_vertices = vertices_c;
-	g->source = NULL;
-	g->sink = NULL;
-	while ((int)i < vertices_c)
-	{
-		curr = vertices[i];
-		while (curr)
-		{
-			if (curr->type == V_SOURCE)
-				g->source = curr;
-			else if (curr->type == V_SINK)
-				g->sink = curr;
-			if (g->vertices_lst == NULL)
-			{
-				g->vertices_lst = ft_memcpy(malloc(sizeof(t_vertex)),
-											curr, sizeof(t_vertex));
-				walk = g->vertices_lst;
-			}
-			else
-			{
-				walk->next = ft_memcpy(malloc(sizeof(t_vertex)),
-										curr, sizeof(t_vertex));
-				walk = walk->next;
-			}
-			g->max_c.x = (g->max_c.x > curr->cords.x ?
-							g->max_c.x : curr->cords.x);
-			g->max_c.y = (g->max_c.y > curr->cords.y ?
-							g->max_c.y : curr->cords.y);
-			curr = curr->next;
-		}
-		i++;
-	}
-	if (!(g->source) || !(g->sink))
-	{
-		ft_printf("error no start or end\n");
-		exit(1);
-	}
-	return (g);
-}
-
-void	graph_dump(t_graph *g)
-{
-	t_vertex *walk;
 	t_edge *e;
 
-	walk = g->vertices_lst;
-	while (walk)
-	{
-		ft_printf("<> name: %s type: %d <>\n", walk->name, walk->type);
-		e = walk->edges;
-		ft_printf(" == edges ==\n");
-		while (e)
-		{
-			ft_printf("<> src %s type: %d <> ", e->src->name,
-					  e->src->type);
-			ft_printf("<> dst %s type: %d <>\n", e->dst->name,
-					  e->dst->type);
-			e = e->next;
-		}
-		ft_printf(" == ===== ==\n\n");
-		walk = walk->next;
-	}
+	(void)size;
+	e = edge;
+	free(e->residual);
+	free(e);
+}
 
+t_graph *graph_init(t_hash *V, t_hash *E)
+{
+	t_graph *g;
+
+	g = malloc(sizeof(t_graph));
+	g->n_vertices = 0;
+	g->vertices = V;
+	g->edges = E;
+	g->source = NULL;
+	g->sink = NULL;
+	return (g);
 }
 
 void	graph_free(t_graph *g)
 {
-	t_vertex *vertex;
-	t_vertex *nwalk;
-	t_edge *edge;
-	t_edge *tmp;
-	t_edge *ewalk;
-
-	nwalk = g->vertices_lst;
-	while (nwalk)
-	{
-		vertex = nwalk;
-		nwalk = nwalk->next;
-		ewalk = vertex->edges;
-		while (ewalk)
-		{
-			/* FIXME:  */
-			edge = ewalk;
-			ewalk = ewalk->next;
-			if (edge->src->edges)
-			{
-				tmp = edge->dst->edges;
-				edge->dst->edges = NULL;
-				free(tmp);
-			}
-			free(edge->src->edges);
-			edge->src->edges = NULL;
-		}
-		free(vertex->name);
-		free(vertex);
-	}
+	hash_free(g->vertices);
+	hash_free(g->edges);
 	free(g);
-}
-
-
-void	vertex_full_dump(t_qnode *e)
-{
-	t_vertex *vertex;
-	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
-								 * but let's get it working first, the fix
-								 * design issues. */
-
-	if (!e)
-		return ;
-	vertex = e->blob;
-	edge = vertex->edges;
-	ft_printf("vertex: %s\n", vertex->name);
-	while (edge && edge->src != vertex)
-	{
-		ft_printf("<%s,%s>\n", edge->src->name, edge->dst->name);
-		edge = edge->next;
-	}
-	ft_putendl("");
-}
-
-void	vertex_oneline_dump(t_qnode *e)
-{
-	t_vertex *vertex;
-	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
-								 * but let's get it working first, the fix
-								 * design issues. */
-
-	if (!e)
-		return ;
-	vertex = e->blob;
-	edge = vertex->edges;
-	ft_printf(" %s", vertex->name);
-}
-
-void	edge_oneline_dump(t_qnode *e)
-{
-	// t_vertex *vertex;
-	t_edge *edge;			/* NOTE: if we save the edge, wont't need this,
-								 * but let's get it working first, the fix
-								 * design issues. */
-
-	if (!e)
-		return ;
-	edge = e->blob;
-	ft_printf(" <%s-%s> ",
-			  edge->src->name,
-			  edge->dst->name);
 }

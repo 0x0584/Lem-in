@@ -6,41 +6,21 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/01/07 06:43:03 by archid-          ###   ########.fr        #
+#    Updated: 2020/11/18 11:07:51 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 NAME		= lem-in
 FARM		= barfarm
 
-VISU		?= 0
 DEBUG		?= 0
 
 CC			= gcc
-CFLAGS		= -Wall -Wextra -g -Ilibft
+CFLAGS		= -Wall -Wextra -g -Ilibft -Iinclude
 LDFLAGS		= -Llibft -lft
 
 ifeq ($(DEBUG),1)
 	CFLAGS  += -DDEBUG
-endif
-
-ifeq ($(shell uname),Linux)
-	SDL_LIB  = `sdl2-config --static-libs` -lSDL2_image
-	SDL_DEPS = `sdl2-config --cflags`
-else
-	SDL_LIB  = -L ~/.brew/Cellar/sdl2/2.0.10/lib -lSDL2-2.0.0 -lSDL2	\
-			   -L ~/.brew/Cellar/sdl2_image/2.0.5/lib -lSDL2_image		\
-			   -lSDL2_image-2.0.0										\
-			   -L ~/.brew/Cellar/sdl2_ttf/2.0.15/lib -lSDL2_ttf			\
-			   -lSDL2_ttf-2.0.0
-	SDL_DEPS =  -I ~/.brew/Cellar/sdl2_image/2.0.5/include/SDL2			\
-			    -I ~/.brew/Cellar/sdl2/2.0.10/include/SDL2				\
-			    -I ~/.brew/Cellar/sdl2_ttf/2.0.15/include/SDL2
-endif
-
-ifeq ($(VISU),1)
-	CFLAGS	  += -DUSE_VISU $(SDL_DEPS)
-	LDFLAGS   += $(SDL_LIB)
 endif
 
 info:

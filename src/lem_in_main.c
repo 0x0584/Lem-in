@@ -3,61 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   lem_in_main.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/12 22:07:41 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/15 18:46:46 by archid-          ###   ########.fr       */
+/*   Created: 2020/11/18 11:57:54 by archid-           #+#    #+#             */
+/*   Updated: 2020/11/23 19:25:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../lem_in.h"
-# include "visu.h"
+# include "lem_in.h"
 
-void	parser_free(t_parse *p)
-{
-	t_parse *walk;
-	t_parse *hold;
+t_netflow *netflow_prepare(void) {
+	t_netflow *net;
+	t_graph *g;
 
-	walk = p;
-	while (walk)
-	{
-		hold = walk;
-		walk = walk->next;
-		free(hold->line);
-		free(hold);
+	if (!(g = read_graph())) {
+		graph_free(g);
+		return NULL;
 	}
+	net = netflow_setup(g, g_ants);
+	graph_free(g);
+	return net;
 }
 
 int		main(void)
 {
-	t_parse		*pp;
-	t_vertex		**vertices;
-	int			vertices_c;
-	int			i;
-	t_graph		*g;
-	t_vertex		**refs;
-	size_t		n_ants;
+	t_netflow *farm;
 
-
-	i = 0;
-	pp = get_lines(&vertices_c);
-
-	n_ants = (size_t)ft_atoi(pp->line);
-	refs = (t_vertex **)malloc(sizeof(t_vertex *) * vertices_c);
-	vertices = h_table(refs, pp, vertices_c);
-	edges_fill(vertices, pp, vertices_c);
-
-	parser_free(pp);
-
-	g = graph_init(refs, vertices, vertices_c);
-
-	t_netflow *farm = netflow_setup(g, n_ants);
+	g_error_line = ft_strdup("");
+	farm = netflow_prepare();
 	netflow_pushflow(farm);
 	netflow_del(&farm);
-
-
-	/* FIXME: fix double free  */
-	// graph_free(g);
-
+	free(g_error_line);
 	return (0);
 }

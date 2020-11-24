@@ -1,4 +1,4 @@
-#include "../lem_in.h"
+#include "netflow.h"
 
 bool prepare_info(struct s_rewire_handy *info, t_queue *paths) {
     if (!paths || !(info->n_paths = queue_size(paths)))

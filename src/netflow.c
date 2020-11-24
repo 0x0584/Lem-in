@@ -6,11 +6,11 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/18 19:34:24 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/24 03:43:39 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../lem_in.h"
+#include "lem_in.h"
 
 int paths_cmp(t_qnode *path1, t_qnode *path2) {
 	t_queue *p1;
@@ -35,7 +35,7 @@ void init_path(t_path *path, t_queue *edges)
 		tmp = queue_pop(edges);
 		path->nodes[i] = ft_strdup(AS_EDGE(tmp)->dst->name);
 		path->ants[i]  = -1;
-		queue_node_del(&tmp, queue_node_del_dry);
+		queue_node_del(&tmp, queue_blob_keep);
 		i++;
 	}
 }
@@ -54,7 +54,7 @@ t_netflow		*netflow_init(t_queue *paths)
 	{
 		tmp = queue_deq(paths);
 		init_path(&net->paths[size], tmp->blob);
-		queue_node_del(&tmp, queue_node_del_dry);
+		queue_node_del(&tmp, queue_blob_keep);
 	}
 	return (net);
 }
@@ -67,14 +67,14 @@ t_netflow				*netflow_setup(t_graph *graph, size_t units)
 
 	paths = queue_init();
 	while ((tmp = bfs_find(graph)))
-		queue_enq(paths, queue_dry_node(tmp, sizeof(t_queue *)));
+		queue_enq(paths, queue_node(tmp, sizeof(t_queue *), false));
 	if (!queue_size(paths))
 		return NULL;
 	queue_mergesort(&paths, paths_cmp);
 	net = netflow_init(re_wire_paths(graph, paths));
 	net->n_units = units;
 	net->maxflow = 0;
-	queue_del(&paths, queue_node_del_dry);
+	queue_del(&paths, queue_blob_keep);
 
 	for (int i = 0; i < net->n_paths; ++i) {
 		ft_printf("path %d has size %zu: ", i, net->paths[i].size);

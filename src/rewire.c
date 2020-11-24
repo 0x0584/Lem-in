@@ -1,4 +1,4 @@
-#include "../lem_in.h"
+#include "netflow.h"
 
 static bool detect_collition(t_graph *g, struct s_rewire_handy *info) {
     /* looking for edges that cae from the same node */
@@ -18,7 +18,7 @@ static bool detect_collition(t_graph *g, struct s_rewire_handy *info) {
 }
 
 static bool discover_collition(t_graph *g, struct s_rewire_handy *info,
-							   int *residual) {
+							   int *which_residual) {
     t_qnode *after1;
     t_qnode *after2;
 
@@ -35,26 +35,27 @@ static bool discover_collition(t_graph *g, struct s_rewire_handy *info,
     /* preparing target edges */
     bool move_edge;
 
+	/* FIXME: fill residual */
     move_edge = false;
     if (info->e2 &&
-        AS_EDGE(info->walk_edge[info->curr])->residual == AS_EDGE(info->e2))
+        (AS_EDGE(info->walk_edge[info->curr])->residual) == AS_EDGE(info->e2))
         /* residual by default in this case would be path2
          * have the residual right after one */
-        *residual = 1;
+        *which_residual = 1;
     else if (after2 && AS_EDGE(after2)->residual ==
                            AS_EDGE(info->walk_edge[info->curr])) {
         /* however, in this case, the residual in the path1 itself, since after
          * two nodes, we have found the residual */
-        *residual = 0;
+        *which_residual = 0;
         info->walk_edge[info->curr + 1] = after2;
         move_edge = true;
     } else if (after1 && AS_EDGE(after1)->residual ==
                              AS_EDGE(info->walk_edge[info->curr + 1])) {
-        *residual = 1;
+        *which_residual = 1;
         info->walk_edge[info->curr] = after1;
         move_edge = true;
     } else
-        *residual = 0;
+        *which_residual = 0;
     return move_edge;
 }
 
@@ -74,14 +75,14 @@ static void fix_collition(t_graph *g, struct s_rewire_handy *info) {
     /* remove residual edge from its path */
     queue_node_del_next(info->apath[info->curr + residual],
                         info->walk_edge[info->curr + residual],
-                        queue_node_del_dry);
+                        queue_blob_keep);
     info->walk_edge[info->curr + residual] =
         info->walk_edge[info->curr + residual]->next;
 
     /* removing the edge itself from its none residual path */
     queue_node_del_next(info->apath[info->curr + !residual],
                         info->walk_edge[info->curr + !residual],
-                        queue_node_del_dry);
+                        queue_blob_keep);
 
     t_qnode *old_next = info->walk_edge[info->curr + !residual]->next;
 

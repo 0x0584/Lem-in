@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/12 22:08:00 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/22 20:02:48 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int check_edge(char *line)
 	while (sline[++i])
 	{
 		// if (!ft_isnumber(sline[i]))
-			//compare node names using hash table (this condition is shit)
+			//compare node names using set table (this condition is shit)
 		//	break ;
 		if (i == 1 && ft_strequ(sline[1], sline[0]))
 			break ;

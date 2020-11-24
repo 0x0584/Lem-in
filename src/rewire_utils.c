@@ -1,4 +1,4 @@
-#include "../lem_in.h"
+#include "netflow.h"
 
 void sort_by_src_name(struct s_rewire_handy *info) {
     size_t i;

@@ -6,22 +6,39 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/17 23:35:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/24 03:44:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "queue.h"
 
-t_qnode		*queue_node(void *blob, size_t size)
+t_qnode		*queue_node(void *blob, size_t size, bool alloc)
 {
 	t_qnode *node;
 
 	node = (t_qnode *)malloc(sizeof(t_qnode));
 	node->size = blob ? size : 0;
-	node->blob = blob ? ft_memcpy(malloc(size), blob, size) : NULL;
+	if (alloc)
+		node->blob = blob ? ft_memcpy(malloc(size), blob, size) : NULL;
+	else
+		node->blob = blob;
 	node->next = NULL;
 	node->prev = NULL;
 	return (node);
+}
+
+
+void		queue_blob_free(void *blob, size_t size)
+{
+	if (size)
+		free(blob);
+}
+
+void		queue_blob_keep(void *blob, size_t size)
+{
+	(void)blob;
+	(void)size;
+	return ;
 }
 
 void		queue_node_del(t_qnode **a_node, void (*del)(void *, size_t))
@@ -38,8 +55,8 @@ t_queue		*queue_init(void)
 	t_queue *queue;
 
 	queue = (t_queue *)malloc(sizeof(t_queue));
-	queue->head = queue_node(NULL, 0);
-	queue->tail = queue_node(NULL, 0);
+	queue->head = queue_node(NULL, 0, false);
+	queue->tail = queue_node(NULL, 0, false);
 	queue->head->next = queue->tail;
 	queue->tail->prev = queue->head;
 	return (queue);
@@ -84,14 +101,15 @@ void		queue_del(t_queue **q, void (*del)(void *, size_t))
 
 }
 
-void		queue_enq(t_queue *queue, t_qnode *node)
+t_queue *queue_enq(t_queue *queue, t_qnode *node)
 {
 	if (!queue || !node)
-		return ;
+		return queue;
 	queue->tail->prev->next = node;
 	node->prev = queue->tail->prev;
 	node->next = queue->tail;
 	queue->tail->prev = node;
+	return queue;
 }
 
 t_qnode 	*queue_deq(t_queue *queue)
@@ -106,23 +124,7 @@ t_qnode 	*queue_deq(t_queue *queue)
 	return (node);
 }
 
-void queue_node_del_dry(void *blob, size_t size)
-{
-	(void)blob;
-	(void)size;
-	return ;
-}
 
-t_qnode		*queue_dry_node(void *data, size_t size)
-{
-	t_qnode *node;
-
-	node = ft_memalloc(sizeof(t_qnode));
-	node->blob = data;
-	node->size = size;
-
-	return (node);
-}
 
 void		queue_iter(t_queue *q, bool from_head, void (*f)(t_qnode *))
 {
@@ -162,11 +164,6 @@ void		print_int_node(t_qnode *node)
 
 }
 
-void		queue_del_helper(void *blob, size_t size)
-{
-	if (size)
-		free(blob);
-}
 /*
 int			main(int ac, char **av)
 {
@@ -311,14 +308,16 @@ void	ft_free(void (*del)(void *o), void *ptr, ...)
 }
 
 
-void		queue_push_front(t_queue *queue, t_qnode *node)
+t_queue *queue_push_front(t_queue *queue, t_qnode *node)
 {
 	if (!queue || !node)
-		return ;
+		return queue;
 	node->next = queue->head->next;
 	queue->head->next->prev = node;
 	node->prev = queue->head;
 	queue->head->next = node;
+
+	return queue;
 }
 
 static t_queue	*helper_merge(t_queue **left, t_queue **right,
@@ -368,8 +367,8 @@ static void		helper_halfsplit(t_queue *root, t_queue **left,
 	(*left) = malloc(sizeof(t_queue));
 	(*right) = malloc(sizeof(t_queue));
 	(*left)->head = root->head;
-	(*left)->tail = queue_node(NULL, 0);
-	(*right)->head = queue_node(NULL, 0);
+	(*left)->tail = queue_node(NULL, 0, false);
+	(*right)->head = queue_node(NULL, 0, false);
 	(*right)->tail = root->tail;
 	(*left)->tail->prev = bar;
 	(*right)->head->next = bar->next;

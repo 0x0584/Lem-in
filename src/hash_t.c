@@ -6,24 +6,24 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/24 13:07:14 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/20 06:02:11 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lem_in.h"
 
-unsigned long	hash(unsigned char *str)
+unsigned long	set(unsigned char *str)
 {
-	unsigned long	hash;
+	unsigned long	set;
 	int				c;
 
-	hash = 5381;
+	set = 5381;
 	while ((c = *str++))
-		hash = ((hash << 5) + hash) + c;
+		set = ((set << 5) + set) + c;
 	/*
-	** hash * 33 + c
+	** set * 33 + c
 	*/
-	return (hash);
+	return (set);
 }
 
 t_vertex		**h_table(t_vertex **refs, t_parse *lines, int vertices_c)

@@ -1,172 +1,191 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/24 13:54:11 by melalj            #+#    #+#             */
-/*   Updated: 2020/11/14 19:36:23 by archid-          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "parser.h"
 
-#include "../lem_in.h"
+int g_state = 0;
+int g_ants = 0;
+bool g_verbose = 0;
+char *g_error_line;
 
-t_vertex	*new_vertex(int index, t_parse *line, int prop)
-{
-	t_vertex	*new_n;
-	char	**s_line;
-
-	s_line = ft_strsplit(line->line, ' ');
-	new_n = (t_vertex *)malloc(sizeof(t_vertex));
-	new_n->name = ft_strdup(s_line[0]);
-	new_n->cords.x = ft_atoi(s_line[1]);
-	new_n->cords.y = ft_atoi(s_line[2]);
-	free_tab(s_line);
-	new_n->edges = NULL;
-	new_n->next = NULL;
-	new_n->type = V_DEFAULT;
-	new_n->seen = false;
-	new_n->index = index;
-	// ft_printf("prop : %d\n", prop);
-	if (prop > 1)
-		new_n->type = (prop == 2 ? V_SOURCE : V_SINK);
-	return (new_n);
+bool ft_isnumber(char *s) {
+	while (*s)
+		if (!ft_isdigit(*s++))
+			return false;
+	return true;
 }
 
-int		add_vertex(t_vertex **lst_vertex, t_parse *lines, int vertices_c, int prop, t_vertex **refs)
-{
-	static size_t	index = 0;
-	char			**s_lines;
-	t_vertex			*curr;
-	int				hash_h;
-
-	s_lines = ft_strsplit(lines->line, ' ');
-	hash_h = hash((unsigned char*)s_lines[0]) % vertices_c;
-	refs[index] = new_vertex(index, lines, prop);
-	// ft_printf("added vertex %s in the hash %d\n", s_lines[0],
-	//						hash((unsigned char*)s_lines[0]) % vertices_c);
-	if (!lst_vertex[hash_h])
-	{
-		lst_vertex[hash_h] = refs[index++];
-		free_tab(s_lines);
-		return (1);
-	}
-	curr = lst_vertex[hash_h];
-	if (ft_strequ((curr)->name, s_lines[0]) && free_tab(s_lines))
-		return (0);
-	while (curr->next)
-	{
-		// ft_printf("%s | %s\n", s_lines[0], curr->name);
-		if (ft_strequ((curr)->name, s_lines[0]) && free_tab(s_lines))
-			return (0);
-		(curr) = (curr)->next;
-	}
-	(curr)->next = refs[index++];
-	free_tab(s_lines);
-	return (1);
+bool error_message(char *line) {
+	if(g_verbose)
+		ft_asprintf(&g_error_line, ": `%s` is not valid\n", line);
+	ft_printf("ERROR%s\n", g_error_line);
+	ft_strchange(&g_error_line, ft_strdup(""));
+	return false;
 }
 
-// get vertex based on a hash
-t_vertex	*get_vertex(t_vertex **lst_vertex, char *name, int vertices_c)
-{
-	int		hash_h;
-	t_vertex	*curr;
-
-	hash_h = hash((unsigned char*)name) % vertices_c;
-	curr = lst_vertex[hash_h];
-	while (curr)
-	{
-		if (ft_strequ((curr)->name, name))
-			return (curr);
-		curr = curr->next;
-	}
-	return (NULL);
+bool valid_vertex_char(char c) {
+	return c && c != ' ' && c != '-';
 }
 
-/*
-   add the edge and it's residual
-*/
-
-int	add_edge(t_vertex *src, t_vertex *dst, bool is_residual, t_edge *e)
+bool valid_edge_line(char *line)
 {
-	t_edge *curr;
-	t_edge *tmp;
+	int i;
 
-	is_residual ^= true;
-	if (src->edges == NULL)
+	i = 0;
+	if (*line == 'L' || (*line == '#' && *(line + 1) == '#'))
+		return false;
+	while (valid_vertex_char(line[i]))
+		i++;
+	if (!line[i] || line[i] == ' ')
+		return false;
+	i++;
+	while (valid_vertex_char(line[i]))
+		i++;
+	return line[i] == '\0';
+}
+
+bool valid_vertex_line(char *line)
+{
+	int i;
+	if (*line == '#' && *(line + 1) == '#')
+		return true;
+	if (*line == 'L')
+		return false;
+	i = 0;
+	while (valid_vertex_char(line[i]))
+		i++;
+	if (!line[i] || line[i] == '-')
+		return false;
+	while (line[i] && ft_isdigit(line[i]))
+		i++;
+	if (line[i] != ' ')
+		return false;
+	i++;
+	while (line[i] && ft_isdigit(line[i]))
+		i++;
+	return line[i] == '\0';
+}
+
+int valid_comment(char *line) {
+	return *line == '#' && *(line + 1) != '#';
+}
+
+bool valid_line(char *line, t_queue *verts, t_queue *edges)
+{
+	if (*line && g_state == 0 && ft_isnumber(line))
 	{
-		src->edges = (t_edge *)malloc(sizeof(t_edge));
-		tmp = src->edges;
-		src->edges->src = src;
-		src->edges->dst = dst;
-		src->edges->next = NULL;
+		g_ants = ft_atoi(line);
+		g_state++;
+		return true;
 	}
-	else
+	if (*line && g_state == 1 && valid_vertex_line(line))
 	{
-		curr = src->edges;
-			if ((ft_strequ(curr->src->name, src->name)
-					&& ft_strequ(curr->dst->name, dst->name))
-					|| (ft_strequ(curr->src->name, dst->name)
-							&& ft_strequ(curr->dst->name, src->name)))
-			{
-				exit(1);
-			}
-		while (curr->next)
+		queue_enq(verts, queue_node(line, sizeof(char *), false));
+		return true;
+	}
+	if (*line && valid_edge_line(line))
+	{
+		g_state++;
+		queue_enq(edges, queue_node(line, sizeof(char *), false));
+		return true;
+	}
+	return error_message(line);
+}
+
+bool parse_edges(t_graph *g, t_queue *ledges)
+{
+	t_qnode *walk;
+	t_hnode enode;
+	t_hnode renode;
+
+	walk = QFIRST(ledges);
+	while (walk != QTAIL(ledges))
+	{
+		if (!edge_alloc(g, walk->blob, &enode, &renode))
+			return edge_del(enode.blob, sizeof(t_edge)),
+				edge_del(renode.blob, sizeof(t_edge)), false;
+		hash_add(g->edges, &enode);
+		hash_add(g->edges, &renode);
+		queue_enq(((t_edge *)enode.blob)->src->edges,
+				  queue_node(enode.blob, sizeof(t_edge *), false));
+		queue_enq(((t_edge *)enode.blob)->src->edges,
+				  queue_node(renode.blob, sizeof(t_edge *), false));
+		queue_enq(((t_edge *)renode.blob)->src->edges,
+				  queue_node(renode.blob, sizeof(t_edge *), false));
+		queue_enq(((t_edge *)renode.blob)->src->edges,
+				  queue_node(enode.blob, sizeof(t_edge *), false));
+	}
+	return true;
+}
+
+int check_tag(t_graph *g, t_qnode **walk) {
+	if (!ft_strncmp((*walk)->blob, "##", 2))
+	{
+		if (!ft_strcmp((*walk)->blob, "##start"))
 		{
-			curr = curr->next;
+			if (g->source)
+				return 0;
+			else
+				return 1;
 		}
-		curr->next = (t_edge *)malloc(sizeof(t_edge));
-		curr->next->src = src;
-		curr->next->dst = dst;
-		curr->next->next = NULL;
-		tmp = curr->next;
+		else if (!ft_strcmp((*walk)->blob, "##end"))
+		{
+			if (g->sink)
+				return 0;
+			else
+				return 2;
+		}
+		*walk = (*walk)->next;
 	}
-
-	if (is_residual == false)
-	{
-		// this need to stay tmp not curr
-		tmp->residual = e;
-		e->residual = tmp;
-
-		e->seen = 0;
-		tmp->seen = 0;
-		return 0;
-	}
-	add_edge(dst, src, true, tmp);
-	return (1);
+	return 1;
 }
 
-int	edges_fill(t_vertex **lst_vertex, t_parse *lines, int vertices_c)
-{
-	char	**s_lines;
-	t_vertex	*vertex[2];
+bool parse_vertices(t_graph *g, t_queue *lverts) {
+	t_qnode *walk;
+	t_hnode hnode;
+	int status;
 
-	while (lines && lines->type < 2) /* this just to walk till the edges
-										in the stored lines ant number has
-										type 0 and vertices has type 1 */
+	walk = QFIRST(lverts);
+	while (walk != QTAIL(lverts))
 	{
-		ft_printf("%s\n", lines->line);
-		lines = lines->next;
+		status = check_tag(g, &walk);
+		if (!status)
+			return false;
+		hnode = vertex_alloc(walk->blob);
+		if (!hash_add(g->vertices, &hnode))
+			return vertex_del(hnode.blob, sizeof(t_vertex *)), false;
+		if (status == 1)
+			g->source = hnode.blob;
+		else if (status == 2)
+			g->sink = hnode.blob;
+		g->n_vertices++;
+		walk = walk->next;
 	}
-	while (lines)
-	{
-		if (lines->line[0] == '#')
-		{
-			lines = lines->next;
-			continue;
-		}
-		s_lines = ft_strsplit(lines->line, '-');
-		vertex[0] = get_vertex(lst_vertex, s_lines[0], vertices_c);
-		vertex[1] = get_vertex(lst_vertex, s_lines[1], vertices_c);
-		if (!vertex[0] || !vertex[1])
-		{
-			ft_printf("edge not found\n");
-			exit(1);
-		}
-		add_edge(vertex[0], vertex[1], false, NULL);
-		lines = lines->next;
-		free_tab(s_lines);
-	}
-	return (1);
+	return true;
+}
+
+t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
+	t_graph *g;
+
+	g = graph_init(hash_init(queue_size(lverts), vertex_del),
+				   hash_init(queue_size(ledges), edge_del));
+	if (!parse_vertices(g, lverts) || !parse_edges(g, ledges))
+		return graph_free(g), NULL;
+	return g;
+}
+
+t_graph *read_graph(void) {
+	t_queue *verts;
+	t_queue *edges;
+	char *line;
+	bool valid;
+
+	valid = true;
+	verts = queue_init(), edges = queue_init();
+	while (valid && gnl(1, &line))
+		if (valid_comment(line))
+			free(line);
+		else if (!valid_line(line, verts, edges))
+		    valid = false;
+	free(line);
+	queue_del(&verts, queue_blob_free);
+	queue_del(&edges, queue_blob_free);
+	return (valid ? parse_graph(verts, edges) : NULL);
 }

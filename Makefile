@@ -1,25 +1,20 @@
-# **************************************************************************** #
+#******************************************************************************#
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: melalj <melalj@student.42.fr>              +#+  +:+       +#+         #
+#    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/10/16 11:00:35 by melalj            #+#    #+#              #
-#    Updated: 2020/11/18 18:49:52 by archid-          ###   ########.fr        #
+#    Created: 2020/11/18 19:51:22 by archid-           #+#    #+#              #
+#    Updated: 2020/11/24 03:44:57 by archid-          ###   ########.fr        #
 #                                                                              #
-# **************************************************************************** #
+#******************************************************************************#
 
 include init.mk
 
 SRC_PATH	= src
-SRC_NAME	= parser.c read_line.c hash_t.c get_lines.c	\
-			  queue.c graph.c bfs.c netflow.c lem_in_main.c \
-			  rewire_utils.c rewire_info.c rewire.c
-
-ifeq ($(VISU),1)
-	SRC_NAME += tools.c visu.c graph_draw.c edges_draw.c
-endif
+SRC_NAME	= queue.c graph.c bfs.c netflow.c lem_in_main.c \
+			  rewire_utils.c rewire_info.c rewire.c parser.c hash.c
 
 OBJ_PATH	= .obj
 OBJ_NAME	:= $(SRC_NAME:.c=.o)
