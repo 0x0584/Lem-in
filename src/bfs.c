@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 00:01:53 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 02:58:19 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,7 @@ static t_queue *construct_path(t_graph *g, t_hash *parent) {
 		return NULL;
 	path = queue_init();
 	prev = g->sink->name;
-	while (true) {
-		tmp = hash_get(parent, prev, NULL);
+	while ((tmp = hash_get(parent, prev, NULL))) {
 		tmp->seen = true;
 		queue_enq(path, queue_node(tmp, sizeof(t_edge *), false));
 		if (tmp->src == g->source)
@@ -66,13 +65,10 @@ void enqueue_edges(t_queue *q, t_queue *other) {
 }
 
 static void handle_edge(t_edge *edge, t_queue *open, t_hash *parent) {
-	t_hnode hnode;
-
 	if (edge->residual->seen == g_turn || edge->dst->seen == g_turn)
 		return;
 	enqueue_edges(open, edge->dst->edges);
-	hnode = (t_hnode){edge->dst->name, edge};
-	hash_add(parent, &hnode);
+	hash_add(parent, edge->dst->name, edge);
 	edge->dst->seen = g_turn;
 	edge->seen = g_turn;
 }
@@ -103,12 +99,7 @@ t_queue *bfs_find(t_graph *g) {
 	parent = hash_init(g->n_vertices, hash_default_del);
 	g->source->seen = g_turn;
 	path = bfs_loop(g, parent) ? construct_path(g, parent) : NULL;
+	hash_free(parent);
 	g_turn++;
-
-	ft_printf("\n");
-	ft_printf("%d>> ", g_turn);
-	queue_iter(path, false, node_dump);
-
-	free(parent);
 	return path;
 }

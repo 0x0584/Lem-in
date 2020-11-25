@@ -128,15 +128,6 @@ t_queue *re_wire_paths(t_graph *g, t_queue *paths) {
         }
         walk_edges(g, &info);
     }
-
-	ft_printf("\n\n");
-	for (int i = 0; i < info.n_paths; ++i) {
-		ft_printf("R %d>> ", i);
-		queue_iter(info.apath[i], false, node_dump);
-		ft_printf("\n");
-	}
-	ft_printf("\n\n");
-
     free(info.apath);
     free(info.walk_edge);
     return (paths);

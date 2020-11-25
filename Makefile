@@ -6,11 +6,11 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/18 19:51:22 by archid-           #+#    #+#              #
-#    Updated: 2020/11/24 03:44:57 by archid-          ###   ########.fr        #
+#    Updated: 2020/11/25 05:09:05 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-include init.mk
+include config.mk
 
 SRC_PATH	= src
 SRC_NAME	= queue.c graph.c bfs.c netflow.c lem_in_main.c \

@@ -1,8 +1,8 @@
 #include "netflow.h"
 
 void sort_by_src_name(struct s_rewire_handy *info) {
-    size_t i;
-    size_t j;
+	int i;
+    int j;
     t_queue *q;
     t_qnode *e;
 

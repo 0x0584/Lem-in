@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 01:12:22 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 05:08:24 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ bool error_message(char *line) {
 	if(g_verbose)
 		ft_asprintf(&g_error_line, ": `%s` is not valid", line);
 	ft_dprintf(2, "ERROR%s\n", g_error_line);
-	ft_strchange(&g_error_line, ft_strdup(""));
+	ft_strchange(&g_error_line, NULL);
 	return false;
 }
 
@@ -84,7 +84,9 @@ bool valid_line(char *line, t_queue *verts, t_queue *edges)
 {
 	if (g_state == 0 && ft_isnumber(line))
 	{
-		if ((g_ants = ft_atoi(line)) <= 0 )
+		g_ants = ft_atoi(line);
+		free(line);
+		if (g_ants <= 0)
 			return error_message("number of ants"), false;
 		g_state++;
 		return true;
@@ -103,6 +105,13 @@ bool valid_line(char *line, t_queue *verts, t_queue *edges)
 	return error_message(line);
 }
 
+void bind_edges(t_edge *e, t_edge *re) {
+	queue_enq(e->src->edges, queue_node(e, sizeof(t_edge *), false));
+	queue_enq(e->src->edges, queue_node(re, sizeof(t_edge *), false));
+	queue_enq(re->src->edges, queue_node(re, sizeof(t_edge *), false));
+	queue_enq(re->src->edges, queue_node(e, sizeof(t_edge *), false));
+}
+
 bool parse_edges(t_graph *g, t_queue *ledges)
 {
 	t_qnode *walk;
@@ -118,15 +127,10 @@ bool parse_edges(t_graph *g, t_queue *ledges)
 			ft_printf("edge is NULL");
 		if (!renode.blob)
 			ft_printf("residual edge is NULL");
-		queue_enq(((t_edge *)enode.blob)->src->edges,
-				  queue_node(enode.blob, sizeof(t_edge *), false));
-		queue_enq(((t_edge *)enode.blob)->src->edges,
-				  queue_node(renode.blob, sizeof(t_edge *), false));
-		queue_enq(((t_edge *)renode.blob)->src->edges,
-				  queue_node(renode.blob, sizeof(t_edge *), false));
-		queue_enq(((t_edge *)renode.blob)->src->edges,
-				  queue_node(enode.blob, sizeof(t_edge *), false));
-		hash_add(g->edges, &enode), hash_add(g->edges, &renode);
+		bind_edges(enode.blob, renode.blob);
+		hash_add(g->edges, enode.key, enode.blob);
+		hash_add(g->edges, renode.key, renode.blob);
+		free(enode.key), free(renode.key);
 		walk = walk->next;
 	}
 	return true;
@@ -160,9 +164,9 @@ bool parse_vertices(t_graph *g, t_queue *lverts) {
 			check_tag(g, &walk) != tag_other)
 			return error_message("Wrong tag"), false;
 		hnode = vertex_alloc(walk->blob);
-		if (!hash_add(g->vertices, &hnode))
-			return error_message(walk->blob),
-				vertex_del(hnode.blob, sizeof(t_vertex *)), false;
+		if (!hash_add(g->vertices, hnode.key, hnode.blob))
+			return vertex_del(hnode.blob),
+				error_message(walk->blob),  false;
 		if (status == tag_start)
 			g->source = hnode.blob;
 		else if (status == tag_end)
@@ -171,6 +175,17 @@ bool parse_vertices(t_graph *g, t_queue *lverts) {
 		walk = walk->next;
 	}
 	return true;
+}
+
+void print_line(t_qnode *node) {
+	ft_printf("%s\n", node->blob);
+}
+
+void print_map(t_queue *lverts, t_queue *ledges) {
+	ft_printf("%d\n", g_ants);
+	queue_iter(lverts, true, print_line);
+	queue_iter(ledges, true, print_line);
+	ft_putendl("");
 }
 
 t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
@@ -187,6 +202,7 @@ t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
 	else if (!g->source || !g->sink)
 		return error_message("Source/Sink are not defined"),
 			graph_free(g), NULL;
+	print_map(lverts, ledges);
 	return g;
 }
 
@@ -199,12 +215,13 @@ t_graph *read_graph(void) {
 
 	valid = true;
 	verts = queue_init(), edges = queue_init();
-	while (valid && gnl(0, &line) && *line)
+	while (valid && gnl(0, &line) && *line){
 		if (valid_comment(line))
 			free(line);
 		else if (!valid_line(line, verts, edges))
-		    valid = false;
-	free(line);
+			valid = false;
+	}
+	free(line), gnl_free_cache();
 	g =	(valid ? parse_graph(verts, edges) : NULL);
 	queue_del(&verts, queue_blob_free);
 	queue_del(&edges, queue_blob_free);

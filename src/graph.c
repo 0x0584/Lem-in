@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/23 01:02:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 01:02:48 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 02:54:35 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,12 @@ void edge_init(t_hnode **e, t_hnode **re, t_vertex *src, t_vertex *dst)
     ((t_edge *)((*e)->blob))->seen = 0;
     ((t_edge *)((*e)->blob))->src = src;
 	((t_edge *)((*e)->blob))->dst = dst;
-	(*e)->key = ft_strnew(0);
-	ft_strchange(&(*e)->key, ft_strjoin(src->name, "-"));
-	ft_strchange(&(*e)->key, ft_strjoin((*e)->key, dst->name));
+	ft_asprintf(&(*e)->key, "%s-%s", src->name, dst->name);
 	(*re)->blob = malloc(sizeof(t_edge));
     ((t_edge *)((*re)->blob))->seen = 0;
     ((t_edge *)((*re)->blob))->src = dst;
 	((t_edge *)((*re)->blob))->dst = src;
-	(*re)->key = ft_strnew(0);
-	ft_strchange(&(*re)->key, ft_strjoin(dst->name, "-"));
-	ft_strchange(&(*re)->key, ft_strjoin((*re)->key, src->name));
+	ft_asprintf(&(*re)->key, "%s-%s", dst->name, src->name);
 	((t_edge *)((*e)->blob))->residual = (*re)->blob;
 	((t_edge *)((*re)->blob))->residual = (*e)->blob;
 }
@@ -110,30 +106,22 @@ bool edge_cmp(void *e1, void *e2, size_t size)
 		!ft_strcmp(e->dst->name, f->dst->name);
 }
 
-void vertex_del(void *vert, size_t size)
+void vertex_del(void *vert)
 {
 	t_vertex *v;
 
 	if (!vert)
 		return ;
-	(void)size;
 	v = vert;
 	free(v->name);
-	queue_del(&v->edges, edge_del);
+	queue_del(&v->edges, queue_blob_keep);
 	free(v);
 }
 
-
-void edge_del(void *edge, size_t size)
+void edge_del(void *edge)
 {
-	t_edge *e;
-
-	if (!edge)
-		return ;
-	(void)size;
-	e = edge;
-	free(e->residual);
-	free(e);
+	(void)edge;
+	free(edge);
 }
 
 t_graph *graph_init(t_hash *V, t_hash *E)

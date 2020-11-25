@@ -5,6 +5,7 @@
 
 enum e_tag { tag_error = 0, tag_other, tag_start, tag_end };
 
+bool ft_gnl(const int fd, char **line);
 bool ft_isnumber(char *s);
 bool error_message(char *line);
 bool valid_vertex_char(char c);

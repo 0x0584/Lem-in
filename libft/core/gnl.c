@@ -6,11 +6,13 @@
 /*   By: archid- <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 18:01:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/24 22:39:19 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 03:59:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+
+static char	*g_cache[0xFF] = {NULL};
 
 static t_state	extract_nl_line(char **cache, char **line)
 {
@@ -59,21 +61,28 @@ static ssize_t	cached_read(const int fd, char **cache)
 
 int				gnl(const int fd, char **line)
 {
-	static char	*cache[0xFF] = {NULL};
 	ssize_t		nbytes;
 
 	if (!line || fd < 0 || BUFF_SIZE <= 0 || read(fd, NULL, 0) < 0)
 		return (failure);
-	if (cache[fd] && extract_nl_line(&cache[fd], line) > 0)
+	if (g_cache[fd] && extract_nl_line(&g_cache[fd], line) > 0)
 		return (success);
 	*line = NULL;
-	if ((nbytes = cached_read(fd, &cache[fd])) < 0)
+	if ((nbytes = cached_read(fd, &g_cache[fd])) < 0)
 		return (failure);
-	if (nbytes == 0 && cache[fd])
+	if (nbytes == 0 && g_cache[fd])
 	{
-		*line = ft_strdup(cache[fd]);
-		ft_strdel(&cache[fd]);
+		*line = ft_strdup(g_cache[fd]);
+		ft_strdel(&g_cache[fd]);
 		return ((*line && ft_strlen(*line)) ? success : eof);
 	}
-	return (extract_nl_line(&cache[fd], line) > 0);
+	return (extract_nl_line(&g_cache[fd], line) > 0);
+}
+
+void gnl_free_cache(void)
+{
+	int i = 0;
+
+	while (i < 0xFF)
+		free(g_cache[i++]);
 }

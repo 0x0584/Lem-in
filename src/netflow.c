@@ -6,11 +6,20 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/24 03:43:39 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 05:07:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
+
+void queue_del_queue(void *blob, size_t size) {
+	t_queue *q;
+
+	if (!blob || !size)
+		return;
+	q = blob;
+	queue_del(&q, queue_blob_free);
+}
 
 int paths_cmp(t_qnode *path1, t_qnode *path2) {
 	t_queue *p1;
@@ -24,7 +33,7 @@ int paths_cmp(t_qnode *path1, t_qnode *path2) {
 void init_path(t_path *path, t_queue *edges)
 {
 	t_qnode	*tmp;
-	size_t	i;
+	int	i;
 
 	i = 0;
 	path->size = queue_size(edges);
@@ -44,7 +53,7 @@ t_netflow		*netflow_init(t_queue *paths)
 {
 	t_netflow	*net;
 	t_qnode		*tmp;
-	size_t		size;
+	int			size;
 
 	size = queue_size(paths);
 	net = malloc(sizeof(t_netflow));
@@ -54,7 +63,7 @@ t_netflow		*netflow_init(t_queue *paths)
 	{
 		tmp = queue_deq(paths);
 		init_path(&net->paths[size], tmp->blob);
-		queue_node_del(&tmp, queue_blob_keep);
+		queue_node_del(&tmp, queue_del_queue);
 	}
 	return (net);
 }
@@ -69,30 +78,22 @@ t_netflow				*netflow_setup(t_graph *graph, size_t units)
 	while ((tmp = bfs_find(graph)))
 		queue_enq(paths, queue_node(tmp, sizeof(t_queue *), false));
 	if (!queue_size(paths))
-		return NULL;
+		return queue_del(&paths, queue_del_queue), NULL;
 	queue_mergesort(&paths, paths_cmp);
 	net = netflow_init(re_wire_paths(graph, paths));
 	net->n_units = units;
 	net->maxflow = 0;
-	queue_del(&paths, queue_blob_keep);
-
-	for (int i = 0; i < net->n_paths; ++i) {
-		ft_printf("path %d has size %zu: ", i, net->paths[i].size);
-
-		for (int j = 0; j < net->paths[i].size; ++j) {
-			ft_printf("%s ", net->paths[i].nodes[j]);
-		}
-		ft_printf("\n");
-	}
-
+	queue_del(&paths, queue_del_queue);
 	return (net);
 }
 
 void		netflow_del(t_netflow **anet)
 {
-	size_t i;
-	size_t j;
+	int i;
+	int j;
 
+	if (!anet || !*anet)
+		return ;
 	i = 0;
 	while (i < (*anet)->n_paths) {
 		j = 0;
@@ -101,9 +102,11 @@ void		netflow_del(t_netflow **anet)
 			j++;
 		}
 		free((*anet)->paths[i].nodes);
+		free((*anet)->paths[i].ants);
 		i++;
 	}
 	free((*anet)->paths);
+	free(*anet);
 	*anet = NULL;
 }
 
@@ -147,13 +150,11 @@ int netflow_simulate(t_netflow *net) {
 
 	while (n_used < net->n_paths) {
 		tmp = netflow_send(net, n_used + 1);
-		printf("prev: %d current: %d\n", prev, tmp);
 		if (tmp > prev)
 			break;
 		prev = tmp;
 		n_used++;
 	}
-	printf("\nused: %d\n", n_used);
 
 	int sum;
 	sum = 0;
@@ -163,8 +164,6 @@ int netflow_simulate(t_netflow *net) {
 		sum += net->paths[i].n_ants;
 		i++;
 	}
-
-	printf("sum: %d\n", sum);
 
 	if (net->n_units - sum > 0)
 	{
@@ -181,12 +180,6 @@ int netflow_simulate(t_netflow *net) {
 		}
 	}
 
-	i = 0;
-	while (i < n_used)
-	{
-		printf("%d = %d\n", i, net->paths[i].n_ants);
-		i++;
-	}
 	return n_used;
 }
 
@@ -198,6 +191,8 @@ void		netflow_pushflow(t_netflow *net)
 	bool flag;
 	int ant;
 
+	if (!net)
+		return ;
 	ant = 0;
 	n_paths = netflow_simulate(net);
 	flag = true;
@@ -216,7 +211,7 @@ void		netflow_pushflow(t_netflow *net)
 			j = net->paths[i].size - 1;
 			while (j >= 0) {
 				if (net->paths[i].ants[j] != -1)
-					printf("L%d-%s ", net->paths[i].ants[j],
+					ft_printf("L%d-%s ", net->paths[i].ants[j],
 						   net->paths[i].nodes[j]);
 				j--;
 			}
@@ -229,6 +224,8 @@ void		netflow_pushflow(t_netflow *net)
 			while (j >= 0) {
 				if (net->paths[i].ants[j] != -1)
 					flag = true;
+				if (j == 0)
+					break;
 				net->paths[i].ants[j] = net->paths[i].ants[j - 1];
 				j--;
 			}
@@ -236,6 +233,6 @@ void		netflow_pushflow(t_netflow *net)
 			i++;
 		}
 		if (flag)
-			printf("\n");
+			ft_printf("\n");
 	}
 }

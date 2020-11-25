@@ -39,10 +39,10 @@ t_graph *graph_init(t_hash *V, t_hash *E);
 void graph_free(t_graph *g);
 
 bool vertex_cmp(void *u, void *v, size_t size);
-void vertex_del(void *v, size_t size);
+void vertex_del(void *v);
 
 bool edge_cmp(void *e1, void *e2, size_t size);
-void edge_del(void *edge, size_t size);
+void edge_del(void *edge);
 
 void node_dump(t_qnode *node);
 
