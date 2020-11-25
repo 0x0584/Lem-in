@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/30 17:32:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/24 22:42:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 01:13:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 # define GET_DIGI(i)						((i) - '0')
 # define TO_DIGI(i)							((i) + '0')
 
-# define BUFF_SIZE							20
+# define BUFF_SIZE							1024
 
 enum			e_read_states
 {

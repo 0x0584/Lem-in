@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
+/*   Updated: 2020/11/25 01:12:22 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "parser.h"
 
 int g_state = 0;
@@ -14,8 +26,8 @@ bool ft_isnumber(char *s) {
 
 bool error_message(char *line) {
 	if(g_verbose)
-		ft_asprintf(&g_error_line, ": `%s` is not valid\n", line);
-	ft_printf("ERROR%s\n", g_error_line);
+		ft_asprintf(&g_error_line, ": `%s` is not valid", line);
+	ft_dprintf(2, "ERROR%s\n", g_error_line);
 	ft_strchange(&g_error_line, ft_strdup(""));
 	return false;
 }
@@ -72,7 +84,8 @@ bool valid_line(char *line, t_queue *verts, t_queue *edges)
 {
 	if (g_state == 0 && ft_isnumber(line))
 	{
-		g_ants = ft_atoi(line);
+		if ((g_ants = ft_atoi(line)) <= 0 )
+			return error_message("number of ants"), false;
 		g_state++;
 		return true;
 	}
@@ -100,8 +113,7 @@ bool parse_edges(t_graph *g, t_queue *ledges)
 	while (walk != QTAIL(ledges))
 	{
 		if (!edge_alloc(g, walk->blob, &enode, &renode))
-			return edge_del(enode.blob, sizeof(t_edge)),
-				edge_del(renode.blob, sizeof(t_edge)), false;
+			return error_message(walk->blob), false;
 		if (!enode.blob)
 			ft_printf("edge is NULL");
 		if (!renode.blob)
@@ -144,11 +156,13 @@ bool parse_vertices(t_graph *g, t_queue *lverts) {
 	while (walk != QTAIL(lverts))
 	{
 		status = check_tag(g, &walk);
-		if (!status)
-			return false;
+		if (!status || walk == QTAIL(lverts) ||
+			check_tag(g, &walk) != tag_other)
+			return error_message("Wrong tag"), false;
 		hnode = vertex_alloc(walk->blob);
 		if (!hash_add(g->vertices, &hnode))
-			return vertex_del(hnode.blob, sizeof(t_vertex *)), false;
+			return error_message(walk->blob),
+				vertex_del(hnode.blob, sizeof(t_vertex *)), false;
 		if (status == tag_start)
 			g->source = hnode.blob;
 		else if (status == tag_end)
@@ -164,8 +178,15 @@ t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
 
 	g = graph_init(hash_init(queue_size(lverts), vertex_del),
 				   hash_init(queue_size(ledges), edge_del));
-	if (!parse_vertices(g, lverts) || !parse_edges(g, ledges))
+	if (!parse_vertices(g, lverts))
 		return graph_free(g), NULL;
+	else if (!g->n_vertices)
+		return error_message("Empty map"), graph_free(g), NULL;
+	else if (!parse_edges(g, ledges))
+		return graph_free(g), NULL;
+	else if (!g->source || !g->sink)
+		return error_message("Source/Sink are not defined"),
+			graph_free(g), NULL;
 	return g;
 }
 
