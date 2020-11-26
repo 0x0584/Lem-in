@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/23 01:02:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 02:54:35 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 23:42:42 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,6 @@ void vertex_del(void *vert)
 
 void edge_del(void *edge)
 {
-	(void)edge;
 	free(edge);
 }
 

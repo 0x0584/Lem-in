@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   queue.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 15:34:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 23:46:11 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef QUEUE_H
 # define QUEUE_H
 
-# include "../libft/libft.h"
+# include "libft.h"
 # include <limits.h>
 
 # define QNODE_AS(t, e)			((t *)e->blob)

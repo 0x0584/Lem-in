@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hash.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/11/26 23:44:57 by archid-           #+#    #+#             */
+/*   Updated: 2020/11/26 23:45:00 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "hash.h"
 
 size_t compute_hash(char *s, size_t size, size_t sum, size_t mod) {
@@ -47,10 +59,10 @@ bool hash_add(t_hash *h, char *key, void *blob)
 
 	if (!h || !blob || !key)
 		return false;
-	hnode = (t_hnode){ft_strdup(key), blob};
 	hash = sfold(key, h->size);
 	if (!h->array[hash])
 	{
+		hnode = (t_hnode){ft_strdup(key), blob};
 		h->array[hash] = queue_init();
 		queue_enq(h->array[hash], queue_node(&hnode, sizeof(t_hnode), true));
 		return true;
@@ -62,6 +74,7 @@ bool hash_add(t_hash *h, char *key, void *blob)
 			return false;
 		walk = walk->next;
 	}
+	hnode = (t_hnode){ft_strdup(key), blob};
 	queue_enq(h->array[hash], queue_node(&hnode, sizeof(t_hnode), true));
 	return true;
 }

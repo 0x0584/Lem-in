@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:10:44 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 23:44:01 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,13 +123,11 @@ bool parse_edges(t_graph *g, t_queue *ledges)
 	{
 		if (!edge_alloc(g, walk->blob, &enode, &renode))
 			return error_message(walk->blob), false;
-		if (!enode.blob)
-			ft_printf("edge is NULL");
-		if (!renode.blob)
-			ft_printf("residual edge is NULL");
-		bind_edges(enode.blob, renode.blob);
-		hash_add(g->edges, enode.key, enode.blob);
-		hash_add(g->edges, renode.key, renode.blob);
+		if (hash_add(g->edges, enode.key, enode.blob) &&
+				hash_add(g->edges, renode.key, renode.blob))
+			bind_edges(enode.blob, renode.blob);
+		else
+			edge_del(enode.blob), edge_del(renode.blob);
 		free(enode.key), free(renode.key);
 		walk = walk->next;
 	}

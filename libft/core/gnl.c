@@ -6,7 +6,7 @@
 /*   By: archid- <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 18:01:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:23:13 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 23:31:00 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ static t_cache *cache_alloc(const int fd) {
         return NULL;
     cache = &g_cache[j];
     cache->fd = fd;
-    cache->base = malloc(BUFF_SIZE + 1);
+    cache->base = ft_memalloc(BUFF_SIZE + 1);
     cache->size = BUFF_SIZE;
     cache->index = 0;
     cache->length = 0;
@@ -112,8 +112,8 @@ static int read_cache(t_cache *cache, char **line) {
         return -1;
     else if (has_line(cache, line))
         return true;
-    *line = ft_strdup(cache->base + cache->index);
-    ret = cache->length != cache->index;
+    if ((ret = (cache->length != cache->index)))
+        *line = ft_strdup(cache->base + cache->index);
     cache->index = cache->length;
     return ret;
 }
@@ -125,6 +125,7 @@ int gnl(const int fd, char **line) {
         return -1;
     if (!(cache = cache_alloc(fd)))
         return -1;
+    *line = NULL;
     return has_line(cache, line) ? 1 : read_cache(cache, line);
 }
 
@@ -142,6 +143,7 @@ void gnl_cleanup(void) {
         cache->fd = -1;
         cache->size = 0;
         cache->index = 0;
+        cache->length = 0;
     }
 }
 
@@ -164,6 +166,7 @@ int gnl_clean(const int fd) {
         cache->fd = -1;
         cache->size = 0;
         cache->index = 0;
+        cache->length = 0;
         flag = true;
     }
     return flag;
