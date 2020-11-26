@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 00:05:59 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 15:45:39 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ t_queue		*queue_init(void)
 	queue->tail = queue_node(NULL, 0, false);
 	queue->head->next = queue->tail;
 	queue->tail->prev = queue->head;
+	queue->size = 0;
 	return (queue);
 }
 
-size_t		queue_size(t_queue *q)
-{
+size_t queue_count(t_queue *q) {
 	size_t size;
 	t_qnode *walk;
 
@@ -77,6 +77,11 @@ size_t		queue_size(t_queue *q)
 		walk = walk->next;
 	}
 	return (size);
+}
+
+size_t		queue_size(t_queue *q)
+{
+	return q ? q->size : 0;
 }
 
 void		queue_del(t_queue **q, void (*del)(void *, size_t))
@@ -109,6 +114,7 @@ t_queue *queue_enq(t_queue *queue, t_qnode *node)
 	node->prev = queue->tail->prev;
 	node->next = queue->tail;
 	queue->tail->prev = node;
+	queue->size++;
 	return queue;
 }
 
@@ -121,6 +127,7 @@ t_qnode 	*queue_deq(t_queue *queue)
 	node = queue->head->next;
 	node->next->prev = queue->head;
 	queue->head->next = node->next;
+	queue->size--;
 	return (node);
 }
 
@@ -256,6 +263,7 @@ void	queue_node_del_next(t_queue *q, t_qnode *node,
 	tmp = node->next;
 	node->next = node->next->next;
 	node->next->prev = node;
+	q->size--;
 	del(tmp->blob, tmp->size);
 	free(tmp);
 }
@@ -316,7 +324,7 @@ t_queue *queue_push_front(t_queue *queue, t_qnode *node)
 	queue->head->next->prev = node;
 	node->prev = queue->head;
 	queue->head->next = node;
-
+	queue->size++;
 	return queue;
 }
 
@@ -390,6 +398,7 @@ void			queue_mergesort(t_queue **q, int (*cmp)(t_qnode *, t_qnode *))
 	queue_mergesort(&right, cmp);
 	tmp = *q;
 	*q = helper_merge(&left, &right, cmp);
+	(*q)->size = tmp->size;
 	ft_free(free, tmp, NULL);
 }
 
@@ -402,5 +411,6 @@ t_qnode		*queue_pop(t_queue *queue)
 	node = queue->tail->prev;
 	queue->tail->prev = node->prev;
 	node->prev->next = queue->tail;
+	queue->size--;
 	return (node);
 }

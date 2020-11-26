@@ -6,7 +6,7 @@
 /*   By: melalj <melalj@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/23 19:04:20 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/25 15:34:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ struct							s_queue
 {
 	struct s_queue_node *head;
 	struct s_queue_node *tail;
+	int				size;
 	void				(*del)(void *, size_t);
 };
 

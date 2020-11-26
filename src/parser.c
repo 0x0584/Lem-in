@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 05:08:24 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 23:10:44 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int g_state = 0;
 int g_ants = 0;
 bool g_verbose = 1;
-char *g_error_line;
+char *g_error_line = NULL;
 
 bool ft_isnumber(char *s) {
 	while (*s)
@@ -215,13 +215,12 @@ t_graph *read_graph(void) {
 
 	valid = true;
 	verts = queue_init(), edges = queue_init();
-	while (valid && gnl(0, &line) && *line){
+	while (valid && gnl(0, &line) > 0 && *line)
 		if (valid_comment(line))
 			free(line);
 		else if (!valid_line(line, verts, edges))
 			valid = false;
-	}
-	free(line), gnl_free_cache();
+	free(line), gnl_cleanup();
 	g =	(valid ? parse_graph(verts, edges) : NULL);
 	queue_del(&verts, queue_blob_free);
 	queue_del(&edges, queue_blob_free);

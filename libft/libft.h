@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/30 17:32:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 05:14:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/26 22:33:02 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@
 
 # define GET_DIGI(i)						((i) - '0')
 # define TO_DIGI(i)							((i) + '0')
-
-# define BUFF_SIZE							1024 * 16
 
 enum			e_read_states
 {
@@ -189,7 +187,6 @@ char			*ft_utoa_base(t_u128 nb, const char *base);
 
 void			**ft_lst_content_asarray(t_lst head, size_t *size);
 int				*ft_lst_int_asarray(t_lst head, size_t *size);
-
-void			gnl_free_cache(void);
-
+void gnl_cleanup(void);
+int gnl_clean(const int fd);
 #endif

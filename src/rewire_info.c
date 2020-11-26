@@ -3,7 +3,6 @@
 bool prepare_info(struct s_rewire_handy *info, t_queue *paths) {
     if (!paths || !(info->n_paths = queue_size(paths)))
         return NULL;
-
     info->apath = malloc(info->n_paths * sizeof(t_queue *));
     info->walk_edge = malloc(info->n_paths * sizeof(t_qnode *));
     /* setup all found paths */
