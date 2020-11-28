@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/25 05:07:16 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/28 03:39:02 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,18 @@ t_netflow		*netflow_init(t_queue *paths)
 	return (net);
 }
 
+
+void print_edge(t_qnode *node) {
+	t_edge *edge = node->blob;
+	ft_printf("%s-%s ", edge->src->name, edge->dst->name);
+}
+
+void print_path(t_qnode *node) {
+	ft_printf(">> %zu\n", queue_size(node->blob));
+	queue_iter(node->blob, false, print_edge);
+	ft_putendl("");
+}
+
 t_netflow				*netflow_setup(t_graph *graph, size_t units)
 {
 	t_queue		*paths;
@@ -75,12 +87,31 @@ t_netflow				*netflow_setup(t_graph *graph, size_t units)
 	t_netflow	*net;
 
 	paths = queue_init();
-	while ((tmp = bfs_find(graph)))
+	while ((tmp = bfs_find(graph))) {
 		queue_enq(paths, queue_node(tmp, sizeof(t_queue *), false));
+
+		ft_putendl(">> --- paths ---- ");
+		queue_iter(paths, false, print_path);
+		ft_putendl(">> --- paths ---- ");
+
+		re_wire_paths(graph, paths);
+
+
+		ft_putendl(">> --- rewired ---- ");
+		queue_iter(paths, true, print_path);
+		ft_putendl(">> --- rewired ---- ");
+
+	}
 	if (!queue_size(paths))
 		return queue_del(&paths, queue_del_queue), NULL;
 	queue_mergesort(&paths, paths_cmp);
-	net = netflow_init(re_wire_paths(graph, paths));
+
+	ft_putendl(">> --- final paths ---- ");
+	queue_iter(paths, false, print_path);
+	ft_putendl(">> --- final paths ---- ");
+
+	net = netflow_init(paths);
+
 	net->n_units = units;
 	net->maxflow = 0;
 	queue_del(&paths, queue_del_queue);

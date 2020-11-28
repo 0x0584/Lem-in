@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:44:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:45:00 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/27 04:50:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,10 @@ bool hash_add(t_hash *h, char *key, void *blob)
 void *hash_get(t_hash *h, char *key, void *val_default)
 {
 	size_t hash = sfold(key, h->size);
-
 	t_qnode *walk;
 
+	if (!h->array[hash])
+		return val_default;
 	walk = QFIRST(h->array[hash]);
 	while (walk != QTAIL(h->array[hash]))
 	{

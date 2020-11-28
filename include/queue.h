@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:46:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/28 02:18:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,4 +85,8 @@ void							queue_swap_halfs(t_queue *head_queue,
 void							queue_mergesort(t_queue **q,
 												int (*cmp)(t_qnode *,
 														   t_qnode *));
+
+size_t							queue_count(t_queue *q);
+t_queue							*queue_push_front(t_queue *queue, t_qnode *node);
+
 #endif

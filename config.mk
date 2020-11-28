@@ -13,7 +13,7 @@
 NAME		= lem-in
 FARM		= big_s
 
-DEBUG		?= 0
+DEBUG		?= 1
 
 CC			= gcc
 LDFLAGS		= -Llibft -lft

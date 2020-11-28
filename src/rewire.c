@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:46:38 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:46:41 by archid-          ###   ########.fr       */
+/*   Updated: 2020/11/28 03:53:49 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,16 @@ static void fix_collition(t_graph *g, struct s_rewire_handy *info) {
 
     t_qnode *old_prev = info->walk_edge[info->curr + !residual]->prev;
 
+	AS_EDGE(info->walk_edge[info->curr + residual]->next)->seen = FRESH;
+
     /* remove residual edge from its path */
     queue_node_del_next(info->apath[info->curr + residual],
                         info->walk_edge[info->curr + residual],
                         queue_blob_keep);
     info->walk_edge[info->curr + residual] =
         info->walk_edge[info->curr + residual]->next;
+
+	AS_EDGE(info->walk_edge[info->curr + !residual]->next)->seen = FRESH;
 
     /* removing the edge itself from its none residual path */
     queue_node_del_next(info->apath[info->curr + !residual],
@@ -127,6 +131,13 @@ static bool handle_collision(t_graph *g, struct s_rewire_handy *info) {
 	return collision;
 }
 
+void update_path_lengths(t_qnode *node) {
+	t_queue *q;
+
+	q = node->blob;
+	q->size = queue_count(q);
+}
+
 t_queue *re_wire_paths(t_graph *g, t_queue *paths) {
     struct s_rewire_handy info;
 
@@ -142,5 +153,6 @@ t_queue *re_wire_paths(t_graph *g, t_queue *paths) {
     }
     free(info.apath);
     free(info.walk_edge);
+	queue_iter(paths, true, update_path_lengths);
     return (paths);
 }
