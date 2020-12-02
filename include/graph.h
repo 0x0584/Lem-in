@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/28 01:24:03 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/01 00:43:05 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@ typedef struct s_vertex t_vertex;
 typedef struct s_edge t_edge;
 typedef struct s_graph t_graph;
 
-enum e_bfs_turn {
+enum e_state {
     FRESH,
     BELONG_TO_PATH,
     INITIAL,
 };
 
-extern enum e_bfs_turn g_turn;
+extern enum e_state g_turn;
 
 struct s_vertex {
-    enum e_bfs_turn seen;
+    enum e_state seen;
     char *name;
     t_queue *edges;
     int x;
@@ -36,7 +36,7 @@ struct s_vertex {
 };
 
 struct s_edge {
-    enum e_bfs_turn seen;
+    enum e_state seen;
     t_edge *residual;
     t_vertex *dst;
     t_vertex *src;
