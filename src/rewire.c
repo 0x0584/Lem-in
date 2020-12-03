@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:46:38 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/02 11:10:25 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/03 12:37:53 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static bool detect_collision(t_graph *g, struct s_rewire_handy *info) {
                        AS_EDGE(info->walk_edge[info->curr + 1])->src->name));
 }
 
-static bool discover_collision(t_graph *g, struct s_rewire_handy *info,
+static void discover_collision(t_graph *g, struct s_rewire_handy *info,
                                int *which_residual) {
     t_qnode *after1;
     t_qnode *after2;
@@ -44,10 +44,10 @@ static bool discover_collision(t_graph *g, struct s_rewire_handy *info,
         after2 = NULL;
 
     /* preparing target edges */
-    bool move_edge;
+    /* bool move_edge; */
 
     /* XXX: fill residual */
-    move_edge = false;
+    /* move_edge = false; */
     if (info->e2 &&
         (AS_EDGE(info->walk_edge[info->curr])->residual) == AS_EDGE(info->e2))
         /* residual by default in this case would be path2
@@ -59,116 +59,109 @@ static bool discover_collision(t_graph *g, struct s_rewire_handy *info,
          * two nodes, we have found the residual */
         *which_residual = 0;
         info->walk_edge[info->curr + 1] = after2;
-        move_edge = true;
+        /* move_edge = true; */
     } else if (after1 && AS_EDGE(after1)->residual ==
                              AS_EDGE(info->walk_edge[info->curr + 1])) {
         *which_residual = 1;
         info->walk_edge[info->curr] = after1;
-        move_edge = true;
+        /* move_edge = true; */
     } else {
         *which_residual = 0;
     }
-    return move_edge;
+    /* return move_edge; */
 }
 
-static bool isbackwards(t_qnode *ref, t_qnode *edge) {
-    t_edge *eref;
-    t_edge *e;
+static void remove_residuals(struct s_rewire_handy *info, int index, t_vertex *src) {
+	ft_printf("remove residuals of %d\n", index);
+	ft_printf(" => vertex %s\n", src->name);
 
-    ft_putstr("is backwards reference ");
-    node_dump(ref);
-    ft_putstr(" edge is ");
-    node_dump(edge);
-    ft_putendl("\n");
+	while (AS_EDGE(info->walk_edge[index]->next)->dst != src)
+	{
+		node_dump(info->walk_edge[index]->next);
+		ft_putendl("");
 
-    eref = AS_EDGE(ref);
-    e = AS_EDGE(edge);
+		/* release edge */
+		AS_EDGE(info->walk_edge[index]->next)->seen = FRESH;
 
-    return eref->src == e->dst;
-}
+		/* remove residual edge from its path */
+		queue_node_del_next(info->apath[index], info->walk_edge[index], queue_blob_keep);
+	}
 
-static void remove_residuals(t_queue *path, t_qnode *walk) {
-    t_qnode *walker;
+	ft_putstr(" ==> ");
+	node_dump(info->walk_edge[index]->next);
+	ft_putendl(" <==\n");
 
-    if (walk != QTAIL(path)) {
-        ft_putstr("remove_residuals walk at ");
-        node_dump(walk);
-        ft_putendl("");
-    }
-
-    walker = walk;
-    while (walker != QTAIL(path)) {
-        ft_putstr("walker at ");
-        node_dump(walker);
-        ft_putendl("\n -------- \n");
-        remove_residuals(path, walk->next);
-        if (isbackwards(walker, walk)) {
-            walker = walker->prev;
-            walk = walk->next;
-            while (walker->next != walk)
-                queue_node_del_next(path, walker, queue_blob_keep);
-        }
-        walker = walker->next;
-    }
+	ft_putendl("\n ********* \n");
 }
 
 static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
     int residual;
-    bool move_edge = discover_collision(g, info, &residual);
+    bool move_edge;
 
-    if (move_edge)
-        info->walk_edge[info->curr + residual] =
-            info->walk_edge[info->curr + residual]->prev;
+	discover_collision(g, info, &residual);
 
-    info->walk_edge[info->curr + !residual] =
-        info->walk_edge[info->curr + !residual]->prev;
+	ft_printf("residual is in %d\n", residual);
 
-    ft_putstr("residual before ");
-    node_dump(info->walk_edge[info->curr + residual]);
-    ft_putstr(" not residual before ");
-    node_dump(info->walk_edge[info->curr + !residual]);
-    ft_putendl("\n------");
+	while (AS_EDGE(info->walk_edge[info->curr + residual])->residual->seen == BELONG_TO_PATH)
+		info->walk_edge[info->curr + residual] = info->walk_edge[info->curr + residual]->prev;
 
-    /* t_qnode *old_prev = info->walk_edge[info->curr + !residual]->prev; */
+	while (AS_EDGE(info->walk_edge[info->curr + !residual])->residual->seen == BELONG_TO_PATH)
+		info->walk_edge[info->curr + !residual] = info->walk_edge[info->curr + !residual]->prev;
 
-    AS_EDGE(info->walk_edge[info->curr + residual]->next)->seen = FRESH;
+	t_qnode *walk;
 
-    /* remove residual edge from its path */
-    queue_node_del_next(info->apath[info->curr + residual],
-                        info->walk_edge[info->curr + residual],
-                        queue_blob_keep);
+	t_vertex *residual_src = AS_EDGE(info->walk_edge[info->curr + residual])->src;
+	t_vertex *not_residual_src = AS_EDGE(info->walk_edge[info->curr + !residual])->src;
 
-    info->walk_edge[info->curr + residual] =
-        info->walk_edge[info->curr + residual]->next;
+	{
+		ft_putendl(" ================ BEFORE ================ ");
 
-    AS_EDGE(info->walk_edge[info->curr + !residual]->next)->seen = FRESH;
+		walk = info->walk_edge[info->curr + residual];
+		ft_putendl("residual to tail ");
+		while (walk != QTAIL(info->apath[info->curr + residual])) {
+			node_dump(walk); ft_putendl("");
+			walk = walk->next;
+		}
+		ft_putendl("\n -------------- \n");
 
-    /* removing the edge itself from its none residual path */
-    queue_node_del_next(info->apath[info->curr + !residual],
-                        info->walk_edge[info->curr + !residual],
-                        queue_blob_keep);
+		walk = info->walk_edge[info->curr + !residual];
+		ft_putendl("not residual to tail ");
+		while (walk != QTAIL(info->apath[info->curr + !residual])) {
+			node_dump(walk); ft_putendl("");
+			walk = walk->next;
+		}
+		ft_putendl("\n -------------- \n");
+	}
 
-    ft_putstr("residual after ");
-    node_dump(info->walk_edge[info->curr + residual]);
-    ft_putstr(" not residual after ");
-    node_dump(info->walk_edge[info->curr + !residual]);
-    ft_putendl("\n------");
+	remove_residuals(info, info->curr + residual, not_residual_src);
+	info->walk_edge[info->curr + residual] = info->walk_edge[info->curr + residual]->next;
+	remove_residuals(info, info->curr + !residual, residual_src);
 
-    /* t_qnode *old_next = info->walk_edge[info->curr + !residual]->next; */
+	{
+		ft_putendl(" ================ AFTER ================ ");
+
+		walk = info->walk_edge[info->curr + residual];
+		ft_putendl("residual to tail ");
+		while (walk != QTAIL(info->apath[info->curr + residual])) {
+			node_dump(walk); ft_putendl("");
+			walk = walk->next;
+		}
+		ft_putendl("\n -------------- \n");
+
+		walk = info->walk_edge[info->curr + !residual];
+		ft_putendl("not residual to tail ");
+		while (walk != QTAIL(info->apath[info->curr + !residual])) {
+			node_dump(walk); ft_putendl("");
+			walk = walk->next;
+		}
+		ft_putendl("\n -------------- \n");
+	}
 
     /* merge the other half of each path a-b 0-9 => a-9 0-b */
     queue_swap_halfs(info->apath[info->curr + !residual],
                      info->apath[info->curr + residual],
                      info->walk_edge[info->curr + !residual],
                      info->walk_edge[info->curr + residual]);
-
-    remove_residuals(info->apath[info->curr + !residual],
-                     QFIRST(info->apath[info->curr + !residual]));
-
-    /* info->walk_edge[info->curr + !residual] = old_next; */
-
-    /* if (move_edge) */
-    /*     info->walk_edge[info->curr + residual] = old_prev; */
 }
 
 static bool handle_collision(t_graph *g, struct s_rewire_handy *info) {
