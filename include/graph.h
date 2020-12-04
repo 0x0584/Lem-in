@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/01 00:43:05 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 18:33:04 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ struct s_vertex {
 struct s_edge {
     enum e_state seen;
     t_edge *residual;
+	t_edge *parent;
     t_vertex *dst;
     t_vertex *src;
 };
@@ -65,4 +66,7 @@ void edge_del(void *edge);
 void node_dump(t_qnode *node);
 void print_edge(t_qnode *node);
 void print_path(t_qnode *node);
+
+bool assert_path_connected(t_queue *path);
+
 #endif /* GRAPH_H */

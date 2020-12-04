@@ -6,11 +6,29 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/23 01:02:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:42:42 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 18:33:49 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "graph.h"
+
+
+bool assert_path_connected(t_queue *path) {
+	t_qnode *walk;
+	t_edge *edge;
+	t_edge *prev;
+
+	walk = QFIRST(path);
+	prev = NULL;
+	while (walk != QTAIL(path)) {
+		edge = walk->blob;
+		if (prev && prev->src != edge->dst)
+			return false;
+		prev = edge;
+		walk = walk->next;
+	}
+	return true;
+}
 
 void vertex_init(t_vertex *vert, char *name, int x, int y) {
 	vert->name = name;

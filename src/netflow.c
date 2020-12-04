@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/28 03:39:02 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 13:15:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void print_edge(t_qnode *node) {
 }
 
 void print_path(t_qnode *node) {
-	ft_printf(">> %zu\n", queue_size(node->blob));
+	ft_printf(">> (length: %zu) ", queue_size(node->blob));
 	queue_iter(node->blob, false, print_edge);
 	ft_putendl("");
 }
@@ -88,18 +88,24 @@ t_netflow				*netflow_setup(t_graph *graph, size_t units)
 
 	paths = queue_init();
 	while ((tmp = bfs_find(graph))) {
+
+		if (!assert_path_connected(tmp))
+		{
+			ft_printf("PATH IS NOT CONNECTED!!!");
+			exit(-1);
+		}
 		queue_enq(paths, queue_node(tmp, sizeof(t_queue *), false));
 
-		ft_putendl(">> --- paths ---- ");
+		ft_putendl("  --- paths ---- ");
 		queue_iter(paths, false, print_path);
-		ft_putendl(">> --- paths ---- ");
+		ft_putendl("  --- paths ---- ");
 
 		re_wire_paths(graph, paths);
 
 
-		ft_putendl(">> --- rewired ---- ");
+		ft_putendl("  --- rewired ---- ");
 		queue_iter(paths, true, print_path);
-		ft_putendl(">> --- rewired ---- ");
+		ft_putendl("  --- rewired ---- ");
 
 	}
 	if (!queue_size(paths))

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:46:38 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/03 12:37:53 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 17:01:13 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,9 +94,19 @@ static void remove_residuals(struct s_rewire_handy *info, int index, t_vertex *s
 	ft_putendl("\n ********* \n");
 }
 
+void print_residuals(t_queue *path) {
+	t_qnode *node = QFIRST(path);
+	while (node != QTAIL(path)) {
+		t_edge *tmp = node->blob;
+		if (tmp->residual->seen == BELONG_TO_PATH) {
+			node_dump(node); ft_putendl("");
+		}
+		node = node->next;
+	}
+}
+
 static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
     int residual;
-    bool move_edge;
 
 	discover_collision(g, info, &residual);
 
@@ -108,28 +118,18 @@ static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
 	while (AS_EDGE(info->walk_edge[info->curr + !residual])->residual->seen == BELONG_TO_PATH)
 		info->walk_edge[info->curr + !residual] = info->walk_edge[info->curr + !residual]->prev;
 
-	t_qnode *walk;
-
 	t_vertex *residual_src = AS_EDGE(info->walk_edge[info->curr + residual])->src;
 	t_vertex *not_residual_src = AS_EDGE(info->walk_edge[info->curr + !residual])->src;
 
 	{
 		ft_putendl(" ================ BEFORE ================ ");
 
-		walk = info->walk_edge[info->curr + residual];
 		ft_putendl("residual to tail ");
-		while (walk != QTAIL(info->apath[info->curr + residual])) {
-			node_dump(walk); ft_putendl("");
-			walk = walk->next;
-		}
+		print_residuals(info->apath[info->curr + residual]);
 		ft_putendl("\n -------------- \n");
 
-		walk = info->walk_edge[info->curr + !residual];
 		ft_putendl("not residual to tail ");
-		while (walk != QTAIL(info->apath[info->curr + !residual])) {
-			node_dump(walk); ft_putendl("");
-			walk = walk->next;
-		}
+		print_residuals(info->apath[info->curr + !residual]);
 		ft_putendl("\n -------------- \n");
 	}
 
@@ -140,20 +140,12 @@ static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
 	{
 		ft_putendl(" ================ AFTER ================ ");
 
-		walk = info->walk_edge[info->curr + residual];
 		ft_putendl("residual to tail ");
-		while (walk != QTAIL(info->apath[info->curr + residual])) {
-			node_dump(walk); ft_putendl("");
-			walk = walk->next;
-		}
+		print_residuals(info->apath[info->curr + residual]);
 		ft_putendl("\n -------------- \n");
 
-		walk = info->walk_edge[info->curr + !residual];
 		ft_putendl("not residual to tail ");
-		while (walk != QTAIL(info->apath[info->curr + !residual])) {
-			node_dump(walk); ft_putendl("");
-			walk = walk->next;
-		}
+		print_residuals(info->apath[info->curr + !residual]);
 		ft_putendl("\n -------------- \n");
 	}
 

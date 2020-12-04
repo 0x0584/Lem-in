@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:44:01 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/03 19:58:30 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@ t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
 	else if (!g->source || !g->sink)
 		return error_message("Source/Sink are not defined"),
 			graph_free(g), NULL;
-	print_map(lverts, ledges);
+	/* print_map(lverts, ledges); */
 	return g;
 }
 

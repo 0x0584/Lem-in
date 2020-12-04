@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/01 01:25:42 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 18:31:07 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,39 @@
   1 for those who belong into a path
 */
 
+
 enum e_state g_turn = INITIAL;
 
 void edge_print(t_edge *edge) {
-    ft_printf("[%s(%d)-%s(%d)|%d]", edge->src->name, edge->src->seen,
-              edge->dst->name, edge->dst->seen, edge->seen);
+	if (edge)
+		ft_printf("[%s(%d)-%s(%d)|%d] ", edge->src->name, edge->src->seen,
+				  edge->dst->name, edge->dst->seen, edge->seen);
 }
 
 void node_dump(t_qnode *node) { edge_print(node->blob); }
 
+void dump_hash_map(t_hash *hash) {
+	t_qnode *walk;
+	size_t i = 0;
+	t_hnode *tmp;
+
+	while (i < hash->size) {
+		if (hash->array[i]) {
+			walk = QFIRST(hash->array[i]);
+			while (walk != QTAIL(hash->array[i])) {
+				tmp = walk->blob;
+				ft_printf("Key: `%s` \n", tmp->key);
+				queue_iter(tmp->blob, true, node_dump);
+				ft_putendl("\n-----------\n");
+				walk = walk->next;
+			}
+		}
+		i++;
+	}
+}
+
 bool edge_state(t_edge *edge, t_edge *backwards) {
+    ft_printf("Edge: ");
     edge_print(edge);
     ft_printf(" ");
 
@@ -35,10 +58,12 @@ bool edge_state(t_edge *edge, t_edge *backwards) {
         return true;
     }
 
+    ft_printf("Previous: ");
     edge_print(backwards);
     ft_putstr(" >> ");
 
-    if (edge->src->seen == backwards->src->seen) {
+    if (edge->src->seen == backwards->src->seen &&
+			backwards->src->seen != BELONG_TO_PATH) {
         ft_printf("fresh edge\n");
         return true;
     } else if (edge->src->seen == BELONG_TO_PATH) {
@@ -73,7 +98,7 @@ static t_queue *traverse_hash(t_graph *g, char *key, t_hash *parent,
 
         bool state = edge_state(edge, backwards);
 
-        ft_printf("state: %d\n", state);
+        /* ft_printf("state: %d\n", state); */
 
         if (state &&
             (path = (edge->src == g->source
@@ -105,9 +130,12 @@ static t_edge *extract_edge(t_queue *q) {
 
 static void enqueue_edges(t_queue *q, t_queue *other) {
     t_qnode *walk;
+	t_edge *edge;
 
     walk = QFIRST(other);
     while (walk != QTAIL(other)) {
+		edge = walk->blob;
+		ft_printf(" enqueuing: %s-%s\n", edge->src->name, edge->dst->name);
         queue_enq(q, queue_node(walk->blob, sizeof(t_edge *), false));
         walk = walk->next;
     }
@@ -126,18 +154,26 @@ static void hash_add_parent(t_edge *edge, t_hash *parent) {
 
 static void handle_edge(t_edge *edge, t_queue *open, t_queue *resids,
                         t_hash *parent) {
-    if (edge->residual->seen == g_turn || edge->dst->seen == g_turn)
+	ft_printf(" IN %s-%s ", edge->src->name, edge->dst->name);
+    if (edge->residual->seen == g_turn || edge->dst->seen == g_turn){
+		ft_printf(" IGNORE %s-%s\n", edge->src->name, edge->dst->name);
         return;
-    else if (edge->dst->seen == BELONG_TO_PATH &&
-             edge->residual->seen != BELONG_TO_PATH) {
-        ft_printf(" #### %s-%s ####\n", edge->src->name, edge->dst->name);
-        queue_enq(resids, queue_node(edge, sizeof(t_edge *), false));
+	}
+    else if (edge->dst->seen == BELONG_TO_PATH) {
+        ft_printf(" Residual %s-%s \n", edge->src->name, edge->dst->name);
+		if (edge->residual->seen != BELONG_TO_PATH)
+			queue_enq(resids, queue_node(edge, sizeof(t_edge *), false));
+		else {
+			enqueue_edges(open, edge->dst->edges);
+			hash_add_parent(edge, parent);
+			edge->seen = g_turn;
+		}
         return;
     }
+	ft_printf(" FRESH %s-%s\n", edge->src->name, edge->dst->name);
     enqueue_edges(open, edge->dst->edges);
     hash_add_parent(edge, parent);
-    if (edge->dst->seen != BELONG_TO_PATH)
-        edge->dst->seen = g_turn;
+	edge->dst->seen = g_turn;
     edge->seen = g_turn;
 }
 
@@ -145,7 +181,9 @@ static void enqueue_residuals(t_queue *open, t_queue *resids, t_hash *parent) {
     t_edge *current;
     t_edge *edge;
     t_qnode *tmp;
+	t_queue *tmp_queue;
 
+	tmp_queue = queue_init();
     ft_putendl(">>> enqueue_residuals");
     while (queue_size(resids)) {
         tmp = queue_deq(resids), current = AS_EDGE(tmp);
@@ -176,6 +214,9 @@ static void enqueue_residuals(t_queue *open, t_queue *resids, t_hash *parent) {
             tmp = tmp->next;
         }
     }
+
+	while (queue_size(tmp_queue))
+		queue_enq(resids, queue_deq(tmp_queue));
 }
 
 static bool bfs_loop(t_graph *g, t_hash *parent) {
@@ -199,6 +240,8 @@ static bool bfs_loop(t_graph *g, t_hash *parent) {
     }
     queue_del(&resids, queue_blob_keep);
     queue_del(&open, queue_blob_keep);
+
+	dump_hash_map(parent);
     return arrived;
 }
 
@@ -216,9 +259,11 @@ t_queue *bfs_find(t_graph *g) {
     parent = hash_init(g->n_vertices, queue_del_parent);
     g->source->seen = g_turn;
     path = bfs_loop(g, parent) ? construct_path(g, parent) : NULL;
-    ft_printf("%d>> ", g_turn);
-    queue_iter(path, false, print_edge);
-    ft_putendl("");
+
+    /* ft_printf("%d>> ", g_turn); */
+    /* queue_iter(path, false, print_edge); */
+    /* ft_putendl(""); */
+
     hash_free(parent);
     g_turn++;
     return path;

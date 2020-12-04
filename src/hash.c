@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:44:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/27 04:50:37 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/03 19:55:07 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ t_hash *hash_init(size_t size, hash_del del) {
 	size_t i;
 
 	hash = malloc(sizeof(t_hash));
+	size = ft_sqrt(size) + 1;
 	hash->size = size;
 	hash->array = malloc(size * sizeof(t_queue *));
 	hash->del = del;
