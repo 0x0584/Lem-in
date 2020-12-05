@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/05 01:58:25 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/05 19:46:44 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,9 +229,25 @@ static void enqueue_residuals(t_queue *open, t_queue *resids, t_hash *parent) {
                     hash_add_parent(edge, current, parent);
                     enqueue_edges(open, edge, parent);
                 } else if (current->residual->seen == BELONG_TO_PATH) {
-                    queue_enq(tmp_queue,
-                              queue_node(edge, sizeof(t_edge *), false));
-                }
+					edge_print(current);
+					ft_printf(" /// is residual \n");
+
+                    ft_printf(" || to >> ");
+                    edge_print(edge);
+                    ft_printf(" /// ");
+                    edge_print(edge->residual);
+                    ft_printf("\n");
+
+					if (edge->dst->seen == BELONG_TO_PATH) {
+						queue_enq(tmp_queue, queue_node(edge, sizeof(t_edge *), false));
+						ft_printf("edge leading to seen destinnation belong to path");
+					} else {
+						edge->seen = g_turn;
+						ft_printf("edge leading to fresh destination");
+						hash_add_parent(edge, current, parent);
+						enqueue_edges(open, edge, parent);
+					}
+				}
             }
             tmp = tmp->next;
         }

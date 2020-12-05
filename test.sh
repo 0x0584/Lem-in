@@ -1,7 +1,14 @@
 #!/bin/bash
 
 mkdir -p big
-declare -a maps=("flow-one" "flow-ten" "flow-thousand" "big" "big-superposition")
+declare -a maps=(
+	#"flow-one" 
+	#"flow-ten" 
+	#"flow-thousand" 
+	"big" 
+	"big-superposition"
+)
+
 for map in "${maps[@]}"
 do
 	for i in {00..100}
