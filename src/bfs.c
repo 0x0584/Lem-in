@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/04 22:45:03 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/05 01:58:25 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,13 +177,13 @@ static void handle_edge(t_edge *edge, t_queue *open, t_queue *resids,
 	}
     else if (edge->dst->seen == BELONG_TO_PATH) {
         ft_printf(" Residual %s-%s \n", edge->src->name, edge->dst->name);
-		if (edge->residual->seen != BELONG_TO_PATH)
+		/* if (edge->residual->seen != BELONG_TO_PATH) */
 			queue_enq(resids, queue_node(edge, sizeof(t_edge *), false));
-		else {
-			enqueue_edges(open, edge, parent);
-			/* hash_add_parent(edge, parent); */
-			edge->seen = g_turn;
-		}
+		/* else { */
+		/* 	enqueue_edges(open, edge, parent); */
+		/* 	/\* hash_add_parent(edge, parent); *\/ */
+		/* 	edge->seen = g_turn; */
+		/* } */
         return;
     }
 	ft_printf(" FRESH %s-%s\n", edge->src->name, edge->dst->name);
@@ -197,9 +197,9 @@ static void enqueue_residuals(t_queue *open, t_queue *resids, t_hash *parent) {
     t_edge *current;
     t_edge *edge;
     t_qnode *tmp;
-	t_queue *tmp_queue;
+    t_queue *tmp_queue;
 
-	tmp_queue = queue_init();
+    tmp_queue = queue_init();
     ft_putendl(">>> enqueue_residuals");
     while (queue_size(resids)) {
         tmp = queue_deq(resids), current = AS_EDGE(tmp);
@@ -212,37 +212,40 @@ static void enqueue_residuals(t_queue *open, t_queue *resids, t_hash *parent) {
         edge_print(current->residual);
         ft_printf("\n");
 
-		/* enqueue_edges(open, current, parent); */
+        /* enqueue_edges(open, current, parent); */
         while (tmp != QTAIL(current->dst->edges)) {
             edge = tmp->blob;
-			/* handle_edge(edge, open, resids, parent); */
-            if (!ft_strcmp(edge->src->name, current->dst->name) &&
-                edge->residual->seen == BELONG_TO_PATH) {
-                ft_printf(" || to >> ");
-                edge_print(edge);
-                ft_printf(" /// ");
-                edge_print(edge->residual);
-                ft_printf("\n");
+            /* handle_edge(edge, open, resids, parent); */
+            if (edge->src == current->dst) {
+                if (edge->residual->seen == BELONG_TO_PATH) {
+                    ft_printf(" || to >> ");
+                    edge_print(edge);
+                    ft_printf(" /// ");
+                    edge_print(edge->residual);
+                    ft_printf("\n");
 
-                edge->seen = g_turn;
-                /* hash_add_parent(edge, parent); */
-				hash_add_parent(edge, current, parent);
-                enqueue_edges(open, edge, parent);
+                    edge->seen = g_turn;
+                    /* hash_add_parent(edge, parent); */
+                    hash_add_parent(edge, current, parent);
+                    enqueue_edges(open, edge, parent);
+                } else if (current->residual->seen == BELONG_TO_PATH) {
+                    queue_enq(tmp_queue,
+                              queue_node(edge, sizeof(t_edge *), false));
+                }
             }
             tmp = tmp->next;
         }
     }
 
-	while (queue_size(tmp_queue))
-		queue_enq(resids, queue_deq(tmp_queue));
+    while (queue_size(tmp_queue))
+        queue_enq(resids, queue_deq(tmp_queue));
+    queue_del(&tmp_queue, queue_blob_keep);
 }
 
 static bool bfs_loop(t_graph *g, t_hash *parent) {
     t_queue *open;
     t_queue *resids;
     t_edge *edge;
-	t_edge *prev = NULL;
-
     bool arrived;
 
     arrived = false;
@@ -269,7 +272,7 @@ static void queue_del_parent(void *node) {
     t_queue *q;
 
     q = node;
-    queue_del(&q, queue_blob_keep);
+    queue_del(&q, queue_blob_free);
 }
 
 t_queue *bfs_find(t_graph *g) {
