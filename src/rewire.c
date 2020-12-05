@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:46:38 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/04 17:01:13 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/04 23:16:33 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,8 @@ static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
 		ft_putendl("not residual to tail ");
 		print_residuals(info->apath[info->curr + !residual]);
 		ft_putendl("\n -------------- \n");
+
+		ft_putendl(" ================ BEFORE ================ ");
 	}
 
 	remove_residuals(info, info->curr + residual, not_residual_src);
@@ -147,6 +149,8 @@ static void fix_collision(t_graph *g, struct s_rewire_handy *info) {
 		ft_putendl("not residual to tail ");
 		print_residuals(info->apath[info->curr + !residual]);
 		ft_putendl("\n -------------- \n");
+		ft_putendl(" ================ AFTER ================ ");
+
 	}
 
     /* merge the other half of each path a-b 0-9 => a-9 0-b */
