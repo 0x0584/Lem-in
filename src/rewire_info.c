@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:46:44 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/04 21:09:54 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/06 12:46:29 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ void walk_edges(t_graph *g, struct s_rewire_handy *info) {
     info->curr = 0;
     while (info->curr < info->n_paths) {
         /* ignoring paths that have reached the source */
-		ft_putstr(" Node: ");
-		node_dump(info->walk_edge[info->curr]);
-		ft_putendl("");
+		/* ft_putstr(" Node: "); */
+		/* node_dump(info->walk_edge[info->curr]); */
+		/* ft_putendl(""); */
         if (AS_EDGE(info->walk_edge[info->curr])->src != g->source)
             info->walk_edge[info->curr] = info->walk_edge[info->curr]->next;
         info->curr++;
