@@ -13,8 +13,8 @@
 include config.mk
 
 SRC_PATH	= src
-SRC_NAME	= queue.c graph.c bfs.c netflow.c lem_in_main.c \
-			  rewire_utils.c rewire_info.c rewire.c parser.c hash.c
+SRC_NAME	= lst.c graph.c bfs.c netflow.c main.c \
+			  correction.c parser.c hash.c
 OBJ_PATH	= .obj
 OBJ_NAME	:= $(SRC_NAME:.c=.o)
 OBJ			:= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))

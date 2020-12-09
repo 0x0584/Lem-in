@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/30 17:32:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 22:33:02 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/08 15:43:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,6 @@
 
 # define GET_DIGI(i)						((i) - '0')
 # define TO_DIGI(i)							((i) + '0')
-
-enum			e_read_states
-{
-	failure = -1, eof, success,
-};
 
 struct			s_list
 {
@@ -159,7 +154,7 @@ void			ft_lstiter_recu(t_list *lst, void (*f)(t_list *elem));
 int				ft_lstadd(t_list **alst, t_list *new);
 int				ft_lstpush(t_list **alst, t_list *e);
 size_t			ft_lstlen(t_list *lst);
-void			ft_lst_mergesort(t_plist *alst, int (*cmp)(t_plist, t_plist));
+void			ft_lst_mergesort(t_list **alst, int (*cmp)(t_list *, t_list *));
 void			lstdel_helper(void *content, size_t size);
 void			lstiter_helper_as_int(t_list *nb);
 t_list			*ft_lstdup(t_list *lst);
@@ -185,8 +180,9 @@ int				ft_swap(void *u, void *v, size_t size);
 char			*ft_itoa_base(t_s128 nb, const char *base);
 char			*ft_utoa_base(t_u128 nb, const char *base);
 
-void			**ft_lst_content_asarray(t_lst head, size_t *size);
-int				*ft_lst_int_asarray(t_lst head, size_t *size);
+void			**ft_lst_content_asarray(t_list *head, size_t *size);
+int				*ft_lst_int_asarray(t_list *head, size_t *size);
+
 void gnl_cleanup(void);
 int gnl_clean(const int fd);
 #endif

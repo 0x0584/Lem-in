@@ -18,9 +18,9 @@ CC			= gcc
 LDFLAGS		= -Llibft -lft
 
 ifeq ($(DEBUG),1)
-	CFLAGS  += -g
+	CFLAGS  = -g
 else
-	CFLAGS  += -Werror
+	CFLAGS  = -Werror
 endif
 
 CFLAGS		+= -Wall -Wextra -Ilibft -Iinclude

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/17 22:16:27 by archid-           #+#    #+#             */
-/*   Updated: 2019/09/30 02:46:31 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/09 00:25:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,10 +105,10 @@ typedef struct	s_format
 }				t_frmt;
 
 void			format_parse(const char *fmt, t_list **alst);
-void			format_doparse(char **fmt, t_plist *alst, int *index);
+void			format_doparse(char **fmt, t_list **alst, int *index);
 bool			format_apply_color(char **fmt, t_list **alst, int *index);
 bool			format_percentage(char **fmt, t_list **alst, int *index);
-int				format_populate(t_plist *alst, va_list *arglst);
+int				format_populate(t_list **alst, va_list *arglst);
 int				format_to_buff(t_list *lstfrmt, t_buff *buff);
 void			format_free(void *dat, size_t size);
 t_frmt			*format_const_string(int index, char *str);

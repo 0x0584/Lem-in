@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/04 18:33:04 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/09 00:18:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,58 +15,52 @@
 
 #include "hash.h"
 
-typedef struct s_vertex t_vertex;
-typedef struct s_edge t_edge;
-typedef struct s_graph t_graph;
+typedef enum e_mark { FRESH, BELONG_TO_PATH, INITIAL } t_mark;
 
-enum e_state {
-    FRESH,
-    BELONG_TO_PATH,
-    INITIAL,
-};
-
-extern enum e_state g_turn;
+typedef struct s_vertex *t_vertex;
+typedef struct s_edge *t_edge;
+typedef struct s_graph *t_graph;
 
 struct s_vertex {
-    enum e_state seen;
+    t_mark seen;
     char *name;
-    t_queue *edges;
-    int x;
-    int y;
+    t_lst edges;
+    int x, y;
 };
 
 struct s_edge {
-    enum e_state seen;
-    t_edge *residual;
-	t_edge *parent;
-    t_vertex *dst;
-    t_vertex *src;
+    t_mark seen;
+    t_edge residual;
+    t_vertex dst;
+    t_vertex src;
 };
 
 struct s_graph {
+    t_hash vertices;
+    t_hash edges;
+
     size_t n_vertices;
-    t_hash *vertices;
-    t_hash *edges;
-    t_vertex *source;
-    t_vertex *sink;
+
+    t_vertex source;
+    t_vertex sink;
 };
 
-t_hnode vertex_alloc(char *line);
-bool edge_alloc(t_graph *g, char *line, t_hnode *e, t_hnode *re);
+t_hashnode vertex_alloc(char *line);
+bool edge_alloc(t_graph g, char *line, t_hashnode *e, t_hashnode *re);
 
-t_graph *graph_init(t_hash *V, t_hash *E);
-void graph_free(t_graph *g);
+t_graph graph_init(t_hash V, t_hash E);
+void graph_del(t_graph *g);
 
-bool vertex_cmp(void *u, void *v, size_t size);
-void vertex_del(void *v);
-
-bool edge_cmp(void *e1, void *e2, size_t size);
+void vertex_del(void *vertex);
 void edge_del(void *edge);
 
-void node_dump(t_qnode *node);
-void print_edge(t_qnode *node);
-void print_path(t_qnode *node);
+t_lst bfs(t_graph g);
+void correct_paths(t_lst paths);
 
-bool assert_path_connected(t_queue *path);
+void assert_path_connected(t_lst path);
+void assert_path_has_correct_edges(t_lst path);
+void assert_paths_correct(t_lst paths);
+
+void print_edge(t_edge e);
 
 #endif /* GRAPH_H */

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:35 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/03 10:25:33 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/08 23:35:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,52 +15,25 @@
 
 #include "graph.h"
 
+typedef struct s_flow_pair {
+	char *vertex;
+	size_t unit;
+} t_flow_pair;
 
-struct s_rewire_handy {
-    t_queue		**apath;     /* keeping track of each path */
-    t_qnode		**walk_edge; /* moving through the paths one edge at a time */
-    int			n_paths;      /* number of paths */
-    int			curr;         /* walk index */
+typedef struct s_flow {
+	t_flow_pair *stage;
+    size_t size;
+    size_t total_units;
+} * t_flow;
 
-    /* edge pair used while walking */
-    t_qnode		*e1;
-    t_qnode		*e2;
-};
+typedef struct s_network {
+    t_lst flows;
+    size_t n_units;
+    size_t maxflow;
+} *t_network;
 
-#define AS_EDGE(e) ((t_edge *)e->blob)
-
-typedef struct path
-{
-	char		**nodes;
-	int			*ants;
-	int			n_ants;
-	int			size;
-} t_path;
-
-typedef struct s_flow_network {
-    struct path *paths;
-	int			n_paths;
-    int			n_units;
-    int			maxflow;
-} t_netflow;
-
-
-t_queue *bfs_find(t_graph *g);
-t_queue *re_wire_paths(t_graph *g, t_queue *paths);
-void netflow_pushflow(t_netflow *net);
-t_netflow *netflow_setup(t_graph *graph, size_t units);
-void netflow_del(t_netflow **anet);
-
-/********************************/
-
-bool rewire_done(t_graph *g, struct s_rewire_handy *info);
-void walk_edges(t_graph *g, struct s_rewire_handy *info);
-void pick_pair(t_graph *g, struct s_rewire_handy *info);
-bool prepare_info(struct s_rewire_handy *info, t_queue *paths);
-void sort_by_src_name(struct s_rewire_handy *info);
-bool has_arrived(t_graph *g, t_edge *e);
-t_qnode *next_edge(t_graph *g, t_qnode *edge);
-void set_walk_edges(t_queue *paths, struct s_rewire_handy *info);
-
+t_network netflow_setup(t_graph graph, size_t units);
+void netflow_pushflow(t_network net);
+void netflow_del(t_network *anet);
 
 #endif /* NETFLOW_H */

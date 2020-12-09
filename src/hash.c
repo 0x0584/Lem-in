@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:44:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/03 19:55:07 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/09 01:56:42 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@ size_t sfold(char *s, size_t mod) {
     return compute_hash(s, size / 4, compute_hash(s, size, 0, mod), mod) % mod;
 }
 
-t_hash *hash_init(size_t size, hash_del del) {
-	t_hash *hash;
+t_hash hash_alloc(size_t size, void (*del)(void *)) {
+	t_hash hash;
 	size_t i;
 
 	hash = malloc(sizeof(t_hash));
 	size = ft_sqrt(size) + 1;
 	hash->size = size;
-	hash->array = malloc(size * sizeof(t_queue *));
+	hash->array = malloc(size * sizeof(t_lst));
 	hash->del = del;
 	i = 0;
 	while (i < size)
@@ -52,76 +52,71 @@ t_hash *hash_init(size_t size, hash_del del) {
 	return hash;
 }
 
-bool hash_add(t_hash *h, char *key, void *blob)
+bool hash_add(t_hash h, char *key, void *blob)
 {
 	size_t hash;
-	t_qnode *walk;
-	t_hnode hnode;
+	t_lstnode walk;
+	t_hashnode hnode;
+	t_hashnode *tmp;
 
 	if (!h || !blob || !key)
 		return false;
-	hash = sfold(key, h->size);
-	if (!h->array[hash])
+	if (!h->array[hash = sfold(key, h->size) ])
 	{
-		hnode = (t_hnode){ft_strdup(key), blob};
-		h->array[hash] = queue_init();
-		queue_enq(h->array[hash], queue_node(&hnode, sizeof(t_hnode), true));
+		hnode = (t_hashnode){ft_strdup(key), blob};
+		h->array[hash] = lst_alloc(h->del);
+	    lst_push_back_blob(h->array[hash], &hnode, sizeof(t_hashnode), true);
 		return true;
 	}
-	walk = QFIRST(h->array[hash]);
-	while (walk != QTAIL(h->array[hash]))
+	walk = lst_front(h->array[hash]);
+	while (walk)
 	{
-		if (!ft_strcmp(AS_HNODE(walk)->key, key))
+		tmp = walk->blob;
+		if (!ft_strcmp(tmp->key, key))
 			return false;
-		walk = walk->next;
+		lst_node_forward(&walk);
 	}
-	hnode = (t_hnode){ft_strdup(key), blob};
-	queue_enq(h->array[hash], queue_node(&hnode, sizeof(t_hnode), true));
+	hnode = (t_hashnode){ft_strdup(key), blob};
+    lst_push_front_blob(h->array[hash], &hnode, sizeof(t_hashnode), true);
 	return true;
 }
 
-void *hash_get(t_hash *h, char *key, void *val_default)
+void *hash_get(t_hash h, char *key, void *default_val)
 {
-	size_t hash = sfold(key, h->size);
-	t_qnode *walk;
+	size_t hash;
+	t_lstnode walk;
+	t_hashnode *tmp;
 
-	if (!h->array[hash])
-		return val_default;
-	walk = QFIRST(h->array[hash]);
-	while (walk != QTAIL(h->array[hash]))
+	if (!h->array[hash = sfold(key, h->size)])
+		return default_val;
+	walk = lst_front(h->array[hash]);
+	while (walk)
 	{
-		if (!ft_strcmp(AS_HNODE(walk)->key, key))
-			return AS_HNODE(walk)->blob;
-		walk = walk->next;
+		tmp = walk->blob;
+		if (!ft_strcmp(tmp->key, key))
+			return tmp->blob;
+	    lst_node_forward(&walk);
 	}
-	return val_default;
+	return default_val;
 }
 
-void hash_default_del(void *ptr) {
-	(void)ptr;
-	return ;
-}
+void hash_del(t_hash *h) {
+    size_t i;
+    t_hash hash;
+    t_hashnode *tmp;
 
-void hash_free(t_hash *h) {
-	size_t i;
-	t_hnode *tmp_hnode;
-	t_qnode *tmp_qnode;
-
-	if (!h)
-		return ;
-	i = 0;
-	while (i < h->size) {
-		while (queue_size(h->array[i])) {
-			tmp_qnode = queue_deq(h->array[i]);
-			tmp_hnode = tmp_qnode->blob;
-			free(tmp_hnode->key);
-			h->del(tmp_hnode->blob);
-			free(tmp_hnode);
-			free(tmp_qnode);
-		}
-		queue_del(&h->array[i], queue_blob_free);
-		i++;
-	}
-	free(h->array);
-	free(h);
+    if (!h || !(hash = *h))
+        return;
+    i = 0;
+    while (i < hash->size) {
+        while (!lst_empty(hash->array[i])) {
+            tmp = lst_pop_back_blob(hash->array[i]);
+            free(tmp->key);
+            hash->del(tmp->blob);
+        }
+        lst_del(&hash->array[i++]);
+    }
+    free(hash->array);
+    free(hash);
+    *h = NULL;
 }

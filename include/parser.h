@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:40 by archid-           #+#    #+#             */
-/*   Updated: 2020/11/26 23:45:43 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/08 16:28:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@ bool valid_vertex_char(char c);
 bool valid_edge_line(char *line);
 bool valid_vertex_line(char *line);
 int valid_comment(char *line);
-bool valid_line(char *line, t_queue *verts, t_queue *edges);
-bool parse_edges(t_graph *g, t_queue *ledges);
-enum e_tag check_tag(t_graph *g, t_qnode **walk);
-bool parse_vertices(t_graph *g, t_queue *lverts);
-t_graph *parse_graph(t_queue *lverts, t_queue *ledges);
-t_graph *read_graph(void);
+bool valid_line(char *line, t_lst verts, t_lst edges);
+bool parse_edges(t_graph g, t_lst ledges);
+enum e_tag check_tag(t_graph g, t_lstnode *walk);
+bool parse_vertices(t_graph g, t_lst lverts);
+t_graph parse_graph(t_lst lverts, t_lst ledges);
+t_graph read_graph(void);
 
 extern int g_state;
 extern int g_ants;

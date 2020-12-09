@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/03 19:58:30 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/09 01:36:13 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int valid_comment(char *line) {
 	return *line == '#' && *(line + 1) != '#';
 }
 
-bool valid_line(char *line, t_queue *verts, t_queue *edges)
+bool valid_line(char *line, t_lst verts, t_lst edges)
 {
 	if (g_state == 0 && ft_isnumber(line))
 	{
@@ -93,33 +93,33 @@ bool valid_line(char *line, t_queue *verts, t_queue *edges)
 	}
 	if (g_state == 1 && valid_vertex_line(line))
 	{
-		queue_enq(verts, queue_node(line, sizeof(char *), false));
+		lst_push_back_blob(verts, line, sizeof(char *), false);
 		return true;
 	}
 	if (valid_edge_line(line))
 	{
 		g_state++;
-		queue_enq(edges, queue_node(line, sizeof(char *), false));
+	    lst_push_back_blob(edges, line, sizeof(char *), false);
 		return true;
 	}
 	return error_message(line);
 }
 
-void bind_edges(t_edge *e, t_edge *re) {
-	queue_enq(e->src->edges, queue_node(e, sizeof(t_edge *), false));
-	queue_enq(e->src->edges, queue_node(re, sizeof(t_edge *), false));
-	queue_enq(re->src->edges, queue_node(re, sizeof(t_edge *), false));
-	queue_enq(re->src->edges, queue_node(e, sizeof(t_edge *), false));
+static void bind_edges(t_edge e, t_edge re) {
+    lst_push_back_blob(e->src->edges, e, sizeof(t_edge *), false);
+	/* queue_enq(e->src->edges, queue_node(re, sizeof(t_edge *), false)); */
+    lst_push_back_blob(re->src->edges, re, sizeof(t_edge *), false);
+	/* queue_enq(re->src->edges, queue_node(e, sizeof(t_edge *), false)); */
 }
 
-bool parse_edges(t_graph *g, t_queue *ledges)
+bool parse_edges(t_graph g, t_lst ledges)
 {
-	t_qnode *walk;
-	t_hnode enode;
-	t_hnode renode;
+	t_lstnode walk;
+	t_hashnode enode;
+	t_hashnode renode;
 
-	walk = QFIRST(ledges);
-	while (walk != QTAIL(ledges))
+	walk = lst_front(ledges);
+	while (walk)
 	{
 		if (!edge_alloc(g, walk->blob, &enode, &renode))
 			return error_message(walk->blob), false;
@@ -129,98 +129,95 @@ bool parse_edges(t_graph *g, t_queue *ledges)
 		else
 			edge_del(enode.blob), edge_del(renode.blob);
 		free(enode.key), free(renode.key);
-		walk = walk->next;
+		lst_node_forward(&walk);
 	}
 	return true;
 }
 
-enum e_tag check_tag(t_graph *g, t_qnode **walk) {
+enum e_tag check_tag(t_graph g, t_lstnode *walk) {
 	char *tmp;
 
 	tmp = (*walk)->blob;
 	if (!ft_strncmp(tmp, "##", 2))
 	{
-		*walk = (*walk)->next;
+		lst_node_forward(walk);
 		if (!ft_strcmp(tmp, "##start"))
 			return g->source ? tag_error : tag_start;
 		else if (!ft_strcmp(tmp, "##end"))
 			return  g->sink ? tag_error : tag_end;
 	}
+
 	return tag_other;
 }
 
-bool parse_vertices(t_graph *g, t_queue *lverts) {
-	t_qnode *walk;
-	t_hnode hnode;
-	enum e_tag status;
+bool parse_vertices(t_graph g, t_lst lverts) {
+    t_lstnode walk;
+    t_hashnode hnode;
+    enum e_tag status;
 
-	walk = QFIRST(lverts);
-	while (walk != QTAIL(lverts))
-	{
-		status = check_tag(g, &walk);
-		if (!status || walk == QTAIL(lverts) ||
-			check_tag(g, &walk) != tag_other)
-			return error_message("Wrong tag"), false;
-		hnode = vertex_alloc(walk->blob);
-		if (!hash_add(g->vertices, hnode.key, hnode.blob))
-			return vertex_del(hnode.blob),
-				error_message(walk->blob),  false;
-		if (status == tag_start)
-			g->source = hnode.blob;
-		else if (status == tag_end)
-			g->sink = hnode.blob;
-		g->n_vertices++;
-		walk = walk->next;
-	}
-	return true;
+    walk = lst_front(lverts);
+    while (walk) {
+        status = check_tag(g, &walk);
+        if (!status || !walk || check_tag(g, &walk) != tag_other)
+            return error_message("Wrong tag"), false;
+        hnode = vertex_alloc(walk->blob);
+        if (!hash_add(g->vertices, hnode.key, hnode.blob))
+            return vertex_del(hnode.blob), error_message(walk->blob), false;
+        if (status == tag_start)
+            g->source = hnode.blob;
+        else if (status == tag_end)
+            g->sink = hnode.blob;
+        g->n_vertices++;
+        lst_node_forward(&walk);
+    }
+    return true;
 }
 
-void print_line(t_qnode *node) {
-	ft_printf("%s\n", node->blob);
+void print_line(void *line) { ft_printf("%s\n", line); }
+
+void print_map(t_lst lverts, t_lst ledges) {
+    ft_printf("%d\n", g_ants);
+    lst_iter(lverts, true, print_line);
+    lst_iter(ledges, true, print_line);
+    ft_putendl("");
 }
 
-void print_map(t_queue *lverts, t_queue *ledges) {
-	ft_printf("%d\n", g_ants);
-	queue_iter(lverts, true, print_line);
-	queue_iter(ledges, true, print_line);
-	ft_putendl("");
+t_graph parse_graph(t_lst lverts, t_lst ledges) {
+    t_graph g;
+
+    g = graph_init(hash_alloc(lst_size(lverts), vertex_del),
+                   hash_alloc(lst_size(ledges), edge_del));
+    if (!parse_vertices(g, lverts))
+        return graph_del(&g), NULL;
+    else if (!g->n_vertices) {
+        error_message("Empty map");
+        return graph_del(&g), NULL;
+    } else if (!parse_edges(g, ledges))
+        return graph_del(&g), NULL;
+    else if (!g->source || !g->sink) {
+        error_message("Source/Sink are not defined");
+        return graph_del(&g), NULL;
+    }
+    print_map(lverts, ledges);
+    return g;
 }
 
-t_graph *parse_graph(t_queue *lverts, t_queue *ledges) {
-	t_graph *g;
+t_graph read_graph(void) {
+    t_lst verts;
+    t_lst edges;
+    t_graph g;
+    char *line;
+    bool valid;
 
-	g = graph_init(hash_init(queue_size(lverts), vertex_del),
-				   hash_init(queue_size(ledges), edge_del));
-	if (!parse_vertices(g, lverts))
-		return graph_free(g), NULL;
-	else if (!g->n_vertices)
-		return error_message("Empty map"), graph_free(g), NULL;
-	else if (!parse_edges(g, ledges))
-		return graph_free(g), NULL;
-	else if (!g->source || !g->sink)
-		return error_message("Source/Sink are not defined"),
-			graph_free(g), NULL;
-	/* print_map(lverts, ledges); */
-	return g;
-}
-
-t_graph *read_graph(void) {
-	t_queue *verts;
-	t_queue *edges;
-	t_graph *g;
-	char *line;
-	bool valid;
-
-	valid = true;
-	verts = queue_init(), edges = queue_init();
-	while (valid && gnl(0, &line) > 0 && *line)
-		if (valid_comment(line))
-			free(line);
-		else if (!valid_line(line, verts, edges))
-			valid = false;
-	free(line), gnl_cleanup();
-	g =	(valid ? parse_graph(verts, edges) : NULL);
-	queue_del(&verts, queue_blob_free);
-	queue_del(&edges, queue_blob_free);
-	return g;
+    valid = true;
+    verts = lst_alloc(blob_free), edges = lst_alloc(blob_free);
+    while (valid && gnl(0, &line) > 0 && *line)
+        if (valid_comment(line))
+            free(line);
+        else if (!valid_line(line, verts, edges))
+            valid = false;
+    free(line), gnl_cleanup();
+    g = (valid ? parse_graph(verts, edges) : NULL);
+    lst_del(&verts), lst_del(&edges);
+    return g;
 }
