@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/11 19:46:12 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 14:26:15 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ static void hash_add_edge(t_hash parent, t_edge edge, t_edge from) {
 }
 
 static void edge_mark(t_edge e, t_mark mark) {
-	if (e->seen != M_BELONG_TO_PATH)
-		e->seen = mark;
+    if (e->seen != M_BELONG_TO_PATH)
+        e->seen = mark;
     if (e->src->seen != M_BELONG_TO_PATH)
         e->src->seen = mark;
     if (e->dst->seen != M_BELONG_TO_PATH)
@@ -45,7 +45,7 @@ static void edge_mark(t_edge e, t_mark mark) {
 
 static bool edge_unseen_or_crossing_path(t_edge e) {
     return (e->seen != g_mark && e->dst->seen != g_mark) ||
-            (e->seen != M_BELONG_TO_PATH && e->dst->seen == M_BELONG_TO_PATH);
+           (e->seen != M_BELONG_TO_PATH && e->dst->seen == M_BELONG_TO_PATH);
 }
 
 static bool edge_fresh(t_edge e) {
@@ -67,12 +67,12 @@ static bool enqueue_edges(t_edge e, t_lst open, t_hash parent,
     t_lstnode walk;
     t_edge next;
 
-    { ft_printf("\n%{white_bg}%{black_fg}edge enqueue:%{reset}\n"); }
+    /* { ft_printf("\n%{white_bg}%{black_fg}edge enqueue:%{reset}\n"); } */
     walk = lst_front(e->dst->edges);
     while (walk) {
         next = walk->blob;
         if (next->dst != e->src && check_edge(next)) {
-            { print_edge2(next); }
+            /* { print_edge2(next); } */
             hash_add_edge(parent, next, e);
             if (next->dst == g_graph->sink)
                 return true;
@@ -80,24 +80,25 @@ static bool enqueue_edges(t_edge e, t_lst open, t_hash parent,
         }
         lst_node_forward(&walk);
     }
-    { ft_putendl("========================================"); }
+    /* { ft_putendl("========================================"); } */
     return false;
 }
 
 static bool handle_edge(t_edge e, t_lst open, t_hash parent) {
     if (edge_fresh(e)) {
-        { ft_printf("%{green_fg}fresh%{reset}\n"); }
+        /* { ft_printf("%{green_fg}fresh%{reset}\n"); } */
         edge_mark(e, g_mark);
         return enqueue_edges(e, open, parent, edge_unseen_or_crossing_path);
     } else if (edge_crossing_path(e)) {
-        { ft_printf("%{red_fg}crossing a path%{reset}\n"); }
+        /* { ft_printf("%{red_fg}crossing a path%{reset}\n"); } */
         edge_mark(e, g_mark);
         return enqueue_edges(e, open, parent,
-                      edge_path_residual(e) ? edge_unseen_or_crossing_path
-                                            : edge_path_residual);
+                             edge_path_residual(e)
+                                 ? edge_unseen_or_crossing_path
+                                 : edge_path_residual);
     } else {
-        { ft_printf("%{yellow_fg}ignored%{reset}\n"); }
-		return false;
+        /* { ft_printf("%{yellow_fg}ignored%{reset}\n"); } */
+        return false;
     }
 }
 
@@ -106,7 +107,12 @@ static bool bfs_setup(t_graph g, t_lst *open, t_hash *parent) {
 
     if (!(g_graph = g))
         return false;
-    { ft_putendl("\nbfs setup "); }
+    {
+        /* ft_putendl("\nbfs setup "); */
+        /* ft_putendl("\n"); */
+        /* print_graph(g); */
+        /* ft_putendl("\n"); */
+    }
     g_graph->source->seen = M_FRESH;
     g_graph->sink->seen = M_FRESH;
     *parent = hash_alloc(g->n_vertices, lst_free);
@@ -114,7 +120,7 @@ static bool bfs_setup(t_graph g, t_lst *open, t_hash *parent) {
     walk = lst_front(g->source->edges);
     while (walk) {
         if (edge_fresh(walk->blob)) {
-            { print_edge2(walk->blob); }
+            /* { print_edge2(walk->blob); } */
             lst_push_back_blob(*open, walk->blob, sizeof(t_edge), false);
             hash_add_edge(*parent, walk->blob, NULL);
         }
@@ -165,10 +171,10 @@ t_lst bfs(t_graph g) {
     sink_reached = false;
     while (!sink_reached && !lst_empty(open)) {
         e = lst_pop_front_blob(open);
-        {
-            ft_printf("\n%{bold}edge dequeue:%{reset} ");
-            print_edge(e);
-        }
+        /* { */
+        /*     ft_printf("\n%{bold}edge dequeue:%{reset} "); */
+        /*     print_edge(e); */
+        /* } */
         sink_reached = handle_edge(e, open, parent);
     }
     lst_del(&open);

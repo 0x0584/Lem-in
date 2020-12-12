@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 00:57:00 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 14:17:10 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ t_network netflow_setup(t_graph graph, size_t units) {
         correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
     ft_printf("\n%{green_fg}final paths%{reset}\n");
     lst_iter(lst_insertion_sort(paths, shortest_path), true, print_path);
+	assert_paths_correct(graph, paths);
     net = netflow_alloc(paths, units);
     lst_del(&paths);
     return net;

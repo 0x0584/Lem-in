@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 00:33:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 14:30:24 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,10 +340,8 @@ t_lst lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *)) {
         return lst;
     walk = lst_front(lst);
     while (walk) {
-        pivot = walk;
         front = lst_front(lst);
-        if (!lst_node_forward(&pivot))
-            break;
+        pivot = walk, lst_node_forward(&walk);
         while (front != pivot) {
             if (cmp(front->blob, pivot->blob) > 0)
                 lst_node_forward(&front);
@@ -352,7 +350,6 @@ t_lst lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *)) {
                 break;
             }
         }
-        lst_node_forward(&walk);
     }
     return lst;
 }

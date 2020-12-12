@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/10 13:35:30 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 14:08:13 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +58,12 @@ t_lst bfs(t_graph g);
 void correct_paths(t_lst paths);
 
 void assert_path_connected(t_lst path);
-void assert_path_has_correct_edges(t_lst path);
-void assert_paths_correct(t_lst paths);
+void assert_path_has_correct_edges(t_graph g, t_lst path);
+void assert_paths_correct(t_graph g, t_lst paths);
 
 void print_edge(t_edge e);
 void print_graph(t_graph g);
 void print_edge2(void *blob);
 
+void mark_path(void *lst);
 #endif /* GRAPH_H */

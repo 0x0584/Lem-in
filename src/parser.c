@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/11 02:18:36 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 14:10:44 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,11 +197,6 @@ t_graph parse_graph(t_lst lverts, t_lst ledges) {
         return graph_del(&g), NULL;
     }
     print_map(lverts, ledges);
-    {
-        ft_putendl("\n");
-        print_graph(g);
-        ft_putendl("\n");
-    }
     return g;
 }
 
