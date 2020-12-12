@@ -6,12 +6,11 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/03 20:01:41 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/09 14:17:33 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-FARM		= big_s
-
+FARM		= crossmap
 DEBUG		?= 1
 
 CC			= gcc
@@ -36,10 +35,8 @@ distcheck:
 	$(CC) --version
 
 check:
-	@make fclean
-	ls -lR
 	@make all
-	./$(NAME) < $(FARM)
+	@./$(NAME) < $(FARM)
 
 # echo "Exit status: $(?)"
 

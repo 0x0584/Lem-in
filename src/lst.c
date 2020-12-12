@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 01:49:12 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 00:33:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ void lst_node_del_with(t_lstnode *anode, void (*del)(void *blob)) {
     *anode = NULL;
 }
 
-void lst_node_del(t_lst q, t_lstnode *anode) {
-    lst_node_del_with(anode, q->del);
+void lst_node_del(t_lst lst, t_lstnode *anode) {
+    lst_node_del_with(anode, lst->del);
 }
 
 t_lst lst_alloc(void (*del)(void *blob)) {
@@ -48,10 +48,10 @@ t_lst lst_alloc(void (*del)(void *blob)) {
     lst = malloc(sizeof(struct s_lst));
     lst->head = lst_node(NULL, 0, false);
     lst->tail = lst_node(NULL, 0, false);
-	lst->head->prev = NULL;
+    lst->head->prev = NULL;
     lst->head->next = lst->tail;
     lst->tail->prev = lst->head;
-	lst->tail->next = NULL;
+    lst->tail->next = NULL;
     lst->size = 0;
     lst->del = del;
     return (lst);
@@ -60,7 +60,7 @@ t_lst lst_alloc(void (*del)(void *blob)) {
 void lst_del_with(t_lst *alst, void (*del)(void *blob)) {
     t_lstnode walk;
     t_lstnode tmp;
-	t_lst lst;
+    t_lst lst;
 
     if (!del || !alst || !(lst = *alst))
         return;
@@ -78,15 +78,14 @@ void lst_del_with(t_lst *alst, void (*del)(void *blob)) {
 
 void lst_del(t_lst *alst) {
     if (alst && *alst)
-		lst_del_with(alst, (*alst)->del);
+        lst_del_with(alst, (*alst)->del);
 }
 
-
 void lst_free(void *lst) {
-	t_lst tmp;
+    t_lst tmp;
 
     if ((tmp = lst))
-		lst_del(&tmp);
+        lst_del(&tmp);
 }
 
 size_t lst_size(t_lst lst) { return lst ? lst->size : 0; }
@@ -102,6 +101,22 @@ t_lstnode lst_front(t_lst lst) {
 
 t_lstnode lst_rear(t_lst lst) {
     return lst_empty(lst) ? NULL : lst_tail(lst)->prev;
+}
+
+void *lst_front_blob(t_lst lst) {
+    t_lstnode front;
+
+    if (!(front = lst_front(lst)))
+        return NULL;
+    return front->blob;
+}
+
+void *lst_rear_blob(t_lst lst) {
+    t_lstnode rear;
+
+    if (!(rear = lst_rear(lst)))
+        return NULL;
+    return rear->blob;
 }
 
 t_lst lst_push_front(t_lst lst, t_lstnode node) {
@@ -215,20 +230,162 @@ void lst_iteri(t_lst lst, bool front,
     }
 }
 
-void lst_node_forward(t_lstnode *anode) {
+bool lst_node_forward(t_lstnode *anode) {
     t_lstnode next;
 
     if (!anode || !*anode)
-        return;
+        return false;
     next = (*anode)->next;
-    *anode = next->next ? next : NULL;
+    return (*anode = next->next ? next : NULL);
 }
 
-void lst_node_backward(t_lstnode *anode) {
+bool lst_node_backward(t_lstnode *anode) {
     t_lstnode prev;
 
     if (!anode || !*anode)
-        return;
+        return false;
     prev = (*anode)->prev;
-    *anode = prev->prev ? prev : NULL;
+    return (*anode = prev->prev ? prev : NULL);
+}
+
+t_lst lst_insert_at(t_lst lst, t_lstnode at, t_lstnode node) {
+    if (!lst || !at || !node || at == node)
+        return lst;
+    else if (at == lst->head)
+        return lst_push_front(lst, node);
+    else if (at == lst->tail)
+        return lst_push_back(lst, node);
+    node->prev = at->prev;
+    at->prev->next = node;
+    at->prev = node;
+    node->next = at;
+    lst->size++;
+    return lst;
+}
+
+t_lst lst_insert_after(t_lst lst, t_lstnode before, t_lstnode node) {
+    if (!lst || !before || !node)
+        return lst;
+    else if (before == lst->tail)
+        return lst_push_back(lst, node);
+    else
+        return lst_insert_at(lst, before->next, node);
+}
+
+t_lst lst_insert_before(t_lst lst, t_lstnode after, t_lstnode node) {
+    if (!lst || !after || !node)
+        return lst;
+    else if (after == lst->head)
+        return lst_push_front(lst, node);
+    else
+        return lst_insert_at(lst, after->prev, node);
+}
+
+void lst_remove(t_lst lst, t_lstnode *node) {
+    t_lstnode tmp;
+
+    if ((tmp = lst_extract(lst, *node))) {
+        lst_node_del(lst, &tmp);
+        *node = NULL;
+    }
+}
+
+void lst_remove_next(t_lst lst, t_lstnode node) {
+    t_lstnode tmp;
+
+    if (node) {
+        tmp = node->next;
+        lst_remove(lst, &tmp);
+    }
+}
+
+void lst_remove_previous(t_lst lst, t_lstnode node) {
+    t_lstnode tmp;
+
+    if (node) {
+        tmp = node->prev;
+        lst_remove(lst, &tmp);
+    }
+}
+
+t_lstnode lst_extract(t_lst lst, t_lstnode node) {
+    if (!lst || !node || lst->head == node || lst->tail == node)
+        return NULL;
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    node->next = NULL;
+    node->prev = NULL;
+    lst->size--;
+    return node;
+}
+
+void *lst_extract_blob(t_lst lst, t_lstnode *node) {
+    t_lstnode tmp;
+    void *blob;
+
+    if (!node || !*node || !(tmp = lst_extract(lst, *node)))
+        return NULL;
+    blob = tmp->blob;
+    lst_node_del_with(&tmp, blob_keep);
+    *node = NULL;
+    return blob;
+}
+
+t_lst lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *)) {
+    t_lstnode walk;
+    t_lstnode front;
+    t_lstnode pivot;
+
+    if (lst_size(lst) < 2)
+        return lst;
+    walk = lst_front(lst);
+    while (walk) {
+        pivot = walk;
+        front = lst_front(lst);
+        if (!lst_node_forward(&pivot))
+            break;
+        while (front != pivot) {
+            if (cmp(front->blob, pivot->blob) > 0)
+                lst_node_forward(&front);
+            else {
+                lst_insert_at(lst, front, lst_extract(lst, pivot));
+                break;
+            }
+        }
+        lst_node_forward(&walk);
+    }
+    return lst;
+}
+
+void lst_clear(t_lst lst) {
+    t_lstnode tmp;
+
+    while (!lst_empty(lst)) {
+        tmp = lst_pop_back(lst);
+        lst_node_del(lst, &tmp);
+    }
+}
+
+t_lst lst_copy(t_lst lst, void *(*func_copy)(void *), void (*del)(void *)) {
+    t_lst copy;
+    t_lstnode walk;
+
+    if (!(walk = lst_front(lst)) || !func_copy)
+        return NULL;
+    copy = lst_alloc(del);
+    while (walk) {
+        lst_push_back_blob(copy, func_copy(walk->blob), walk->size, false);
+        lst_node_forward(&walk);
+    }
+    return copy;
+}
+
+static void *blob_identity(void *blob) { return blob; }
+
+t_lst lst_copy_shallow(t_lst lst) {
+    return lst_copy(lst, blob_identity, blob_keep);
+}
+
+t_lst lst_copy_deep(t_lst lst, void *(copy)(void *)) {
+    return lst_copy(lst, copy, blob_free);
 }

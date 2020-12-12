@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:35 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/08 23:35:21 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 00:55:01 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,8 @@ typedef struct s_network {
 t_network netflow_setup(t_graph graph, size_t units);
 void netflow_pushflow(t_network net);
 void netflow_del(t_network *anet);
+
+int shortest_path(void *path_a, void *path_b);
+void print_path(void *path);
 
 #endif /* NETFLOW_H */

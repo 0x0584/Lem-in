@@ -6,33 +6,26 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/23 01:02:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 00:20:09 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/11 19:25:06 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "graph.h"
 
-void print_edge(t_edge e) {
-    if (!e)
-        return;
-    ft_printf("[src: %s(%d) | dst: %s(%d)](%d) ", e->src->name, e->src->seen,
-              e->dst->name, e->dst->seen, e->seen);
-}
-
 void assert_path_connected(t_lst path) {
-	t_lstnode walk;
-	t_edge edge;
-	t_edge prev;
+    t_lstnode walk;
+    t_edge edge;
+    t_edge prev;
 
-	prev = NULL;
-	walk = lst_front(path);
-	while (walk) {
-		edge = walk->blob;
-		if (prev && prev->dst != edge->src)
+    prev = NULL;
+    walk = lst_front(path);
+    while (walk) {
+        edge = walk->blob;
+        if (prev && prev->dst != edge->src)
             exit(ft_dprintf(2, "%s\n", "PATH IS NOT CONNECTED"));
-		prev = edge;
-		lst_node_forward(&walk);
-	}
+        prev = edge;
+        lst_node_forward(&walk);
+    }
 }
 
 void assert_path_has_correct_edges(t_lst path) {
@@ -44,8 +37,8 @@ void assert_path_has_correct_edges(t_lst path) {
         e = walk->blob;
         if (e->residual->seen == e->seen)
             exit(ft_dprintf(2, "%s\n", "PATH HAS RESIDUAL EDGE"));
-        if (e->seen != BELONG_TO_PATH || e->src->seen != BELONG_TO_PATH ||
-            e->dst->seen != BELONG_TO_PATH)
+        if (e->seen != M_BELONG_TO_PATH || e->src->seen != M_BELONG_TO_PATH ||
+            e->dst->seen != M_BELONG_TO_PATH)
             exit(ft_dprintf(2, "%s\n", "PATH HAS AN INCORRECT EDGE"));
         lst_node_forward(&walk);
     }
@@ -57,7 +50,7 @@ void assert_paths_correct(t_lst paths) {
     walk = lst_front(paths);
     while (walk) {
         assert_path_connected(walk->blob);
-        /* assert_path_has_correct_edges(walk->blob); */
+        assert_path_has_correct_edges(walk->blob);
         lst_node_forward(&walk);
     }
 }
@@ -75,12 +68,13 @@ void vertex_del(void *vert)
 
 void edge_del(void *edge)
 {
-	free(edge);
+	if (edge)
+		free(edge);
 }
 
 void vertex_init(t_vertex vert, char *name, int x, int y) {
 	vert->name = name;
-	vert->edges = lst_alloc(blob_free);
+	vert->edges = lst_alloc(blob_keep);
 	vert->x = x;
 	vert->y = y;
 	vert->seen = 0;
@@ -158,12 +152,45 @@ t_graph graph_init(t_hash V, t_hash E)
 	return (g);
 }
 
-void	graph_del(t_graph *g)
-{
-	if (!g || !*g)
-		return ;
-	hash_del(&(*g)->vertices);
-	hash_del(&(*g)->edges);
-	free(*g);
-	*g = NULL;
+void graph_del(t_graph *g) {
+    if (!g || !*g)
+        return;
+    hash_del(&(*g)->vertices);
+    hash_del(&(*g)->edges);
+    free(*g);
+    *g = NULL;
+}
+
+void print_edge(t_edge e) {
+    if (!e)
+        return;
+    ft_printf("[%s(%{bold}%{magenta_fg}%d%{reset})-%s(%{bold}%{magenta_fg}%d%{"
+              "reset})](%{bold}%{magenta_fg}%d%{reset}) ",
+              e->src->name, e->src->seen, e->dst->name, e->dst->seen, e->seen);
+}
+
+void print_edge2(void *blob) {
+    t_edge e;
+
+    e = blob;
+    print_edge(e);
+    ft_putstr("--- ");
+    print_edge(e->residual);
+    ft_putendl("");
+}
+
+void print_vertex(const char *key, void *vertex) {
+    t_vertex v;
+
+    (void)key;
+    v = vertex;
+    ft_printf("vertex: %s (%d, %d)\n\n", v->name, v->x, v->y);
+    lst_iter(v->edges, true, print_edge2);
+    ft_printf("\n----------------\n");
+}
+
+void print_graph(t_graph g) {
+    ft_printf("n_vertices: %zu\nn_edges: %zu\n", hash_count(g->vertices),
+              hash_count(g->edges) / 2);
+    hash_iter(g->vertices, print_vertex);
 }

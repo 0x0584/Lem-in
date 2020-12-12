@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 01:36:13 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/11 02:18:36 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,7 @@ bool valid_line(char *line, t_lst verts, t_lst edges)
 
 static void bind_edges(t_edge e, t_edge re) {
     lst_push_back_blob(e->src->edges, e, sizeof(t_edge *), false);
-	/* queue_enq(e->src->edges, queue_node(re, sizeof(t_edge *), false)); */
     lst_push_back_blob(re->src->edges, re, sizeof(t_edge *), false);
-	/* queue_enq(re->src->edges, queue_node(e, sizeof(t_edge *), false)); */
 }
 
 bool parse_edges(t_graph g, t_lst ledges)
@@ -199,6 +197,11 @@ t_graph parse_graph(t_lst lverts, t_lst ledges) {
         return graph_del(&g), NULL;
     }
     print_map(lverts, ledges);
+    {
+        ft_putendl("\n");
+        print_graph(g);
+        ft_putendl("\n");
+    }
     return g;
 }
 

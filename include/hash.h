@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:23 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/08 17:28:17 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/09 16:40:21 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,11 @@ typedef struct s_hash {
 
 t_hash hash_alloc(size_t size, void (*del)(void *));
 
-bool hash_add(t_hash h, char *key, void *blob);
+bool hash_add(t_hash h, const char *key, void *blob);
 void hash_del(t_hash *h);
-void *hash_get(t_hash h, char *key, void *val_default);
+void *hash_get(t_hash h, const char *key, void *val_default);
 void hash_default_del(void *ptr);
+size_t hash_count(t_hash h);
+void hash_iter(t_hash h, void (*callback)(const char *key, void *blob));
 
 #endif /* HASH_H */

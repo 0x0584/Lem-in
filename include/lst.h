@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/08 23:03:58 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 00:23:58 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,6 @@ typedef struct s_lst {
     void (*del)(void *blob);
 } * t_lst;
 
-void blob_free(void *blob);
-void blob_keep(void *blob);
-
 t_lstnode lst_node(void *blob, size_t size, bool alloc);
 void lst_node_del(t_lst lst, t_lstnode *anode);
 void lst_node_del_with(t_lstnode *anode, void (*del)(void *blob));
@@ -45,6 +42,7 @@ size_t lst_size(t_lst lst);
 bool lst_empty(t_lst lst);
 t_lstnode lst_head(t_lst lst);
 t_lstnode lst_tail(t_lst lst);
+
 t_lstnode lst_front(t_lst lst);
 t_lstnode lst_rear(t_lst lst);
 
@@ -53,16 +51,40 @@ t_lst lst_push_back(t_lst lst, t_lstnode node);
 t_lstnode lst_pop_back(t_lst lst);
 t_lstnode lst_pop_front(t_lst lst);
 
+void lst_iter(t_lst lst, bool front, void (*apply)(void *blob));
+void lst_iteri(t_lst lst, bool front,
+               void (*index_apply)(void *blob, size_t index));
+
+bool lst_node_forward(t_lstnode *anode);
+bool lst_node_backward(t_lstnode *anode);
+
+t_lst lst_insert_at(t_lst lst, t_lstnode at, t_lstnode node);
+t_lst lst_insert_after(t_lst lst, t_lstnode before, t_lstnode node);
+t_lst lst_insert_before(t_lst lst, t_lstnode after, t_lstnode node);
+t_lstnode lst_extract(t_lst lst, t_lstnode node);
+
+t_lst lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *));
+
+void blob_free(void *blob);
+void blob_keep(void *blob);
+
+void *lst_front_blob(t_lst lst);
+void *lst_rear_blob(t_lst lst);
+
 t_lst lst_push_front_blob(t_lst lst, void *blob, size_t size, bool alloc);
 t_lst lst_push_back_blob(t_lst lst, void *blob, size_t size, bool alloc);
 void *lst_pop_back_blob(t_lst lst);
 void *lst_pop_front_blob(t_lst lst);
 
-void lst_iter(t_lst lst, bool front, void (*apply)(void *blob));
-void lst_iteri(t_lst lst, bool front,
-               void (*index_apply)(void *blob, size_t index));
+void *lst_extract_blob(t_lst lst, t_lstnode *node);
+void lst_clear(t_lst lst);
 
-void lst_node_forward(t_lstnode *anode);
-void lst_node_backward(t_lstnode *anode);
+t_lst lst_copy(t_lst lst, void *(*func_copy)(void *), void (*del)(void *));
+t_lst lst_copy_shallow(t_lst lst);
+t_lst lst_copy_deep(t_lst lst, void *(copy)(void *));
+
+void lst_remove(t_lst lst, t_lstnode *node);
+void lst_remove_next(t_lst lst, t_lstnode node);
+void lst_remove_previous(t_lst lst, t_lstnode node);
 
 #endif

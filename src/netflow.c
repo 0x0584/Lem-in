@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 00:03:31 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 00:57:00 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ static void flow_free(void *blob) {
     i = 0;
     while (i < flow->size)
         free(flow->stage[i++].vertex);
+    free(flow->stage);
     free(flow);
 }
 
@@ -69,15 +70,14 @@ t_network netflow_setup(t_graph graph, size_t units) {
     paths = lst_alloc(lst_free);
     while ((path = bfs(graph)))
         correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
+    ft_printf("\n%{green_fg}final paths%{reset}\n");
+    lst_iter(lst_insertion_sort(paths, shortest_path), true, print_path);
     net = netflow_alloc(paths, units);
     lst_del(&paths);
     return net;
 }
 
-void netflow_pushflow(t_network net) {
-    ;
-    ;
-}
+void netflow_pushflow(t_network net) {}
 
 void netflow_del(t_network *anet) {
     t_network net;

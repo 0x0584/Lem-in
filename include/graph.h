@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 00:18:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/10 13:35:30 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "hash.h"
 
-typedef enum e_mark { FRESH, BELONG_TO_PATH, INITIAL } t_mark;
+typedef enum e_mark { M_FRESH, M_BELONG_TO_PATH, M_INITIAL } t_mark;
 
 typedef struct s_vertex *t_vertex;
 typedef struct s_edge *t_edge;
@@ -62,5 +62,7 @@ void assert_path_has_correct_edges(t_lst path);
 void assert_paths_correct(t_lst paths);
 
 void print_edge(t_edge e);
+void print_graph(t_graph g);
+void print_edge2(void *blob);
 
 #endif /* GRAPH_H */
