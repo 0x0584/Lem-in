@@ -6,7 +6,7 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/09 14:17:33 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/13 20:07:51 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -24,6 +24,8 @@ endif
 
 CFLAGS		+= -Wall -Wextra -Ilibft -Iinclude
 
+default: all
+
 info:
 	@echo "make [all|clean|fclean|re|ft|check|distcheck|info]"
 
@@ -40,4 +42,4 @@ check:
 
 # echo "Exit status: $(?)"
 
-.PHONY: ft init check distcheck info
+.PHONY: ft init check distcheck info default
