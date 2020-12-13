@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 14:30:24 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/13 00:44:30 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -385,4 +385,16 @@ t_lst lst_copy_shallow(t_lst lst) {
 
 t_lst lst_copy_deep(t_lst lst, void *(copy)(void *)) {
     return lst_copy(lst, copy, blob_free);
+}
+
+t_lst lst_shrink(t_lst lst, bool from_head, size_t size) {
+	t_lstnode (*func)(t_lst);
+	t_lstnode tmp;
+
+	if (lst_size(lst) <= size)
+		return lst;
+	func = from_head ? lst_pop_front : lst_pop_back;
+	while (lst_size(lst) > size)
+		tmp = func(lst), lst_node_del(lst, &tmp);
+	return lst;
 }

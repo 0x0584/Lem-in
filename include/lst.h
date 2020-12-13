@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 00:23:58 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/12 22:51:29 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,7 @@ t_lst lst_copy_deep(t_lst lst, void *(copy)(void *));
 void lst_remove(t_lst lst, t_lstnode *node);
 void lst_remove_next(t_lst lst, t_lstnode node);
 void lst_remove_previous(t_lst lst, t_lstnode node);
+
+t_lst lst_shrink(t_lst lst, bool from_head, size_t size);
 
 #endif
