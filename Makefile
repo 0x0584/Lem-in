@@ -6,15 +6,19 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/18 19:51:22 by archid-           #+#    #+#              #
-#    Updated: 2020/12/09 14:22:32 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/14 22:42:32 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 include config.mk
 
+INC_PATH	= include
+INCLUDES	= $(shell find $(INC_PATH) -name '*.h' -type f)
+
 SRC_PATH	= src
 SRC_NAME	= lst.c graph.c bfs.c netflow.c main.c \
-			  correction.c parser.c hash.c
+			  correction.c parser.c hash.c vizu.c
+
 OBJ_PATH	= .obj
 OBJ_NAME	:= $(SRC_NAME:.c=.o)
 OBJ			:= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
@@ -33,7 +37,7 @@ endif
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INCLUDES)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
