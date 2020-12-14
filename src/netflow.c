@@ -6,48 +6,49 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/14 17:12:27 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/14 17:49:44 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
 
 static size_t last_flow;
+static bool visualize = false;
 
-static void print_flow_info(void *pflow) {
-    t_flow flow;
-    size_t i;
+/* static void print_flow_info(void *pflow) { */
+/*     t_flow flow; */
+/*     size_t i; */
 
-    if (!(flow = pflow))
-        return;
-    ft_printf("n edges: %zu ", flow->size);
-    ft_printf("total units: %zu ", flow->total_units);
-    i = 0;
-    while (i < flow->size) {
-        ft_printf(" | %{magenta_fg}[%d]%{italic}%5s%{reset} ", i,
-                  flow->stage[i].vertex);
-        i++;
-    }
-    ft_putendl(" |");
-}
+/*     if (!(flow = pflow)) */
+/*         return; */
+/*     ft_printf("n edges: %zu ", flow->size); */
+/*     ft_printf("total units: %zu ", flow->total_units); */
+/*     i = 0; */
+/*     while (i < flow->size) { */
+/*         ft_printf(" | %{magenta_fg}[%d]%{italic}%5s%{reset} ", i, */
+/*                   flow->stage[i].vertex); */
+/*         i++; */
+/*     } */
+/*     ft_putendl(" |"); */
+/* } */
 
-static void flow_print(void *pflow) {
-    size_t i;
-    t_flow flow;
+/* static void flow_print(void *pflow) { */
+/*     size_t i; */
+/*     t_flow flow; */
 
-    if (!(flow = pflow))
-        return;
-    i = 0;
-    while (i < flow->size) {
-        if (flow->stage[i].unit != NIL_ANT)
-            ft_printf(" | %{magenta_fg}[%d]%{italic}%zu-%s%{reset} ", i,
-                      flow->stage[i].unit, flow->stage[i].vertex);
-        else
-            ft_printf(" | %{bold}*[%d]no ant*%{reset} ", i);
-        i++;
-    }
-    ft_putendl(" |");
-}
+/*     if (!(flow = pflow)) */
+/*         return; */
+/*     i = 0; */
+/*     while (i < flow->size) { */
+/*         if (flow->stage[i].unit != NIL_ANT) */
+/*             ft_printf(" | %{magenta_fg}[%d]%{italic}%zu-%s%{reset} ", i, */
+/*                       flow->stage[i].unit, flow->stage[i].vertex); */
+/*         else */
+/*             ft_printf(" | %{bold}*[%d]no ant*%{reset} ", i); */
+/*         i++; */
+/*     } */
+/*     ft_putendl(" |"); */
+/* } */
 
 #define DEFAULT_COLOR "%{reset}"
 #define BORDER_COLOR "%{bold}%{magenta_fg}"
@@ -96,6 +97,8 @@ static void print_flows_ascii(t_lst flows) {
 }
 
 static void network_print(t_network net, size_t maxflow) {
+    system("clear");
+
     /* ft_putendl(""); */
     /* ft_printf("n_flows: %zu\n", lst_size(net->flows)); */
     /* ft_printf("n_units: %zu\n", net->n_units); */
@@ -113,7 +116,6 @@ static void network_print(t_network net, size_t maxflow) {
         ft_printf(" %{red_fg}%zu%{reset}", maxflow);
     print_flows_ascii(net->flows);
     system("sleep 1");
-    system("clear");
 }
 
 static void flow_free(void *blob) {
@@ -206,8 +208,8 @@ static void netflow_regulate(t_network net) {
     }
 
     {
-        lst_iter(net->flows, true, print_flow_info);
-        ft_putendl("\n");
+        /* lst_iter(net->flows, true, print_flow_info); */
+        /* ft_putendl("\n"); */
     }
 }
 
@@ -253,15 +255,15 @@ static void netflow_prepare(t_graph graph, t_network net) {
         correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
         lst_iter_arg(lst_insertion_sort(paths, shortest_path), true,
                      lst_clear(flows), path_to_flow);
-        if ((result = netflow_simulate(net)) > prev) {
+        if ((result = netflow_simulate(net)) >= prev) {
             lst_node_free(flows, lst_extract(flows, lst_rear(flows)));
             break;
         }
         prev = result;
     }
     {
-        ft_printf("\n%{green_fg}final paths%{reset}\n");
-        lst_iter(paths, true, print_path);
+        /* ft_printf("\n%{green_fg}final paths%{reset}\n"); */
+        /* lst_iter(paths, true, print_path); */
         assert_paths_correct(graph, paths);
     }
     lst_del(&paths);
@@ -305,10 +307,9 @@ void netflow_pushflow(t_network net) {
     netflow_regulate(net);
     unit = 1;
     flag = true;
-    {
-        /* system("clear"); */
-        /* network_print(net, 0); */
-        /* ft_putendl(""); */
+    if (visualize) {
+        network_print(net, 0);
+        ft_putendl("");
     }
     while (flag) {
         maxflow = 0;
@@ -324,8 +325,8 @@ void netflow_pushflow(t_network net) {
             flow_out(walk->blob);
             lst_node_forward(&walk);
         }
-        { /* network_print(net, maxflow); */
-        }
+        if (visualize)
+            network_print(net, maxflow);
         walk = lst_front(net->flows);
         while (walk) {
             flag = flow_sync(walk->blob) || flag;
@@ -333,7 +334,9 @@ void netflow_pushflow(t_network net) {
         }
         ft_putstr(flag ? "\n" : "");
     }
-    { /* network_print(net, maxflow); */
+    if (visualize) {
+        network_print(net, maxflow);
+        system("tail -f /dev/null");
     }
     ft_putendl("");
 }

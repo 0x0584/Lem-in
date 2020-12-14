@@ -6,12 +6,12 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/13 20:07:51 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/14 17:51:56 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 FARM		= crossmap
-DEBUG		?= 1
+DEBUG		?= 0
 
 CC			= gcc
 LDFLAGS		= -Llibft -lft
@@ -38,7 +38,7 @@ distcheck:
 
 check:
 	@make all
-	@./$(NAME) < $(FARM)
+	@./test2.sh
 
 # echo "Exit status: $(?)"
 
