@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/13 20:48:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/14 17:12:27 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ static t_flow flow_alloc(t_lst path) {
     size_t i;
 
     flow = malloc(sizeof(struct s_flow));
-    flow->total_units = NIL_ANT;
+    flow->total_units = 0;
     flow->size = lst_size(path);
     flow->stage = malloc(flow->size * sizeof(t_flow_pair));
     i = 0;
@@ -148,38 +148,6 @@ static t_flow flow_alloc(t_lst path) {
         i++, lst_node_forward(&walk);
     }
     return flow;
-}
-
-static t_network netflow_alloc(t_lst paths, size_t units) {
-    t_network net;
-    t_lstnode walk;
-
-    net = malloc(sizeof(struct s_network));
-    net->flows = lst_alloc(flow_free);
-    walk = lst_front(paths);
-    while (walk) {
-        lst_push_back_blob(net->flows, flow_alloc(walk->blob), sizeof(t_flow),
-                           false);
-        lst_node_forward(&walk);
-    }
-    net->n_units = units;
-    return net;
-}
-
-t_network netflow_setup(t_graph graph, size_t units) {
-    t_network net;
-    t_lst path;
-    t_lst paths;
-
-    paths = lst_alloc(lst_free);
-    while ((path = bfs(graph)))
-        correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
-    ft_printf("\n%{green_fg}final paths%{reset}\n");
-    lst_iter(lst_insertion_sort(paths, shortest_path), true, print_path);
-    assert_paths_correct(graph, paths);
-    net = netflow_alloc(paths, units);
-    lst_del(&paths);
-    return net;
 }
 
 static bool flow_push(t_flow flow, size_t unit) {
@@ -205,46 +173,11 @@ static bool flow_sync(t_flow flow) {
     return flag;
 }
 
-static void flow_out(t_flow flow) {
-    size_t i;
-
-    i = flow->size;
-    while (i--)
-        if (flow->stage[i].unit != NIL_ANT) {
-            ft_printf("L%zu-%s ", flow->stage[i].unit, flow->stage[i].vertex);
-        }
+static void path_to_flow(void *path, void *flows) {
+    lst_push_back_blob(flows, flow_alloc(path), sizeof(t_flow), false);
 }
 
-static size_t netflow_simulate(t_network net, size_t n_paths) {
-    t_lst paths;
-    t_lstnode walk;
-    size_t instructions;
-    size_t unit;
-    bool flag;
-
-    unit = 0;
-    instructions = 0;
-    paths = lst_shrink(lst_copy_shallow(net->flows), false, n_paths);
-    flag = true;
-    while (flag) {
-        flag = false;
-        walk = lst_front(paths);
-        while (walk && unit < net->n_units) {
-            flow_push(walk->blob, ++unit);
-            lst_node_forward(&walk);
-        }
-        walk = lst_front(paths);
-        while (walk) {
-            flag = flow_sync(walk->blob) || flag;
-            lst_node_forward(&walk);
-        }
-        instructions++;
-    }
-    lst_del(&paths);
-    return instructions;
-}
-
-static void netflow_regulate(t_network net, size_t n_paths) {
+static void netflow_regulate(t_network net) {
     t_lstnode walk;
     t_flow flow_a;
     t_flow flow_b;
@@ -253,7 +186,6 @@ static void netflow_regulate(t_network net, size_t n_paths) {
     size_t mod;
 
     sum = 0;
-    lst_shrink(net->flows, false, n_paths);
     walk = lst_front(net->flows);
     flow_a = lst_rear_blob(net->flows);
     while (walk) {
@@ -279,23 +211,89 @@ static void netflow_regulate(t_network net, size_t n_paths) {
     }
 }
 
-static void netflow_prepare(t_network net) {
-    size_t result;
-    size_t n_paths;
-    size_t prev;
+static size_t netflow_simulate(t_network net) {
     t_lstnode walk;
+    size_t instructions;
+    size_t unit;
+    bool flag;
 
-    n_paths = 1;
-    prev = NIL_ANT;
-    walk = lst_front(net->flows);
-    while (walk) {
-        if ((result = netflow_simulate(net, n_paths)) >= prev)
-            break;
-        prev = result;
-        if (lst_node_forward(&walk))
-            n_paths++;
+    netflow_regulate(net);
+    unit = 0;
+    flag = true;
+    instructions = 0;
+    while (flag) {
+        flag = false;
+        walk = lst_front(net->flows);
+        while (walk && unit < net->n_units) {
+            if (flow_push(walk->blob, unit))
+                unit++;
+            lst_node_forward(&walk);
+        }
+        walk = lst_front(net->flows);
+        while (walk) {
+            flag = flow_sync(walk->blob) || flag;
+            lst_node_forward(&walk);
+        }
+        instructions += flag;
     }
-    netflow_regulate(net, n_paths);
+    return instructions;
+}
+
+static void netflow_prepare(t_graph graph, t_network net) {
+    t_lst path;
+    t_lst paths;
+    t_lst flows;
+    size_t result;
+    size_t prev;
+
+    prev = NIL_ANT;
+    flows = net->flows;
+    paths = lst_alloc(lst_free);
+    while ((path = bfs(graph))) {
+        correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
+        lst_iter_arg(lst_insertion_sort(paths, shortest_path), true,
+                     lst_clear(flows), path_to_flow);
+        if ((result = netflow_simulate(net)) > prev) {
+            lst_node_free(flows, lst_extract(flows, lst_rear(flows)));
+            break;
+        }
+        prev = result;
+    }
+    {
+        ft_printf("\n%{green_fg}final paths%{reset}\n");
+        lst_iter(paths, true, print_path);
+        assert_paths_correct(graph, paths);
+    }
+    lst_del(&paths);
+}
+
+t_network netflow_setup(t_graph graph, size_t units) {
+    t_network net;
+
+    net = malloc(sizeof(struct s_network));
+    net->flows = lst_alloc(flow_free);
+    net->n_units = units;
+    netflow_prepare(graph, net);
+    return net;
+}
+
+void netflow_del(t_network *anet) {
+    t_network net;
+
+    if (!anet || !(net = *anet))
+        return;
+    lst_del(&net->flows);
+    free(net);
+    *anet = NULL;
+}
+
+static void flow_out(t_flow flow) {
+    size_t i;
+
+    i = flow->size;
+    while (i--)
+        if (flow->stage[i].unit != NIL_ANT)
+            ft_printf("L%zu-%s ", flow->stage[i].unit, flow->stage[i].vertex);
 }
 
 void netflow_pushflow(t_network net) {
@@ -304,11 +302,14 @@ void netflow_pushflow(t_network net) {
     size_t unit;
     bool flag;
 
-    netflow_prepare(net);
-    walk = lst_front(net->flows);
-    unit = 1, flag = true;
-    system("clear");
-    network_print(net, 0);
+    netflow_regulate(net);
+    unit = 1;
+    flag = true;
+    {
+        /* system("clear"); */
+        /* network_print(net, 0); */
+        /* ft_putendl(""); */
+    }
     while (flag) {
         maxflow = 0;
         flag = false;
@@ -320,26 +321,19 @@ void netflow_pushflow(t_network net) {
         }
         walk = lst_front(net->flows);
         while (walk) {
-            /* flow_out(walk->blob); */
+            flow_out(walk->blob);
             lst_node_forward(&walk);
         }
-        network_print(net, maxflow);
+        { /* network_print(net, maxflow); */
+        }
         walk = lst_front(net->flows);
         while (walk) {
             flag = flow_sync(walk->blob) || flag;
             lst_node_forward(&walk);
         }
-        /* ft_putstr(flag ? "\n" : ""); */
+        ft_putstr(flag ? "\n" : "");
     }
-    network_print(net, maxflow);
-}
-
-void netflow_del(t_network *anet) {
-    t_network net;
-
-    if (!anet || !(net = *anet))
-        return;
-    lst_del(&net->flows);
-    free(net);
-    *anet = NULL;
+    { /* network_print(net, maxflow); */
+    }
+    ft_putendl("");
 }

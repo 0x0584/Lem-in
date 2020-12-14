@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 22:51:29 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/14 17:09:16 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ typedef struct s_lst {
 } * t_lst;
 
 t_lstnode lst_node(void *blob, size_t size, bool alloc);
+void lst_node_free(t_lst lst, t_lstnode anode);
 void lst_node_del(t_lst lst, t_lstnode *anode);
 void lst_node_del_with(t_lstnode *anode, void (*del)(void *blob));
 
@@ -50,6 +51,12 @@ t_lst lst_push_front(t_lst lst, t_lstnode node);
 t_lst lst_push_back(t_lst lst, t_lstnode node);
 t_lstnode lst_pop_back(t_lst lst);
 t_lstnode lst_pop_front(t_lst lst);
+
+void lst_iter_arg(t_lst lst, bool front, void *arg,
+                          void (*apply_arg)(void *blob, void *arg));
+void lst_iteri_arg(t_lst lst, bool front, void *arg,
+                   void (*index_apply_arg)(void *blob, size_t index,
+                                           void *arg));
 
 void lst_iter(t_lst lst, bool front, void (*apply)(void *blob));
 void lst_iteri(t_lst lst, bool front,
@@ -77,7 +84,7 @@ void *lst_pop_back_blob(t_lst lst);
 void *lst_pop_front_blob(t_lst lst);
 
 void *lst_extract_blob(t_lst lst, t_lstnode *node);
-void lst_clear(t_lst lst);
+t_lst lst_clear(t_lst lst);
 
 t_lst lst_copy(t_lst lst, void *(*func_copy)(void *), void (*del)(void *));
 t_lst lst_copy_shallow(t_lst lst);

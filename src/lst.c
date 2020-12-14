@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 17:12:11 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/13 00:44:30 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/14 17:09:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ void lst_node_del_with(t_lstnode *anode, void (*del)(void *blob)) {
 void lst_node_del(t_lst lst, t_lstnode *anode) {
     lst_node_del_with(anode, lst->del);
 }
+
+void lst_node_free(t_lst lst, t_lstnode anode) { lst_node_del(lst, &anode); }
 
 t_lst lst_alloc(void (*del)(void *blob)) {
     t_lst lst;
@@ -203,6 +205,19 @@ void *lst_pop_front_blob(t_lst lst) {
     return blob;
 }
 
+void lst_iter_arg(t_lst lst, bool front, void *arg,
+                  void (*apply_arg)(void *blob, void *arg)) {
+    t_lstnode walk;
+
+    if (lst_empty(lst))
+        return;
+    walk = front ? lst->head->next : lst->tail->prev;
+    while (walk != (front ? lst->tail : lst->head)) {
+        apply_arg(walk->blob, arg);
+        walk = front ? walk->next : walk->prev;
+    }
+}
+
 void lst_iter(t_lst lst, bool front, void (*apply)(void *blob)) {
     t_lstnode walk;
 
@@ -215,8 +230,24 @@ void lst_iter(t_lst lst, bool front, void (*apply)(void *blob)) {
     }
 }
 
+void lst_iteri_arg(t_lst lst, bool front, void *params,
+                   void (*index_apply_arg)(void *blob, size_t index,
+                                           void *arg)) {
+    t_lstnode walk;
+    size_t i;
+
+    if (lst_empty(lst))
+        return;
+    i = 0;
+    walk = front ? lst->head->next : lst->tail->prev;
+    while (walk != (front ? lst->tail : lst->head)) {
+        index_apply_arg(walk->blob, i++, params);
+        walk = front ? walk->next : walk->prev;
+    }
+}
+
 void lst_iteri(t_lst lst, bool front,
-               void (*index_apply)(void *blob, size_t size)) {
+               void (*index_apply)(void *blob, size_t index)) {
     t_lstnode walk;
     size_t i;
 
@@ -354,13 +385,14 @@ t_lst lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *)) {
     return lst;
 }
 
-void lst_clear(t_lst lst) {
+t_lst lst_clear(t_lst lst) {
     t_lstnode tmp;
 
     while (!lst_empty(lst)) {
         tmp = lst_pop_back(lst);
         lst_node_del(lst, &tmp);
     }
+    return lst;
 }
 
 t_lst lst_copy(t_lst lst, void *(*func_copy)(void *), void (*del)(void *)) {
