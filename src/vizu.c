@@ -2,10 +2,12 @@
 
 static size_t last_flow;
 
-static bool visualize = true;
-static bool output_maxflow = true;
-static bool output_flow_info = true;
+static bool visualize = false;
+static bool output_maxflow = false;
+static bool output_flow_info = false;
+static bool output_ant_lines = false;
 
+/*
 static unsigned short xdim;
 static unsigned short ydim;
 
@@ -32,6 +34,7 @@ static void print_flow_info(void *pflow) {
     }
     ft_putendl(" |");
 }
+*/
 
 static void flow_print(void *pflow) {
     size_t i;
@@ -103,6 +106,8 @@ static void print_flow_lines(t_network net) {
         flow_out(walk->blob);
         lst_node_forward(&walk);
     }
+    if (!visualize)
+        ft_putendl("");
 }
 
 void show(t_network net, size_t maxflow) {
@@ -111,12 +116,16 @@ void show(t_network net, size_t maxflow) {
     if (output_maxflow) {
         ft_printf("\n  %{underline}%{italic}maxflow is%{reset}%{underline}");
         if (maxflow == lst_size(net->flows))
-            ft_printf(" %{green_fg}%zu%{reset}", maxflow);
+            ft_printf(" %{green_fg}%zu%{reset}\n", maxflow);
         else if (maxflow >= lst_size(net->flows) / 2)
-            ft_printf(" %{yellow_fg}%zu%{reset}", maxflow);
+            ft_printf(" %{yellow_fg}%zu%{reset}\n", maxflow);
         else
-            ft_printf(" %{red_fg}%zu%{reset}", maxflow);
+            ft_printf(" %{red_fg}%zu%{reset}\n", maxflow);
+		if (output_ant_lines)
+			ft_putendl("");
     }
+	if (output_ant_lines || !visualize)
+		print_flow_lines(net);
     if (output_flow_info) {
         /* ft_putendl(""); */
         /* ft_printf("n_flows: %zu\n", lst_size(net->flows)); */
