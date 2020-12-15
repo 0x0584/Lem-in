@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/15 20:27:10 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:29:53 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,8 +219,7 @@ static void paths_as_JSON(t_lst paths) {
 }
 
 static void save_JSON(t_graph g, t_lst paths) {
-    fd = open("out.json", O_CREAT | O_APPEND | O_RDWR,
-              S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP);
+    fd = open("out.json", O_CREAT | O_APPEND | O_RDWR, 0666);
     ftruncate(fd, 0);
 
     level_graph(g);

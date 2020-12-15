@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/15 20:25:53 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:28:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,4 +206,5 @@ void level_graph(t_graph g) {
         e->seen = g_mark;
         e->dst->seen = g_mark;
     }
+    lst_del(&open);
 }
