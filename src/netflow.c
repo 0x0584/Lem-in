@@ -6,11 +6,15 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/14 23:48:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:30:11 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "visu.h"
+
+static int fd;
+
+static bool json_output = true;
 
 static void flow_free(void *blob) {
     t_flow flow;
@@ -158,6 +162,82 @@ static size_t netflow_simulate(t_network net, bool visualize) {
     return instructions;
 }
 
+static void vertex_as_JSON(const char *str, t_vertex v) {
+    ft_dprintf(fd, "\"%s\": {\"name\":\"%s\", \"x\": %d, \"y\": %d}", str,
+               v->name, v->x, v->y);
+}
+
+static void vertex_with_edges_as_JSON(const char *key, void *blob) {
+    t_vertex v;
+    t_lstnode walk;
+    t_edge e;
+
+    v = blob;
+    ft_dprintf(fd, ",\n");
+    ft_dprintf(fd, "\"%s\": {", key);
+    ft_dprintf(fd, "\"x\": %d, \"y\": %d, ", v->x, v->y);
+    ft_dprintf(fd, "\"edges\": [");
+    walk = lst_front(v->edges);
+    while (walk) {
+        e = walk->blob;
+        ft_dprintf(fd, "\"%s\"", e->dst->name);
+        if (lst_node_forward(&walk))
+            ft_dprintf(fd, ",");
+    }
+    ft_dprintf(fd, "]}");
+}
+
+static void vertices_as_JSON(t_hash verts) {
+
+    ft_dprintf(fd, "\"vertices\": {");
+    ft_dprintf(fd, "\"count\": \"%zu\"", hash_count(verts));
+    hash_iter(verts, vertex_with_edges_as_JSON);
+    ft_dprintf(fd, "}");
+}
+
+static void path_as_JSON(void *path, size_t index) {
+    t_lstnode walk;
+    t_edge e;
+
+    walk = lst_front(path);
+    e = walk->blob;
+    ft_dprintf(fd, ",\n \"%zu\": [\"%s\"", index, e->src->name);
+    while (walk) {
+        e = walk->blob;
+        ft_dprintf(fd, ", \"%s\"", e->dst->name);
+        lst_node_forward(&walk);
+    }
+    ft_dprintf(fd, "]");
+}
+
+static void paths_as_JSON(t_lst paths) {
+    ft_dprintf(fd, "\"paths\": {");
+    ft_dprintf(fd, "\"size\": %zu", lst_size(paths));
+    lst_iteri(paths, true, path_as_JSON);
+    ft_dprintf(fd, "}");
+}
+
+static void save_JSON(t_graph g, t_lst paths) {
+    fd = open("out.json", O_CREAT | O_APPEND | O_RDWR);
+    ftruncate(fd, 0);
+
+    ft_dprintf(fd, "{");
+
+    vertex_as_JSON("start", g->source);
+    ft_dprintf(fd, ",\n");
+
+    vertex_as_JSON("end", g->sink);
+    ft_dprintf(fd, ",\n");
+
+    vertices_as_JSON(g->vertices);
+    ft_dprintf(fd, ",\n");
+
+    paths_as_JSON(paths);
+
+    ft_dprintf(fd, "}\n");
+    close(fd);
+}
+
 static void netflow_prepare(t_graph graph, t_network net) {
     t_lst path;
     t_lst paths;
@@ -174,10 +254,13 @@ static void netflow_prepare(t_graph graph, t_network net) {
                      lst_clear(flows), path_to_flow);
         if ((result = netflow_simulate(net, false)) >= prev) {
             lst_node_free(flows, lst_extract(flows, lst_rear(flows)));
+            lst_node_free(paths, lst_extract(paths, lst_rear(paths)));
             break;
         }
         prev = result;
     }
+    if (json_output)
+        save_JSON(graph, paths);
     {
         /* ft_printf("\n%{green_fg}final paths%{reset}\n"); */
         /* lst_iter(paths, true, print_path); */

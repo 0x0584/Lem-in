@@ -13,6 +13,12 @@ def read_farm():
                       ('2','3'), ('3','4'), ('4','5'),
                       ('1','8'), ('8','9'), ('9','10'),
                       ('10','11'),('11','t')])
+    plt.subplot(121)
+    fig, ax = plt.subplots()
+    nx.draw(g, pos=nx.planar_layout(g), node_color='r', edge_color='b')
+    fig.savefig('bar.png')
+    plt.show()
+
     print(g.adj)
 
 def draw_graph():
