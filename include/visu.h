@@ -2,6 +2,7 @@
 #define VISU_H
 
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 #include "netflow.h"
 

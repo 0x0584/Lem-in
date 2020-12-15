@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/15 19:30:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:27:10 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,8 @@ static void vertex_with_edges_as_JSON(const char *key, void *blob) {
     v = blob;
     ft_dprintf(fd, ",\n");
     ft_dprintf(fd, "\"%s\": {", key);
-    ft_dprintf(fd, "\"x\": %d, \"y\": %d, ", v->x, v->y);
+    ft_dprintf(fd, "\"x\": %d, \"y\": %d, \"level\": %d,", v->x, v->y,
+               v->level);
     ft_dprintf(fd, "\"edges\": [");
     walk = lst_front(v->edges);
     while (walk) {
@@ -218,8 +219,11 @@ static void paths_as_JSON(t_lst paths) {
 }
 
 static void save_JSON(t_graph g, t_lst paths) {
-    fd = open("out.json", O_CREAT | O_APPEND | O_RDWR);
+    fd = open("out.json", O_CREAT | O_APPEND | O_RDWR,
+              S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP);
     ftruncate(fd, 0);
+
+    level_graph(g);
 
     ft_dprintf(fd, "{");
 
@@ -259,13 +263,13 @@ static void netflow_prepare(t_graph graph, t_network net) {
         }
         prev = result;
     }
-    if (json_output)
-        save_JSON(graph, paths);
     {
         /* ft_printf("\n%{green_fg}final paths%{reset}\n"); */
         /* lst_iter(paths, true, print_path); */
         assert_paths_correct(graph, paths);
     }
+    if (json_output)
+        save_JSON(graph, paths);
     lst_del(&paths);
 }
 

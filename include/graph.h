@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 14:08:13 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:06:34 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ struct s_vertex {
     char *name;
     t_lst edges;
     int x, y;
+	int level;
 };
 
 struct s_edge {
@@ -66,4 +67,7 @@ void print_graph(t_graph g);
 void print_edge2(void *blob);
 
 void mark_path(void *lst);
+
+void level_graph(t_graph g);
+
 #endif /* GRAPH_H */

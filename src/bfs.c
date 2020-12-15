@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/12 14:26:15 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:25:53 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,4 +182,28 @@ t_lst bfs(t_graph g) {
     hash_del(&parent);
     g_mark++;
     return path;
+}
+
+static void enqueue_edge(void *edge, void *open) {
+    t_edge e = edge;
+
+    if (e->seen != g_mark && e->dst->seen != g_mark)
+        lst_push_back_blob(open, edge, sizeof(t_edge), false);
+}
+
+void level_graph(t_graph g) {
+    t_lst open;
+    t_edge e;
+
+    open = lst_alloc(blob_keep);
+    g->source->level = 1;
+    lst_iter_arg(g->source->edges, true, open, enqueue_edge);
+    while (!lst_empty(open)) {
+        e = lst_pop_front_blob(open);
+        if (e->dst->level == -1)
+            e->dst->level = e->src->level + 1;
+        lst_iter_arg(e->dst->edges, true, open, enqueue_edge);
+        e->seen = g_mark;
+        e->dst->seen = g_mark;
+    }
 }

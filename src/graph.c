@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/23 01:02:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/15 17:54:16 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:55:25 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,11 +116,12 @@ void edge_del(void *edge)
 }
 
 void vertex_init(t_vertex vert, char *name, int x, int y) {
-	vert->name = name;
-	vert->edges = lst_alloc(blob_keep);
-	vert->x = x;
-	vert->y = y;
-	vert->seen = 0;
+    vert->name = name;
+    vert->edges = lst_alloc(blob_keep);
+    vert->x = x;
+    vert->y = y;
+    vert->seen = 0;
+    vert->level = -1;
 }
 
 t_hashnode vertex_alloc(char *line) {
