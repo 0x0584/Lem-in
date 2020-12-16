@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/17 22:16:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/09 00:25:51 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 14:07:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,8 @@
 # include "ieeefp.h"
 # include "colors.h"
 
-# define FLAG(fl)					(1U << fl)
-# define IS_FLAG(val, fl)			((val & FLAG(fl)) != 0)
-# define HAS_FLAG(frmt, fl)			(IS_FLAG(frmt->flags, fl))
-
-# define IS_PREFIX_SIGN(c)			(c == '+' || c == '-' || c == ' ')
-
 # define LONG_TYPES					"DOUSC"
 # define UPPER_TYPES				"XFEAGB"
-
-# define LEN_DIFF(s1, s2)			(s2 ? (size_t)(s2 - s1 - 1) : ft_strlen(s1))
 
 typedef enum	e_flags
 {
@@ -154,5 +146,20 @@ void			set_width(char **fmt, t_frmt *frmt);
 void			get_wild_args(t_frmt *frmt, va_list *alst);
 
 size_t			format_init_padding(t_frmt *frmt, char const *str);
+
+
+/*
+********* extra after fixing norm ***********
+*/
+
+int				flag(int fl);
+bool			is_flag(int val, int fl);
+bool			has_flag(t_frmt *frmt, int fl);
+bool			is_hash(t_frmt *frmt);
+bool			is_hex(t_frmt *frmt, t_conv c);
+bool			is_bin(t_frmt *frmt, t_conv c);
+bool			good_adjust_args(char **astr, t_frmt *frmt, size_t *pad);
+bool			is_prefix_sign(char c);
+size_t			str_len_diff(const char *s1, const char *s2);
 
 #endif

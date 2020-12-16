@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/02 18:00:10 by archid-           #+#    #+#             */
-/*   Updated: 2019/09/28 19:55:58 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 14:09:43 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,5 +117,12 @@ void				ieee_extract_hex_parts(t_ieeefp *fp, t_u128 *man,
 												t_s32 *exp);
 bool				ieee_get_sign(t_ieeefp *fp);
 bool				ieee_is_zero(t_ieeefp *fp);
+
+/*
+** ************* added after marco removal *************
+*/
+
+bool				is_even(t_s64 num);
+bool				is_odd(t_s64 num);
 
 #endif

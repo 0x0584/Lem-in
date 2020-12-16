@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strsub.c                                        :+:      :+:    :+:   */
+/*   extra.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: archid- <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/04/04 05:42:35 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 13:42:17 by archid-          ###   ########.fr       */
+/*   Created: 2020/12/16 14:08:56 by archid-           #+#    #+#             */
+/*   Updated: 2020/12/16 14:10:26 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strsub(char const *s, unsigned int start, size_t len)
+bool			is_odd(t_s64 num)
 {
-	char	*buff;
-	size_t	i;
+	return (num & 1);
+}
 
-	i = 0;
-	if (!s || !(buff = ft_calloc(len + 1, sizeof(char))))
-		return (NULL);
-	while (s[start] && len)
-	{
-		buff[i] = s[start + i];
-		i++;
-		len--;
-	}
-	return (buff);
+bool			is_even(t_s64 num)
+{
+	return (!is_odd(num));
 }
