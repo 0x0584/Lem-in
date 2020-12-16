@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/05 15:40:49 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 13:44:19 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 17:15:12 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,7 @@ static bool		adjust_int_precision(t_frmt *frmt, char **astr, size_t *pad)
 	t_s64	n_pad;
 	bool	has_base_prefix;
 
-	if (!good_adjust_args(astr, frmt, pad) ||
-		(!format_isnumeric(frmt) && frmt->conv != CONV_PTR))
+	if ((!format_isnumeric(frmt) && frmt->conv != CONV_PTR))
 		return (false);
 	has_base_prefix = adjust_base_prefix(astr, frmt, true, false);
 	tmp_c = (*astr)[0];
@@ -48,8 +47,8 @@ static bool		adjust_str_precision(t_frmt *frmt, char **astr, size_t *pad)
 	char	*tmp;
 	size_t	len;
 
-	if (!good_adjust_args(astr, frmt, pad) || frmt->conv != CONV_STR ||
-			!frmt->has_radix || frmt->prec >= (len = (frmt->length == MOD_L
+	if (frmt->conv != CONV_STR || !frmt->has_radix ||
+			frmt->prec >= (len = (frmt->length == MOD_L
 									? utf8_wstrlen(frmt->data.wstr)
 										: ft_strlen(*astr))))
 		return (false);
@@ -72,8 +71,7 @@ static bool		adjust_str_precision(t_frmt *frmt, char **astr, size_t *pad)
 
 void			adjust_prefix(t_frmt *frmt, char **astr, size_t *pad)
 {
-	if (!good_adjust_args(astr, frmt, pad) ||
-			flag_alterform(frmt, astr, pad))
+	if (flag_alterform(frmt, astr, pad))
 		return ;
 	if ((has_flag(frmt, FL_PLUS) || has_flag(frmt, FL_SPACE))
 			&& (frmt->conv == CONV_INT || format_isfloat(frmt)))
@@ -87,8 +85,6 @@ void			adjust_prefix(t_frmt *frmt, char **astr, size_t *pad)
 
 void			adjust_padding(t_frmt *frmt, char **astr, size_t *pad)
 {
-	if (!good_adjust_args(astr, frmt, pad))
-		return ;
 	if (frmt->has_radix && !format_isfloat(frmt))
 		frmt->flags &= ~flag(FL_ZERO);
 	if (frmt->width && *pad)
@@ -113,6 +109,8 @@ void			adjust_padding(t_frmt *frmt, char **astr, size_t *pad)
 
 void			adjustments(t_frmt *frmt, char **astr, size_t *pad)
 {
+	if (!good_adjust_args(astr, frmt, pad))
+		return ;
 	adjust_prefix(frmt, astr, pad);
 	if (!adjust_int_precision(frmt, astr, pad))
 		adjust_str_precision(frmt, astr, pad);

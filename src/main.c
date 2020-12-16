@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/18 11:57:54 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 11:23:00 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 17:18:03 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@ int main(void) {
     t_network net;
     t_graph g;
     clock_t t1, t2;
+
+	ft_printf("%05.2f\n", 3.14159);
+	ft_printf("%05.2lf\n", 3.14159);
+	ft_printf("%05.2llf\n", 3.14159);
 
     t1 = clock();
     if (!(g = read_graph()))

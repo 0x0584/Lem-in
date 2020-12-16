@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/30 17:32:57 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 14:09:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 17:10:06 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 # include <fcntl.h>
 
 # include "types.h"
+
+# define BUFF_SIZE						    16384
+# define CACHE_SIZE							32
 
 # define BASE_LHEX							"0123456789abcdef"
 # define BASE_UHEX							"0123456789ABCDEF"
@@ -51,16 +54,12 @@ enum			e_string_position
 	TOWARD_TAIL = false
 };
 
-
-#define BUFF_SIZE 1024 * 16
-#define CACHE_SIZE 32
-
 typedef struct	s_cache {
-    int		fd;
-    char	*base;
-    size_t	size;
-    size_t	length;
-    size_t	index;
+	int		fd;
+	char	*base;
+	size_t	size;
+	size_t	length;
+	size_t	index;
 }				t_cache;
 
 extern char		*g_buff;
@@ -190,7 +189,6 @@ char			*ft_utoa_base(t_u128 nb, const char *base);
 void			**ft_lst_content_asarray(t_list *head, size_t *size);
 int				*ft_lst_int_asarray(t_list *head, size_t *size);
 
-
 /*
 ** ***************** added after macro ***************
 */
@@ -202,7 +200,5 @@ t_u64			umin(size_t a, size_t b);
 t_u64			ft_abs(t_s64 x);
 
 void			*ft_calloc(size_t n, size_t sz);
-int				get_digit(char c);
-int				to_digit(char c);
 
 #endif
