@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/15 20:06:34 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/16 18:28:29 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ struct s_graph {
     t_vertex source;
     t_vertex sink;
 };
+
+typedef struct edge_pair {
+    t_edge edge;
+    t_edge from;
+} t_edge_pair;
 
 t_hashnode vertex_alloc(char *line);
 bool edge_alloc(t_graph g, char *line, t_hashnode *e, t_hashnode *re);
