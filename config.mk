@@ -6,7 +6,7 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/16 17:53:02 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/18 11:31:24 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -33,8 +33,12 @@ ft:
 	@make -C libft DEBUG=$(DEBUG)
 
 distcheck:
-	uname -a
-	$(CC) --version
+	@uname -a
+	@echo CC: $(CC)
+	@echo CFLAGS: $(CFLAGS)
+	@echo LDFLAGS: $(LDFLAGS)
+	@echo
+	@$(CC) --version
 
 check:
 	@make all
