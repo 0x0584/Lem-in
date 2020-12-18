@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:11:07 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:28:10 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,13 @@ bool			edge_path_residual(t_edge e);
 
 t_lst			construct_path(t_graph g, t_hash parent);
 
-void			save_json(t_graph g, t_lst paths);
+void			paths_as_json(t_lst paths);
+void			path_as_json(void *path, size_t index);
+void			vertices_as_json(t_hash verts);
+void			vertex_with_edges_as_json(const char *key, void *blob);
+void			vertex_as_json(const char *str, t_vertex v);
 
 extern t_mark	g_mark;
+extern int		g_fd;
 
 #endif
