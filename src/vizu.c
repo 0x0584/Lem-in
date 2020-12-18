@@ -44,7 +44,7 @@ static void flow_print(void *pflow) {
         return;
     i = 0;
     while (i < flow->size) {
-        if (flow->stage[i].unit != NIL_ANT)
+        if (flow->stage[i].unit != (size_t)NIL_ANT)
             ft_printf(" | %{magenta_fg}%5s: %{italic}%{yellow_fg}%4zu%{reset}",
                       flow->stage[i].vertex, flow->stage[i].unit);
         else
@@ -73,7 +73,7 @@ static void flow_ascii(void *pflow) {
     print_top_bar(flow->size);
     i = 0;
     while (i < flow->size) {
-        if (flow->stage[i].unit != NIL_ANT)
+        if (flow->stage[i].unit != (size_t)NIL_ANT)
             ft_printf(UNIT_CELL, flow->stage[i].unit);
         else
             ft_printf(SIDE_BAR EMPTY_CELL);
@@ -94,7 +94,7 @@ static void flow_out(t_flow flow) {
 
     i = flow->size;
     while (i--)
-        if (flow->stage[i].unit != NIL_ANT)
+        if (flow->stage[i].unit != (size_t)NIL_ANT)
             ft_printf("L%zu-%s ", flow->stage[i].unit, flow->stage[i].vertex);
 }
 
