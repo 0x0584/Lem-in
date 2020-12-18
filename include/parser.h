@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:40 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 18:19:18 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:54:07 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define PARSER_H
 
 # include "graph.h"
+
+# define JSON_OUTPUT "out.json"
 
 enum			e_tag
 {

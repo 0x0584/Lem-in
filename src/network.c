@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 18:11:45 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 19:24:17 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 static void		save_json(t_graph g, t_lst paths)
 {
-	g_fd = open("out.json", O_CREAT | O_APPEND | O_RDWR, 0666);
+	g_fd = open(JSON_OUTPUT, O_CREAT | O_APPEND | O_RDWR, 0666);
 	ftruncate(g_fd, 0);
 	level_graph(g);
 	ft_dprintf(g_fd, "{");

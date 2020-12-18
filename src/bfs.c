@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 14:26:53 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:50:10 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,8 @@ static bool		handle_edge(t_edge e, t_lst open, t_hash parent)
 
 static t_lst	bfs_setup(t_lst *open, t_hash *parent)
 {
-	t_lstnode walk;
-	t_edge e;
+	t_lstnode	walk;
+	t_edge		e;
 
 	g_graph->source->seen = M_FRESH;
 	g_graph->sink->seen = M_FRESH;
@@ -88,12 +88,15 @@ static t_lst	bfs_setup(t_lst *open, t_hash *parent)
 			lst_push_back_blob(*open, e, sizeof(t_edge), false);
 			hash_add_edge(*parent, e, NULL);
 			if (e->dst == g_graph->sink)
-				return lst_push_back_blob(lst_alloc(blob_keep),
-											e, sizeof(t_edge), false);
+			{
+				edge_mark(e, M_BELONG_TO_PATH);
+				return (lst_push_back_blob(lst_alloc(blob_keep),
+											e, sizeof(t_edge), false));
+			}
 		}
 		lst_node_forward(&walk);
 	}
-	return NULL;
+	return (NULL);
 }
 
 t_lst			bfs(t_graph g)
@@ -105,9 +108,9 @@ t_lst			bfs(t_graph g)
 	bool	sink_reached;
 
 	if (!(g_graph = g))
-		return NULL;
+		return (NULL);
 	if ((path = bfs_setup(&open, &parent)))
-		return path;
+		return (path);
 	sink_reached = false;
 	while (!sink_reached && !lst_empty(open))
 	{
