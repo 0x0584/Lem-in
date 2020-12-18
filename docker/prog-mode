@@ -1,1 +1,0 @@
-eval docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --rm -v `pwd`:/workspace -it 0x0584/prog-mode

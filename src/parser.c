@@ -6,15 +6,14 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 01:02:06 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:08:23 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:20:33 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 
+size_t	g_ants = 0;
 int		g_state = 0;
-int		g_ants = 0;
-bool	g_verbose = 1;
 char	*g_error_line = NULL;
 
 bool		ft_isnumber(char *s)
@@ -44,7 +43,6 @@ void		print_map(t_lst lverts, t_lst ledges)
 	ft_printf("%d\n", g_ants);
 	lst_iter(lverts, true, print_line);
 	lst_iter(ledges, true, print_line);
-	ft_putendl("");
 }
 
 t_graph		read_graph(void)

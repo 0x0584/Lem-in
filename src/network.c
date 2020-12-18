@@ -6,13 +6,12 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 14:14:51 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:11:45 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "visu.h"
-
-static bool		g_json_output = false;
+#include "parser.h"
 
 static void		save_json(t_graph g, t_lst paths)
 {

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 13:44:45 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 14:16:40 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:03:58 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,5 @@ void			print_flows_ascii(t_lst flows);
 void			flow_out(t_flow flow);
 
 extern size_t	g_last_flow;
-
-extern bool		g_visualize;
-extern bool		g_output_maxflow;
-extern bool		g_output_flow_info;
-extern bool		g_output_ant_lines;
 
 #endif

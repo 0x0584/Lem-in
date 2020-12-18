@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 14:07:03 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 14:16:28 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 18:31:15 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void		flow_print(void *pflow)
 	if (!(flow = pflow))
 		return ;
 	i = 0;
+	ft_putstr(" ");
 	while (i < flow->size)
 	{
 		if (flow->stage[i].unit != (size_t)NIL_ANT)
@@ -58,7 +59,7 @@ void		flow_ascii(void *pflow)
 	while (i < flow->size)
 	{
 		if (flow->stage[i].unit != (size_t)NIL_ANT)
-			ft_printf(BORDER_COLOR " | " UNIT_CELL_COLOR "%-4zu ",
+			ft_printf(BORDER_COLOR " | " DEFAULT_COLOR UNIT_CELL_COLOR "%-4zu ",
 						flow->stage[i].unit);
 		else
 			ft_printf(BORDER_COLOR " | " EMPTY_CELL_COLOR " /// ");
