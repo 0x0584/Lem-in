@@ -1,22 +1,41 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   visu.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/12/18 13:44:45 by archid-           #+#    #+#             */
+/*   Updated: 2020/12/18 14:16:40 by archid-          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef VISU_H
-#define VISU_H
+# define VISU_H
 
-#include <sys/ioctl.h>
-#include <sys/stat.h>
+# include <sys/ioctl.h>
+# include <sys/stat.h>
 
-#include "network.h"
+# include "network.h"
 
-#define DEFAULT_COLOR "%{reset}"
-#define BORDER_COLOR "%{bold}%{magenta_fg}"
-#define EMPTY_CELL_COLOR "%{blue_fg}"
-#define UNIT_CELL_COLOR "%{yellow_fg}"
+# define DEFAULT_COLOR			"%{reset}"
+# define BORDER_COLOR			"%{bold}%{magenta_fg}"
+# define EMPTY_CELL_COLOR		"%{blue_fg}"
+# define UNIT_CELL_COLOR		"%{yellow_fg}"
 
-#define TOP_BAR BORDER_COLOR "-------" DEFAULT_COLOR
-#define CORNER BORDER_COLOR "+" DEFAULT_COLOR
-#define SIDE_BAR BORDER_COLOR " | " DEFAULT_COLOR
-#define EMPTY_CELL EMPTY_CELL_COLOR " /// " DEFAULT_COLOR
-#define UNIT_CELL SIDE_BAR UNIT_CELL_COLOR "%-4zu " DEFAULT_COLOR
+void			show(t_network net, size_t maxflow);
 
-void show(t_network net, size_t maxflow);
+void			flow_print(void *pflow);
+void			print_top_bar(size_t size);
+void			flow_ascii(void *pflow);
+void			print_flows_ascii(t_lst flows);
+void			flow_out(t_flow flow);
 
-#endif /* VISU_H */
+extern size_t	g_last_flow;
+
+extern bool		g_visualize;
+extern bool		g_output_maxflow;
+extern bool		g_output_flow_info;
+extern bool		g_output_ant_lines;
+
+#endif

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:28:12 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:14:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,6 @@ static void		network_prepare(t_graph graph, t_network net)
 			break ;
 		}
 		prev = result;
-	}
-	{
-		assert_paths_correct(graph, paths);
 	}
 	if (g_json_output)
 		save_json(graph, paths);

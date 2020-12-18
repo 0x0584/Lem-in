@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:28:10 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:15:15 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,6 @@ void			edge_del(void *edge);
 
 t_lst			bfs(t_graph g);
 void			correct_paths(t_lst paths);
-
-void			assert_path_connected(t_lst path);
-void			assert_path_has_correct_edges(t_graph g, t_lst path);
-void			assert_paths_correct(t_graph g, t_lst paths);
 
 void			level_graph(t_graph g);
 
