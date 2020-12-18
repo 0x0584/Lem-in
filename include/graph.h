@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 20:00:51 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 12:53:48 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,20 @@ void			assert_path_connected(t_lst path);
 void			assert_path_has_correct_edges(t_graph g, t_lst path);
 void			assert_paths_correct(t_graph g, t_lst paths);
 
-void			print_edge(t_edge e);
-void			print_graph(t_graph g);
-void			print_edge2(void *blob);
-
 void			level_graph(t_graph g);
+
+bool			residual(t_edge e);
+bool			residual_of(t_edge e, t_edge re);
+void			set_edge_fresh(t_edge e);
+void			set_edge_to_path(t_edge e);
+void			edge_mark(t_edge e, t_mark mark);
+bool			edge_unseen_or_crossing_path(t_edge e);
+bool			edge_fresh(t_edge e);
+bool			edge_crossing_path(t_edge e);
+bool			edge_path_residual(t_edge e);
+
+t_lst			construct_path(t_graph g, t_hash parent);
+
+extern t_mark	g_mark;
 
 #endif

@@ -6,7 +6,7 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/18 19:51:22 by archid-           #+#    #+#              #
-#    Updated: 2020/12/14 22:42:32 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/18 12:11:52 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -16,12 +16,10 @@ INC_PATH	= include
 INCLUDES	= $(shell find $(INC_PATH) -name '*.h' -type f)
 
 SRC_PATH	= src
-SRC_NAME	= lst.c graph.c bfs.c netflow.c main.c \
-			  correction.c parser.c hash.c vizu.c
+SRCS		= $(shell find $(SRC_PATH) -name '*.c' -type f)
 
-OBJ_PATH	= .obj
-OBJ_NAME	:= $(SRC_NAME:.c=.o)
-OBJ			:= $(addprefix $(OBJ_PATH)/, $(OBJ_NAME))
+OBJ_PATH	= .objs
+OBJS		= $(patsubst $(SRC_PATH)/%.c, $(OBJ_PATH)/%.o, $(SRCS))
 
 ifeq ($(DEBUG),1)
 	NAME	= $(OBJ_PATH)/lem-in.$(shell uname)
@@ -34,7 +32,7 @@ ifeq ($(DEBUG),1)
 	@ln -sf $(NAME) lem-in
 endif
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INCLUDES)
@@ -43,11 +41,11 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INCLUDES)
 
 clean:
 	@make -C libft clean
-	@rm -f $(OBJ)
+	@rm -f $(OBJS)
 
 fclean:
 	@make -C libft fclean
-	@rm -f $(NAME) $(OBJ) lem-in
+	@rm -f $(NAME) $(OBJS) lem-in
 
 re: fclean all
 

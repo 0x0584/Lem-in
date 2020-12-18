@@ -6,14 +6,14 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 22:52:55 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 18:40:26 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 12:54:18 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "graph.h"
 
-static t_mark	g_mark = M_INITIAL;
 static t_graph	g_graph = NULL;
+t_mark	g_mark = M_INITIAL;
 
 static void		hash_add_edge(t_hash parent, t_edge edge, t_edge from)
 {
@@ -28,39 +28,6 @@ static void		hash_add_edge(t_hash parent, t_edge edge, t_edge from)
 	else
 		hash_add(parent, edge->dst->name,
 					lst_push_back(lst_alloc(blob_free), pair));
-}
-
-static void		edge_mark(t_edge e, t_mark mark)
-{
-	if (e->seen != M_BELONG_TO_PATH)
-		e->seen = mark;
-	if (e->src->seen != M_BELONG_TO_PATH)
-		e->src->seen = mark;
-	if (e->dst->seen != M_BELONG_TO_PATH)
-		e->dst->seen = mark;
-}
-
-static bool		edge_unseen_or_crossing_path(t_edge e)
-{
-	return ((e->seen != g_mark && e->dst->seen != g_mark) ||
-			(e->seen != M_BELONG_TO_PATH && e->dst->seen == M_BELONG_TO_PATH));
-}
-
-static bool		edge_fresh(t_edge e)
-{
-	return ((e->seen != M_BELONG_TO_PATH && e->dst->seen != M_BELONG_TO_PATH) &&
-			(e->seen != g_mark && e->dst->seen != g_mark));
-}
-
-static bool		edge_crossing_path(t_edge e)
-{
-	return (e->seen != M_BELONG_TO_PATH && e->seen != g_mark &&
-			e->dst->seen == M_BELONG_TO_PATH);
-}
-
-static bool		edge_path_residual(t_edge e)
-{
-	return (e->residual->seen == M_BELONG_TO_PATH);
 }
 
 static bool		enqueue_edges(t_edge e, t_lst open, t_hash parent,
@@ -126,41 +93,6 @@ static bool		bfs_setup(t_graph g, t_lst *open, t_hash *parent)
 	return (true);
 }
 
-static bool		valid_pair(t_edge_pair *current, t_edge_pair *prev)
-{
-	return (!prev || !prev->from || current->edge == prev->from);
-}
-
-static t_lst	backtrack_source(t_hash parent, const char *key,
-									t_edge_pair *prev)
-{
-	t_lstnode	walk;
-	t_edge_pair *current;
-	t_lst		path;
-
-	walk = lst_front(hash_get(parent, key, NULL));
-	while (walk)
-	{
-		if (valid_pair(current = walk->blob, prev) &&
-			(path = prev && !current->from
-				? lst_alloc(blob_keep)
-					: backtrack_source(parent, current->from->dst->name,
-										current)))
-		{
-			edge_mark(current->edge, M_BELONG_TO_PATH);
-			return (lst_push_back_blob(path, current->edge, sizeof(t_edge),
-										false));
-		}
-		lst_node_forward(&walk);
-	}
-	return (NULL);
-}
-
-static t_lst	construct_path(t_hash parent)
-{
-	return (backtrack_source(parent, g_graph->sink->name, NULL));
-}
-
 t_lst			bfs(t_graph g)
 {
 	t_hash	parent;
@@ -178,37 +110,8 @@ t_lst			bfs(t_graph g)
 		sink_reached = handle_edge(e, open, parent);
 	}
 	lst_del(&open);
-	path = sink_reached ? construct_path(parent) : NULL;
+	path = sink_reached ? construct_path(g, parent) : NULL;
 	hash_del(&parent);
 	g_mark++;
 	return (path);
-}
-
-static void		enqueue_edge(void *edge, void *open)
-{
-	t_edge e;
-
-	e = edge;
-	if (e->seen != g_mark && e->dst->seen != g_mark)
-		lst_push_back_blob(open, edge, sizeof(t_edge), false);
-}
-
-void			level_graph(t_graph g)
-{
-	t_lst	open;
-	t_edge	e;
-
-	open = lst_alloc(blob_keep);
-	g->source->level = 1;
-	lst_iter_arg(g->source->edges, true, open, enqueue_edge);
-	while (!lst_empty(open))
-	{
-		e = lst_pop_front_blob(open);
-		if (e->dst->level == -1)
-			e->dst->level = e->src->level + 1;
-		lst_iter_arg(e->dst->edges, true, open, enqueue_edge);
-		e->seen = g_mark;
-		e->dst->seen = g_mark;
-	}
-	lst_del(&open);
 }

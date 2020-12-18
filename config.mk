@@ -6,12 +6,12 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/18 11:36:26 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/18 12:30:10 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
 FARM		= crossmap
-DEBUG		?= 0
+DEBUG		?= 1
 
 CC			= gcc
 LDFLAGS		= -Llibft -lft
