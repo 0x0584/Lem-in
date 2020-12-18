@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 13:22:00 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 19:24:52 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:27:55 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,56 +63,49 @@ static size_t	network_push(t_network net, size_t *unit)
 	size_t		maxflow;
 
 	walk = lst_front(net->flows);
-	maxflow = 0;
 	while (walk && *unit <= net->n_units)
 	{
 		if (flow_push(walk->blob, *unit))
-		{
 			*unit += 1;
-			maxflow++;
-		}
 		lst_node_forward(&walk);
 	}
+	maxflow = 0;
+	lst_iter_arg(net->flows, true, &maxflow, compute_maxflow);
 	return (maxflow);
 }
 
-static bool		network_sync(t_network net)
+static void		network_sync(t_network net)
 {
 	t_lstnode	walk;
-	bool		flag;
 
-	flag = false;
 	walk = lst_front(net->flows);
 	while (walk)
 	{
-		flag = flow_sync(walk->blob) || flag;
+		flow_sync(walk->blob);
 		lst_node_forward(&walk);
 	}
-	return (flag);
 }
 
 size_t			network_simulate(t_network net, bool visualize)
 {
 	size_t	instructions;
 	size_t	unit;
-	bool	flag;
 	size_t	maxflow;
 
 	network_regulate(net);
 	unit = 1;
-	flag = true;
 	instructions = 0;
 	if (visualize)
 		show(net, 0);
-	while (flag)
+	while (true)
 	{
 		maxflow = network_push(net, &unit);
 		if (visualize)
 			show(net, maxflow);
-		if ((flag = network_sync(net)))
-			instructions++;
+		if (!maxflow)
+			break ;
+		network_sync(net);
+		instructions++;
 	}
-	if (visualize)
-		show(net, maxflow);
 	return (instructions);
 }

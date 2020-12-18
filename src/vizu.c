@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 14:02:24 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 18:30:29 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:29:05 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,16 @@ size_t			g_last_flow;
 
 static void		show_maxflow(t_network net, size_t maxflow)
 {
+	size_t maxflow_;
+
+	maxflow_ = 0;
+	lst_iter_arg(net->flows, true, &maxflow_, compute_maxflow_);
 	if (g_output_maxflow)
 	{
 		ft_printf("\n  %{underline}%{italic}maxflow is%{reset}%{underline}");
-		if (maxflow == lst_size(net->flows))
+		if (maxflow == maxflow_)
 			ft_printf(" %{green_fg}%zu%{reset}\n", maxflow);
-		else if (maxflow >= lst_size(net->flows) / 2)
+		else if (maxflow >= maxflow_ / 2)
 			ft_printf(" %{yellow_fg}%zu%{reset}\n", maxflow);
 		else
 			ft_printf(" %{red_fg}%zu%{reset}\n", maxflow);

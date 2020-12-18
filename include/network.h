@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:35 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:22:52 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:28:35 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ struct			s_network
 void			flow_free(void *blob);
 t_flow			flow_alloc(t_lst path);
 bool			flow_push(t_flow flow, size_t unit);
-bool			flow_sync(t_flow flow);
+void			flow_sync(t_flow flow);
 void			path_to_flow(void *path, void *flows);
 
 t_network		network_setup(t_graph graph, size_t units);
@@ -52,5 +52,9 @@ void			network_pushflow(t_network net);
 void			network_del(t_network *anet);
 
 int				shortest_path(void *path_a, void *path_b);
+
+size_t			nil_unit(void);
+void			compute_maxflow(void *flow, void *maxflow);
+void			compute_maxflow_(void *flow, void *maxflow);
 
 #endif

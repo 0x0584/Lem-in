@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 13:15:42 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 19:24:34 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:21:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,28 +59,17 @@ bool		flow_push(t_flow flow, size_t unit)
 	return (true);
 }
 
-bool		flow_sync(t_flow flow)
+void		flow_sync(t_flow flow)
 {
 	size_t	i;
-	bool	flag;
 
-	if (flow->size == 1)
-	{
-		if (flow->stage->unit == (size_t)NIL_ANT)
-			return (false);
-		flow->stage->unit = NIL_ANT;
-		return (true);
-	}
-	flag = false;
 	i = flow->size - 1;
 	while (i)
 	{
-		flag = (flow->stage[i - 1].unit != (size_t)NIL_ANT) || flag;
 		flow->stage[i].unit = flow->stage[i - 1].unit;
 		i--;
 	}
-	flow->stage->unit = NIL_ANT;
-	return (flag);
+	flow->stage->unit = nil_unit();
 }
 
 void		path_to_flow(void *path, void *flows)

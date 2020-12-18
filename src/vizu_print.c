@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 14:07:03 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 18:31:15 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:16:00 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void		flow_print(void *pflow)
 	ft_putstr(" ");
 	while (i < flow->size)
 	{
-		if (flow->stage[i].unit != (size_t)NIL_ANT)
+		if (flow->stage[i].unit != nil_unit())
 			ft_printf(" | %{magenta_fg}%5s: %{italic}%{yellow_fg}%4zu%{reset}",
 						flow->stage[i].vertex, flow->stage[i].unit);
 		else
@@ -58,7 +58,7 @@ void		flow_ascii(void *pflow)
 	i = 0;
 	while (i < flow->size)
 	{
-		if (flow->stage[i].unit != (size_t)NIL_ANT)
+		if (flow->stage[i].unit != nil_unit())
 			ft_printf(BORDER_COLOR " | " DEFAULT_COLOR UNIT_CELL_COLOR "%-4zu ",
 						flow->stage[i].unit);
 		else
@@ -82,6 +82,6 @@ void		flow_out(t_flow flow)
 
 	i = flow->size;
 	while (i--)
-		if (flow->stage[i].unit != (size_t)NIL_ANT)
+		if (flow->stage[i].unit != nil_unit())
 			ft_printf("L%zu-%s ", flow->stage[i].unit, flow->stage[i].vertex);
 }

@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 19:24:17 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 20:15:22 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void		network_prepare(t_graph graph, t_network net)
 	size_t	result;
 	size_t	prev;
 
-	prev = NIL_ANT;
+	prev = nil_unit();
 	flows = net->flows;
 	paths = lst_alloc(lst_free);
 	while ((path = bfs(graph)))
