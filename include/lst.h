@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/29 16:34:27 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 20:05:15 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 11:47:37 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ t_lst		lst_insertion_sort(t_lst lst, int (*cmp)(void *, void *));
 
 void		blob_free(void *blob);
 void		blob_keep(void *blob);
+
+void		*blob_identity(void *blob);
 
 void		*lst_front_blob(t_lst lst);
 void		*lst_rear_blob(t_lst lst);

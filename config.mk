@@ -6,7 +6,7 @@
 #    By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/07 04:27:17 by archid-           #+#    #+#              #
-#    Updated: 2020/12/18 11:31:24 by archid-          ###   ########.fr        #
+#    Updated: 2020/12/18 11:36:26 by archid-          ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -43,7 +43,5 @@ distcheck:
 check:
 	@make all
 	@./test2.sh
-
-# echo "Exit status: $(?)"
 
 .PHONY: ft init check distcheck info default
