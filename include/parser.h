@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:40 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 20:08:31 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:07:59 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ enum e_tag	check_tag(t_graph g, t_lstnode *walk);
 bool		parse_vertices(t_graph g, t_lst lverts);
 t_graph		parse_graph(t_lst lverts, t_lst ledges);
 t_graph		read_graph(void);
+
+void		print_map(t_lst lverts, t_lst ledges);
 
 extern int	g_state;
 extern int	g_ants;

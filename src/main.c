@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/18 11:57:54 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/16 18:16:53 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:16:51 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,16 @@ int		main(void)
 	ft_dprintf(2, "graph is read in %{bold}%.2f%{reset} ms\n",
 				measure(t1, t2));
 	t1 = clock();
-	net = netflow_setup(g, g_ants);
+	net = network_setup(g, g_ants);
 	t2 = clock();
 	ft_dprintf(2, "network is ready in %{bold}%.2f%{reset} ms\n",
 				measure(t1, t2));
 	graph_del(&g);
 	t1 = clock();
-	netflow_pushflow(net);
+	network_pushflow(net);
 	t2 = clock();
 	ft_dprintf(2, "flow is pushed in %{bold}%.2f%{reset} ms\n",
 				measure(t1, t2));
-	netflow_del(&net);
+	network_del(&net);
 	return (0);
 }

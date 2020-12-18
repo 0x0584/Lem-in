@@ -4,7 +4,7 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 
-#include "netflow.h"
+#include "network.h"
 
 #define DEFAULT_COLOR "%{reset}"
 #define BORDER_COLOR "%{bold}%{magenta_fg}"

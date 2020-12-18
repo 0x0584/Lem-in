@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:17 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 12:53:48 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:11:07 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,8 @@ bool			edge_crossing_path(t_edge e);
 bool			edge_path_residual(t_edge e);
 
 t_lst			construct_path(t_graph g, t_hash parent);
+
+void			save_json(t_graph g, t_lst paths);
 
 extern t_mark	g_mark;
 

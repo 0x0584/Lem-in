@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:15:06 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:12:39 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ static size_t	compute_difference(t_lst flows)
 	return (sum);
 }
 
-static void		network_regulate(t_network net)
+static void		netflow_regulate(t_network net)
 {
 	t_lstnode	walk;
 	t_flow		flow_a;
@@ -128,7 +128,7 @@ static void		network_regulate(t_network net)
 	}
 }
 
-static size_t	network_push(t_network net, size_t *unit)
+static size_t	netflow_push(t_network net, size_t *unit)
 {
 	t_lstnode	walk;
 	size_t		maxflow;
@@ -147,7 +147,7 @@ static size_t	network_push(t_network net, size_t *unit)
 	return (maxflow);
 }
 
-static bool		network_sync(t_network net)
+static bool		netflow_sync(t_network net)
 {
 	t_lstnode	walk;
 	bool		flag;
@@ -162,14 +162,14 @@ static bool		network_sync(t_network net)
 	return (flag);
 }
 
-static size_t	network_simulate(t_network net, bool visualize)
+static size_t	netflow_simulate(t_network net, bool visualize)
 {
 	size_t	instructions;
 	size_t	unit;
 	bool	flag;
 	size_t	maxflow;
 
-	network_regulate(net);
+	netflow_regulate(net);
 	unit = 1;
 	flag = true;
 	instructions = 0;
@@ -177,10 +177,10 @@ static size_t	network_simulate(t_network net, bool visualize)
 		show(net, 0);
 	while (flag)
 	{
-		maxflow = network_push(net, &unit);
+		maxflow = netflow_push(net, &unit);
 		if (visualize)
 			show(net, maxflow);
-		if ((flag = network_sync(net)))
+		if ((flag = netflow_sync(net)))
 			instructions++;
 	}
 	if (visualize)
@@ -188,7 +188,7 @@ static size_t	network_simulate(t_network net, bool visualize)
 	return (instructions);
 }
 
-static void		network_prepare(t_graph graph, t_network net)
+static void		netflow_prepare(t_graph graph, t_network net)
 {
 	t_lst	path;
 	t_lst	paths;
@@ -204,7 +204,7 @@ static void		network_prepare(t_graph graph, t_network net)
 		correct_paths(lst_push_back_blob(paths, path, sizeof(t_lst), false));
 		lst_iter_arg(lst_insertion_sort(paths, shortest_path), true,
 						lst_clear(flows), path_to_flow);
-		if ((result = network_simulate(net, false)) >= prev)
+		if ((result = netflow_simulate(net, false)) >= prev)
 		{
 			lst_node_free(flows, lst_extract(flows, lst_rear(flows)));
 			lst_node_free(paths, lst_extract(paths, lst_rear(paths)));
@@ -220,18 +220,18 @@ static void		network_prepare(t_graph graph, t_network net)
 	lst_del(&paths);
 }
 
-t_network	network_setup(t_graph graph, size_t units)
+t_network	netflow_setup(t_graph graph, size_t units)
 {
 	t_network net;
 
 	net = malloc(sizeof(struct s_network));
 	net->flows = lst_alloc(flow_free);
 	net->n_units = units;
-	network_prepare(graph, net);
+	netflow_prepare(graph, net);
 	return (net);
 }
 
-void		network_del(t_network *anet)
+void		netflow_del(t_network *anet)
 {
 	t_network net;
 
@@ -242,7 +242,7 @@ void		network_del(t_network *anet)
 	*anet = NULL;
 }
 
-void		network_pushflow(t_network net)
+void		netflow_pushflow(t_network net)
 {
-	network_simulate(net, true);
+	netflow_simulate(net, true);
 }
