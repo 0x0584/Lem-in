@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/18 13:05:47 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 13:06:45 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/19 13:27:50 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ bool		valid_edge_line(char *line)
 bool		valid_vertex_line(char *line)
 {
 	int i;
+	int old_i;
 
 	if (*line == '#' && *(line + 1) == '#')
 		return (true);
@@ -48,14 +49,16 @@ bool		valid_vertex_line(char *line)
 	if (!line[i] || line[i] == '-')
 		return (false);
 	i++;
-	while (line[i] && ft_isdigit(line[i]))
+	old_i = i;
+	while (line[i] && ft_isdigit(line[i]) && i - old_i < 11)
 		i++;
-	if (line[i] != ' ')
+	if (line[i] != ' ' || ft_atol(line + old_i) != ft_atoi(line + old_i))
 		return (false);
 	i++;
-	while (line[i] && ft_isdigit(line[i]))
+	old_i = i;
+	while (line[i] && ft_isdigit(line[i]) && i - old_i < 11)
 		i++;
-	return (line[i] == '\0');
+	return (line[i] == '\0' && ft_atol(line + old_i) == ft_atoi(line + old_i));
 }
 
 int			valid_comment(char *line)

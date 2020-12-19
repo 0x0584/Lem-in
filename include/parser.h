@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/26 23:45:40 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 20:08:11 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/19 13:10:50 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ t_graph			read_graph(void);
 
 void			print_map(t_lst lverts, t_lst ledges);
 
-extern size_t	g_ants;
+extern int		g_ants;
 extern char		*g_error_line;
 extern int		g_state;
 

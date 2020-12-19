@@ -6,7 +6,7 @@
 /*   By: archid- <archid-@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/23 19:06:16 by archid-           #+#    #+#             */
-/*   Updated: 2020/12/18 20:15:22 by archid-          ###   ########.fr       */
+/*   Updated: 2020/12/19 13:30:42 by archid-          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,5 +83,6 @@ void			network_del(t_network *anet)
 
 void			network_pushflow(t_network net)
 {
-	network_simulate(net, true);
+	if (net && lst_size(net->flows))
+		network_simulate(net, true);
 }
